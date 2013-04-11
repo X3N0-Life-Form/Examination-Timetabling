@@ -96,10 +96,16 @@ public class ExamSessionParser {
 			}
 			reader.close();
 			for (PeriodHardConstraint current : periodHardConstraints) {
+<<<<<<< HEAD
 				System.out.println(current);
 				int index = current.getE1Id();
 				exams.get(index).addConstraint(current);
 	
+=======
+				int index = current.getE1Id();
+				exams.get(index).addConstraint(current);
+				//TODO: special case: EXAM_COINCIDENCE
+>>>>>>> 790a45c311cd6d413a0a51a2416a9daf67433d76
 			}
 			
 			ExamSession res = new ExamSession(exams,

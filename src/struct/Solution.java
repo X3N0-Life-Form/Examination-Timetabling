@@ -1,7 +1,10 @@
 package struct;
 
+<<<<<<< HEAD
 import java.util.ArrayList;
 
+=======
+>>>>>>> 790a45c311cd6d413a0a51a2416a9daf67433d76
 /**
  * 
  * @author Adrien Droguet - Sara Tari
@@ -23,10 +26,16 @@ public class Solution {
 	/**
 	 * [id_exam] True if the exam has been placed on the timetable.
 	 */
+<<<<<<< HEAD
 	private ArrayList<Exam> nonPlacedExams = null;
 	
 	private ArrayList<ResultCouple> result = null;//TODO:optimisation réfléchir au type de liste
 	
+=======
+	private boolean[] examPlaced;
+	
+	private int[][] result;
+>>>>>>> 790a45c311cd6d413a0a51a2416a9daf67433d76
 	private ExamSession examSession;
 	
 	/**
@@ -36,6 +45,7 @@ public class Solution {
 	 */
 	public Solution(ExamSession examSession) {
 		this.examSession = examSession;
+<<<<<<< HEAD
 		
 		/**
 		 * fills examCoincidence 
@@ -125,4 +135,11 @@ public class Solution {
 	
 
 	
+=======
+		/*for () {
+			
+		}*/
+	}
+	
+>>>>>>> 790a45c311cd6d413a0a51a2416a9daf67433d76
 }
