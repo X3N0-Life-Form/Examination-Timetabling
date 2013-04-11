@@ -96,7 +96,6 @@ public class ExamSessionParser {
 			}
 			reader.close();
 			for (PeriodHardConstraint current : periodHardConstraints) {
-				System.out.println(current);
 				int index = current.getE1Id();
 				exams.get(index).addConstraint(current);
 				//TODO: special case: EXAM_COINCIDENCE
