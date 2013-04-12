@@ -1,5 +1,5 @@
 package struct;
-
+//TODO: constraint interface? + hard constraint interface?
 public class PeriodHardConstraint {
 	private int e1Id;
 	private int e2Id;

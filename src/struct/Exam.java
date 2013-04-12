@@ -2,7 +2,7 @@ package struct;
 
 import java.util.ArrayList;
 
-public class Exam {
+public class Exam implements Comparable<Exam>{
 	/**
 	 * Starts at 0.
 	 */
@@ -12,6 +12,7 @@ public class Exam {
 	private ArrayList<Integer> students;
 	private ArrayList<PeriodHardConstraint> constraints;
 	private RoomHardConstraint roomHardConstraint = null;
+	//TODO: make comparable according to number of constraints
 	
 	public Exam(int id, int duration, int size, ArrayList<Integer> students) {
 		this.id = id;
@@ -40,8 +41,6 @@ public class Exam {
 		return "Exam [id=" + id + ", duration=" + duration + ", size=" + size
 				+ ", students=" + students + "]";
 	}
-
-
 
 	public int getId() {
 		return id;
@@ -81,6 +80,22 @@ public class Exam {
 
 	public void setRoomHardConstraint(RoomHardConstraint roomHardConstraint) {
 		this.roomHardConstraint = roomHardConstraint;
+	}
+
+	/**
+	 * Compares the number of constraints.
+	 */
+	@Override
+	public int compareTo(Exam exam) {
+		int res = this.getNumberOfConstraints() - exam.getNumberOfConstraints();
+		return res;
+	}
+	
+	public int getNumberOfConstraints() {
+		int res = constraints.size();
+		if (roomHardConstraint != null)
+			res++;
+		return res;
 	}
 
 }

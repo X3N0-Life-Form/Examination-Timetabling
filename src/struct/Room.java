@@ -4,6 +4,7 @@ public class Room {
 	//private int id;
 	private int size;
 	private int cost;
+	//TODO: make comparable according to size &/or cost?
 	
 	public Room(int size, int cost) {
 		this.size = size;

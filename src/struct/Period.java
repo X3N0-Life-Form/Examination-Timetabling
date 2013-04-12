@@ -6,6 +6,7 @@ public class Period {
 	private Date date_hour;
 	private int duration;
 	private int cost;
+	//TODO: make comparable according to ???
 
 	public Period(Date date_hour, int duration, int cost) {
 		this.date_hour = date_hour;

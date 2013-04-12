@@ -1,6 +1,8 @@
 package struct;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * 
@@ -16,6 +18,7 @@ public class Solution {
 	 * [id_exam][id_period]
 	 */
 	private int[][] examPeriod;
+	
 	/**
 	 * [id_exam][id_room]
 	 */
@@ -23,12 +26,21 @@ public class Solution {
 	/**
 	 * [id_exam] True if the exam has been placed on the timetable.
 	 */
-	
+	/**
+	 * List of exams that still need to be placed.
+	 */
 	private ArrayList<Exam> nonPlacedExams = null;
+	public ArrayList<Exam> getNonPlacedExams() {
+		return nonPlacedExams;
+	}
 	
-	private ArrayList<ResultCouple> result = null;//TODO:optimisation réfléchir au type de liste
-	public ArrayList<ResultCouple> getResult() {
+	//TODO:optimisation réfléchir au type de liste
+	private List<ResultCouple> result = null;
+	public List<ResultCouple> getResult() {
 		return result;
+	}
+	public void setResult(ArrayList<ResultCouple> result) {
+		this.result = result;
 	}
 	
 	private ExamSession examSession;
@@ -41,6 +53,16 @@ public class Solution {
 	public Solution(ExamSession examSession) {
 		this.examSession = examSession;
 		
+		/////////////////////
+		// initializations //
+		/////////////////////
+		int numberOfExams = examSession.getExams().size();
+		examCoincidence = new int[numberOfExams][numberOfExams];
+		int numberOfPeriods = examSession.getPeriods().size();
+		examPeriod = new int[numberOfExams][numberOfPeriods];
+		int numberOfRooms = examSession.getRooms().size();
+		examRoom = new int[numberOfExams][numberOfRooms];
+		
 		/**
 		 * fills examCoincidence 
 		 */
@@ -48,14 +70,17 @@ public class Solution {
 		/**
 		 * fills examCoincidence (full of 1 )
 		 */
-		for (int i = 0; i < examSession.getExams().size(); i++) 
-			for (int j = 0; j < examSession.getExams().size(); j++)
+		System.out.println("fills examCoincidence (full of 1 )");
+		for (int i = 0; i < numberOfExams; i++) 
+			for (int j = 0; j < numberOfExams; j++)
 				examCoincidence [i][j] = 1;
 		/**
 		 * if a student takes exam i & exam j then examCoincidence = 0
 		 */
-		for (int i = 0; i < examSession.getExams().size(); i++)
-			for (int j = 0; j < examSession.getExams().size() ; j++)
+		//TODO:something about that loop fest (22s exec time)
+		System.out.println("if a student takes exam i & exam j then examCoincidence = 0");
+		for (int i = 0; i < numberOfExams; i++)
+			for (int j = 0; j < numberOfExams ; j++)
 				for (int ei = 0 ; ei < examSession.getExams().get(i).getSize(); ei ++)
 					for (int ej = 0 ; ej < examSession.getExams().get(j).getSize(); ej++){
 						if (examSession.getExams().get(i).getStudents().get(ei) == 
@@ -63,7 +88,6 @@ public class Solution {
 								examCoincidence [i][j] = 0;
 								break;
 						}
-							
 					}
 		/**
 		 * if exam i and j can't be on the same period
@@ -125,5 +149,43 @@ public class Solution {
 		 * initialise results 
 		 */
 		nonPlacedExams = (ArrayList<Exam>) examSession.getExams().clone();
+		Collections.sort(nonPlacedExams);
 	}
+	
+	public int[][] getExamCoincidence() {
+		return examCoincidence;
+	}
+
+	public void setExamCoincidence(int[][] examCoincidence) {
+		this.examCoincidence = examCoincidence;
+	}
+
+	public int[][] getExamPeriod() {
+		return examPeriod;
+	}
+
+	public void setExamPeriod(int[][] examPeriod) {
+		this.examPeriod = examPeriod;
+	}
+
+	public int[][] getExamRoom() {
+		return examRoom;
+	}
+
+	public void setExamRoom(int[][] examRoom) {
+		this.examRoom = examRoom;
+	}
+
+	public void setNonPlacedExams(ArrayList<Exam> nonPlacedExams) {
+		this.nonPlacedExams = nonPlacedExams;
+	}
+
+	public ExamSession getExamSession() {
+		return examSession;
+	}
+
+	public void setExamSession(ExamSession examSession) {
+		this.examSession = examSession;
+	}
+	
 }
