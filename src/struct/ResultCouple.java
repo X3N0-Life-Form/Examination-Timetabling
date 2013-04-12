@@ -10,8 +10,8 @@ public class ResultCouple {
 	
 	public ResultCouple(Room room, Period period) {
 		super();
-		this.room = room;
-		this.period = period;
+		this.setRoom(room);
+		this.setPeriod(period);
 		examList = new ArrayList<Exam>();
 	}
 	
@@ -23,6 +23,24 @@ public class ResultCouple {
 		examList.remove(e);
 	}
 	
-	
+	public ArrayList<Exam> getExamList() {
+		return examList;
+	}
+
+	public Room getRoom() {
+		return room;
+	}
+
+	public void setRoom(Room room) {
+		this.room = room;
+	}
+
+	public Period getPeriod() {
+		return period;
+	}
+
+	public void setPeriod(Period period) {
+		this.period = period;
+	}
 	
 }
