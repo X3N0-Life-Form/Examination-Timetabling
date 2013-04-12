@@ -11,6 +11,7 @@ public class Exam {
 	private int size;
 	private ArrayList<Integer> students;
 	private ArrayList<PeriodHardConstraint> constraints;
+	private RoomHardConstraint roomHardConstraint = null;
 	
 	public Exam(int id, int duration, int size, ArrayList<Integer> students) {
 		this.id = id;
@@ -72,6 +73,14 @@ public class Exam {
 
 	public void setStudents(ArrayList<Integer> students) {
 		this.students = students;
+	}
+
+	public RoomHardConstraint getRoomHardConstraint() {
+		return roomHardConstraint;
+	}
+
+	public void setRoomHardConstraint(RoomHardConstraint roomHardConstraint) {
+		this.roomHardConstraint = roomHardConstraint;
 	}
 
 }

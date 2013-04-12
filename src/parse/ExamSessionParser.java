@@ -95,10 +95,23 @@ public class ExamSessionParser {
 				}
 			}
 			reader.close();
+			//////////////////////////////////
+			// add constraints to each exam //
+			//////////////////////////////////
 			for (PeriodHardConstraint current : periodHardConstraints) {
 				int index = current.getE1Id();
 				exams.get(index).addConstraint(current);
-				//TODO: exam coincidence stuff
+				if (current.getConstraint() ==
+						EPeriodHardConstraint.EXAM_COINCIDENCE) {
+					exams.get(current.getE2Id()).addConstraint(current);
+				}
+			}
+			/////////////////////////////////
+			// add constraint to each room //
+			/////////////////////////////////
+			for (RoomHardConstraint current : roomHardConstraints) {
+				int index = current.getId();
+				exams.get(index).setRoomHardConstraint(current);
 			}
 			
 			ExamSession res = new ExamSession(exams,
