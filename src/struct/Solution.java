@@ -33,6 +33,9 @@ public class Solution {
 	public ArrayList<Exam> getNonPlacedExams() {
 		return nonPlacedExams;
 	}
+	public void setNonPlacedExams(ArrayList<Exam> nonPlacedExams) {
+		this.nonPlacedExams = nonPlacedExams;
+	}
 	
 	//TODO:optimisation réfléchir au type de liste
 	private List<ResultCouple> result = null;
@@ -44,6 +47,25 @@ public class Solution {
 	}
 	
 	private ExamSession examSession;
+	public ExamSession getExamSession() {
+		return examSession;
+	}
+	public void setExamSession(ExamSession examSession) {
+		this.examSession = examSession;
+	}
+	
+	private List<Exam> afterExams;
+	public List<Exam> getAfterExams() {
+		return afterExams;
+	}
+	
+	private List<Exam> coincidingExams;
+	public List<Exam> getCoincidingExams() {
+		return coincidingExams;
+	}
+	public void setCoincidingExams(List<Exam> coincidingExams) {
+		this.coincidingExams = coincidingExams;
+	}
 	
 	/**
 	 * Must at least be passed through a HardConstraintSolver
@@ -62,6 +84,24 @@ public class Solution {
 		examPeriod = new int[numberOfExams][numberOfPeriods];
 		int numberOfRooms = examSession.getRooms().size();
 		examRoom = new int[numberOfExams][numberOfRooms];
+		
+		/////////////////////////////////////
+		// create constraint-related lists //
+		/////////////////////////////////////
+		afterExams = new ArrayList<Exam>();
+		coincidingExams = new ArrayList<Exam>();
+		for (Exam currentExam : examSession.getExams()) {
+			for (PeriodHardConstraint c : currentExam.getConstraints()) {
+				if (c.getConstraint() == EPeriodHardConstraint.AFTER) {
+					afterExams.add(currentExam);
+				} else if (c.getConstraint() ==
+						EPeriodHardConstraint.EXAM_COINCIDENCE) {
+					coincidingExams.add(currentExam);
+				}
+			}
+		}
+
+		
 		
 		/**
 		 * fills examCoincidence 
@@ -175,17 +215,8 @@ public class Solution {
 	public void setExamRoom(int[][] examRoom) {
 		this.examRoom = examRoom;
 	}
+	
 
-	public void setNonPlacedExams(ArrayList<Exam> nonPlacedExams) {
-		this.nonPlacedExams = nonPlacedExams;
-	}
 
-	public ExamSession getExamSession() {
-		return examSession;
-	}
-
-	public void setExamSession(ExamSession examSession) {
-		this.examSession = examSession;
-	}
 	
 }

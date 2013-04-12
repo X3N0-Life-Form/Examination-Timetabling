@@ -40,19 +40,20 @@ public class HardConstraintsSolver {//TODO: interface solver
 		System.out.println("entering solve loop");
 		while (nonPlacedExams.size() > 0) {
 			int lastIndex = nonPlacedExams.size() - 1;
-			Exam current = nonPlacedExams.get(lastIndex);
+			Exam currentExam = nonPlacedExams.get(lastIndex);
 			if (phase == ESolvingPhase.HARD_CONSTRAINT) {
-				if (current.getNumberOfConstraints() == 0) {
+				if (currentExam.getNumberOfConstraints() == 0) {
 					phase = ESolvingPhase.LEFTOVER;
-					continue;
 				} else {
+					//test constraint
 					//loop through periods
 						//loop through rooms
 				}
-			} else if (phase == ESolvingPhase.LEFTOVER) {
+			}
+			if (phase == ESolvingPhase.LEFTOVER) {
 				
 			}
-			nonPlacedExams.remove(current);//TODO:remove only if solved?
+			nonPlacedExams.remove(currentExam);//TODO:remove only if solved?
 		}
 		return s;
 	}
