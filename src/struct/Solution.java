@@ -27,6 +27,9 @@ public class Solution {
 	private ArrayList<Exam> nonPlacedExams = null;
 	
 	private ArrayList<ResultCouple> result = null;//TODO:optimisation réfléchir au type de liste
+	public ArrayList<ResultCouple> getResult() {
+		return result;
+	}
 	
 	private ExamSession examSession;
 	
