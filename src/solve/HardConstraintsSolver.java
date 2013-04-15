@@ -7,6 +7,7 @@ import java.util.Date;
 import parse.ExamSessionParser;
 import struct.Exam;
 import struct.ExamSession;
+import struct.Period;
 import struct.PeriodHardConstraint;
 import struct.ResultCouple;
 import struct.Room;
@@ -177,13 +178,47 @@ public class HardConstraintsSolver {//TODO: interface solver
 		return res;
 	}
 	
-	/**
-	 * 
-	 * @param exam
-	 * @return
-	 */
-	public Room getSuitableRoom(Exam exam) {
-		
+	public List<Integer> checkCoincidence(int examId) {
 		return null;
 	}
+	
+	public int getAvailablePeriod(int examId) {
+		return -1;
+	}
+	
+	public int getAvailablePeriod(List<Integer> coincidingExams) {
+		return -1;
+	}
+	
+	/**
+	 * Can this period host the specified list of exams.
+	 * @param exams
+	 * @param periodId
+	 * @return
+	 */
+	public boolean canHost(List<Integer> exams, int periodId) {
+		
+		return false;
+	}
+	
+	public boolean canHost(int examId, int periodId) {
+		return false;
+	}
+	
+	/**
+	 * Find a suitable room for the specified exam in the specified period.
+	 * @param examId
+	 * @param periodId
+	 * @return
+	 */
+	public int findSuitable(int examId, int periodId) {
+		//note: prioritize rooms that are already in use.
+		return -1;
+	}
+	
+	public List<Integer> findSuitable(List<Integer> exams, int periodId) {
+		return null;
+	}
+	
+	
 }
