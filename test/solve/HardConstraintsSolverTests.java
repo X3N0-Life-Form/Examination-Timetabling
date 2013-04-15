@@ -3,8 +3,10 @@ package solve;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import parse.ExamParsingException;
@@ -32,10 +34,20 @@ public class HardConstraintsSolverTests {
 	/**
 	 * Does the solver remove all non placed exams?
 	 */
+	@Ignore
 	@Test
 	public void solve_loop() {
 		Solution res = solver.solve();
 		assertFalse(res.getNonPlacedExams().size() > 0);
+	}
+	
+	@Test
+	public void checkCoincidence() {
+		List<Integer> res = solver.checkCoincidence(306);
+		assertNotNull(res);
+		assertTrue(res.size() == 2);
+		assertTrue(res.get(0) == 307);
+		assertTrue(res.get(1) == 306);
 	}
 
 }

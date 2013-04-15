@@ -97,5 +97,20 @@ public class Exam implements Comparable<Exam>{
 			res++;
 		return res;
 	}
+	
+	/**
+	 * 
+	 * @param constraint
+	 * @return true if this Exam has at least one constraint
+	 * of the specified type.
+	 */
+	public boolean hasPeriodHardConstraint(
+			EPeriodHardConstraint constraint) {
+		for (PeriodHardConstraint current : constraints) {
+			if (current.getConstraint() == constraint)
+				return true;
+		}
+		return false;
+	}
 
 }

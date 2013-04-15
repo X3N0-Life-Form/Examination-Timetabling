@@ -1,6 +1,8 @@
 package struct;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.NavigableSet;
 import java.util.TreeMap;
 
 public class ExamSession {
@@ -85,5 +87,17 @@ public class ExamSession {
 		this.institutionalWeightings = institutionalWeightings;
 	}
 	
+	/**
+	 * 
+	 * @return The exams TreeMap as a List.
+	 */
+	public List<Exam> getExamsAsList() {
+		NavigableSet<Integer> nset = exams.navigableKeySet();
+		ArrayList<Exam> res = new ArrayList<Exam>();
+		for (Integer current : nset) {
+			res.add(exams.get(current));
+		}
+		return res;
+	}
 	
 }

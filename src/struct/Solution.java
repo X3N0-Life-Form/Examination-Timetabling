@@ -29,11 +29,11 @@ public class Solution {
 	/**
 	 * List of exams that still need to be placed.
 	 */
-	private ArrayList<Exam> nonPlacedExams = null;
-	public ArrayList<Exam> getNonPlacedExams() {
+	private List<Exam> nonPlacedExams = null;
+	public List<Exam> getNonPlacedExams() {
 		return nonPlacedExams;
 	}
-	public void setNonPlacedExams(ArrayList<Exam> nonPlacedExams) {
+	public void setNonPlacedExams(List<Exam> nonPlacedExams) {
 		this.nonPlacedExams = nonPlacedExams;
 	}
 	
@@ -85,13 +85,19 @@ public class Solution {
 		int numberOfRooms = examSession.getRooms().size();
 		examRoom = new int[numberOfExams][numberOfRooms];
 		
+		result = new ArrayList<ResultCouple>();
+		for (Period currentPeriod : examSession.getPeriods()) {
+			for (Room currentRoom : examSession.getRooms()) {
+				result.add(new ResultCouple(currentRoom, currentPeriod));
+			}
+		}
+		
 		/////////////////////////////////////
 		// create constraint-related lists //
 		/////////////////////////////////////
 		afterExams = new ArrayList<Exam>();
 		coincidingExams = new ArrayList<Exam>();
-		/* TODO: fix that shit
-		for (Exam currentExam : examSession.getExams()) {
+		for (Exam currentExam : examSession.getExamsAsList()) {
 			for (PeriodHardConstraint c : currentExam.getConstraints()) {
 				if (c.getConstraint() == EPeriodHardConstraint.AFTER) {
 					afterExams.add(currentExam);
@@ -100,7 +106,7 @@ public class Solution {
 					coincidingExams.add(currentExam);
 				}
 			}
-		}*/
+		}
 
 		
 		
@@ -118,18 +124,28 @@ public class Solution {
 		/**
 		 * if a student takes exam i & exam j then examCoincidence = 0
 		 */
-		//TODO:something about that loop fest (22s exec time)
-		System.out.println("if a student takes exam i & exam j then examCoincidence = 0");
-		for (int i = 0; i < numberOfExams; i++)
-			for (int j = 0; j < numberOfExams ; j++)
-				for (int ei = 0 ; ei < examSession.getExams().get(i).getSize(); ei ++)
-					for (int ej = 0 ; ej < examSession.getExams().get(j).getSize(); ej++){
+		//TODO:something about that loop fest
+		System.out.print("Finding mutually exclusive exams based on student presence");
+		int loopCounter = 0;
+		for (int i = 0; i < numberOfExams; i++) {
+			for (int j = i + 1; j < numberOfExams ; j++) {
+				int eiNumberOfStudents = examSession.getExams().get(i).getSize();
+				int ejNumberOfStudents = examSession.getExams().get(j).getSize();
+				for (int ei = 0 ; ei < eiNumberOfStudents; ei ++)
+					for (int ej = 0 ; ej < ejNumberOfStudents; ej++) {
+						//if student is present in both exams --> no coincidence 
 						if (examSession.getExams().get(i).getStudents().get(ei) == 
-							examSession.getExams().get(j).getStudents().get(ej)){
+							examSession.getExams().get(j).getStudents().get(ej)) {
 								examCoincidence [i][j] = 0;
 								break;
 						}
+						loopCounter++;
 					}
+			}
+			//System.out.println("i=" + i + ";numberOfExams=" + numberOfExams);
+		}//TODO: mirror values to fully initialize the matrix
+		System.out.println(" - done\nLooped " + loopCounter + " times.\n");
+		
 		/**
 		 * if exam i and j can't be on the same period
 		 */
@@ -189,7 +205,7 @@ public class Solution {
 		/**
 		 * initialise results 
 		 */
-		nonPlacedExams = (ArrayList<Exam>) examSession.getExams().clone();
+		nonPlacedExams = examSession.getExamsAsList();
 		Collections.sort(nonPlacedExams);
 	}
 	
