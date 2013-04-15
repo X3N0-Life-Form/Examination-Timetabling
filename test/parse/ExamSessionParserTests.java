@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TreeMap;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -61,7 +62,7 @@ public class ExamSessionParserTests {
 	 */
 	@Test
 	public void examDuration() throws ExamParsingException, IOException {
-		ArrayList<Exam> exams = es_1.getExams();
+		TreeMap<Integer,Exam> exams = es_1.getExams();
 		assertTrue(exams.get(0).getDuration() == 195);
 		assertTrue(exams.get(1).getDuration() == 135);
 		assertTrue(exams.get(2).getDuration() == 120);
@@ -74,7 +75,7 @@ public class ExamSessionParserTests {
 	 */
 	@Test
 	public void examSize() throws ExamParsingException, IOException {
-		ArrayList<Exam> exams = es_1.getExams();
+		TreeMap<Integer,Exam> exams = es_1.getExams();
 		assertTrue(exams.get(0).getSize() == 252);
 		assertTrue(exams.get(1).getSize() == 85);
 		assertTrue(exams.get(2).getSize() == 139);
@@ -82,7 +83,7 @@ public class ExamSessionParserTests {
 	
 	@Test
 	public void examConstraints_parsed() {
-		ArrayList<Exam> exams = es_1.getExams();
+		TreeMap<Integer,Exam> exams = es_1.getExams();
 		assertTrue(exams.get(11).getConstraints().size() > 0);
 		assertTrue(exams.get(26).getConstraints().size() > 0);
 		assertTrue(exams.get(98).getConstraints().size() > 0);

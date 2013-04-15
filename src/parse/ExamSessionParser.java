@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TreeMap;
 
 import struct.EPeriodHardConstraint;
 import struct.ERoomHardConstraint;
@@ -65,7 +66,7 @@ public class ExamSessionParser {
 			BufferedReader reader = new BufferedReader(isr);
 			
 			String line = "";
-			ArrayList<Exam> exams = null;
+			TreeMap<Integer, Exam> exams = null;
 			ArrayList<Period> periods = null;
 			ArrayList<Room> rooms = null;
 			ArrayList<PeriodHardConstraint> periodHardConstraints = null;
@@ -73,8 +74,6 @@ public class ExamSessionParser {
 			InstitutionalWeightings institutionalWeightings = null;
 			System.out.println("Parsing file:" + fileName);
 			while ((line = reader.readLine()) != null) {
-				//TODO: utiliser des regexs, ce sera plus propre
-				//line.matches("[Exams:]");
 				if (line.contains(ENTRY_EXAMS)) {
 					exams = parseExams(reader, line);
 				} else if (line.contains(ENTRY_PERIODS)) {
@@ -267,7 +266,7 @@ public class ExamSessionParser {
 			int size = Integer.parseInt(line.substring(0, comaIndex));
 			line = line.substring(comaIndex + 2);
 			int cost = Integer.parseInt(line);
-			Room currentRoom = new Room(size, cost);
+			Room currentRoom = new Room(i, size, cost);
 			rooms.add(currentRoom);
 		}
 		return rooms;
@@ -317,15 +316,15 @@ public class ExamSessionParser {
 			line = line.substring(comaIndex + 2); //", "
 			int cost = Integer.parseInt(line);
 			
-			Period currentPeriod = new Period(date, duration, cost);
+			Period currentPeriod = new Period(i, date, duration, cost);
 			periods.add(currentPeriod);
 		}
 		return periods;
 	}
 
-	private ArrayList<Exam> parseExams(BufferedReader reader, String line)
+	private TreeMap<Integer, Exam> parseExams(BufferedReader reader, String line)
 			throws IOException {
-		ArrayList<Exam> exams = new ArrayList<Exam>();
+		TreeMap<Integer, Exam> exams = new TreeMap<Integer, Exam>();
 		int numberOfExams = getNumberOfEntries(line);
 		//////////////////////////
 		// read every exam line //
@@ -353,7 +352,7 @@ public class ExamSessionParser {
 			}
 			int size = students.size();
 			Exam currentExam = new Exam(i, duration, size, students);
-			exams.add(currentExam);
+			exams.put(i, currentExam);
 		}
 		return exams;
 	}

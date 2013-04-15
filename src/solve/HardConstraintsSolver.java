@@ -9,6 +9,7 @@ import struct.Exam;
 import struct.ExamSession;
 import struct.PeriodHardConstraint;
 import struct.ResultCouple;
+import struct.Room;
 import struct.Solution;
 import struct.EPeriodHardConstraint;
 
@@ -174,5 +175,15 @@ public class HardConstraintsSolver {//TODO: interface solver
 			}
 		}
 		return res;
+	}
+	
+	/**
+	 * 
+	 * @param exam
+	 * @return
+	 */
+	public Room getSuitableRoom(Exam exam) {
+		
+		return null;
 	}
 }

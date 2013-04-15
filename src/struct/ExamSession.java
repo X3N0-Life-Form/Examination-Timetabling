@@ -1,16 +1,17 @@
 package struct;
 
 import java.util.ArrayList;
+import java.util.TreeMap;
 
 public class ExamSession {
-	private ArrayList<Exam> exams;
+	private TreeMap<Integer, Exam> exams;
 	private ArrayList<Period> periods;
 	private ArrayList<Room> rooms;
 	private ArrayList<PeriodHardConstraint> periodHardConstraints;
 	private ArrayList<RoomHardConstraint> roomHardConstraints;
 	private InstitutionalWeightings institutionalWeightings;
 	
-	public ExamSession(ArrayList<Exam> exams, ArrayList<Period> periods,
+	public ExamSession(TreeMap<Integer, Exam> exams, ArrayList<Period> periods,
 			ArrayList<Room> rooms,
 			ArrayList<PeriodHardConstraint> periodHardConstraints,
 			ArrayList<RoomHardConstraint> roomHardConstraints,
@@ -33,11 +34,11 @@ public class ExamSession {
 				+ institutionalWeightings + "]";
 	}
 
-	public ArrayList<Exam> getExams() {
+	public TreeMap<Integer,Exam> getExams() {
 		return exams;
 	}
 
-	public void setExams(ArrayList<Exam> exams) {
+	public void setExams(TreeMap<Integer, Exam> exams) {
 		this.exams = exams;
 	}
 

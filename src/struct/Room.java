@@ -1,12 +1,26 @@
 package struct;
 
 public class Room {
-	//private int id;
+	private int id;
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
 	private int size;
+	public int getSize() {
+		return size;
+	}
+	public void setSize(int size) {
+		this.size = size;
+	}
+	
 	private int cost;
 	//TODO: make comparable according to size &/or cost?
 	
-	public Room(int size, int cost) {
+	public Room(int id, int size, int cost) {
+		this.id = id;
 		this.size = size;
 		this.cost = cost;
 	}
@@ -16,13 +30,7 @@ public class Room {
 		return "Room [size=" + size + ", cost=" + cost + "]";
 	}
 
-	public int getSize() {
-		return size;
-	}
-
-	public void setSize(int size) {
-		this.size = size;
-	}
+	
 
 	public int getCost() {
 		return cost;

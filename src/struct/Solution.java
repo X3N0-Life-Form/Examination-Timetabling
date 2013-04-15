@@ -90,6 +90,7 @@ public class Solution {
 		/////////////////////////////////////
 		afterExams = new ArrayList<Exam>();
 		coincidingExams = new ArrayList<Exam>();
+		/* TODO: fix that shit
 		for (Exam currentExam : examSession.getExams()) {
 			for (PeriodHardConstraint c : currentExam.getConstraints()) {
 				if (c.getConstraint() == EPeriodHardConstraint.AFTER) {
@@ -99,7 +100,7 @@ public class Solution {
 					coincidingExams.add(currentExam);
 				}
 			}
-		}
+		}*/
 
 		
 		
