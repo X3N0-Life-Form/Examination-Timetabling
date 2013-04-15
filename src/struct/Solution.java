@@ -117,7 +117,7 @@ public class Solution {
 		/**
 		 * fills examCoincidence (full of 1 )
 		 */
-		System.out.println("fills examCoincidence (full of 1 )");
+		System.out.println("--fills examCoincidence (full of 1 )");
 		for (int i = 0; i < numberOfExams; i++) 
 			for (int j = 0; j < numberOfExams; j++)
 				examCoincidence [i][j] = 1;
@@ -125,7 +125,7 @@ public class Solution {
 		 * if a student takes exam i & exam j then examCoincidence = 0
 		 */
 		//TODO:something about that loop fest
-		System.out.print("Finding mutually exclusive exams based on student presence");
+		System.out.print("--Finding mutually exclusive exams based on student presence");
 		int loopCounter = 0;
 		for (int i = 0; i < numberOfExams; i++) {
 			for (int j = i + 1; j < numberOfExams ; j++) {
@@ -144,7 +144,7 @@ public class Solution {
 			}
 			//System.out.println("i=" + i + ";numberOfExams=" + numberOfExams);
 		}//TODO: mirror values to fully initialize the matrix
-		System.out.println(" - done\nLooped " + loopCounter + " times.\n");
+		System.out.println(" - done\n--Looped " + loopCounter + " times.\n");
 		
 		/**
 		 * if exam i and j can't be on the same period
