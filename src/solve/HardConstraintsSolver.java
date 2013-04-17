@@ -39,29 +39,87 @@ public class HardConstraintsSolver {//TODO: interface solver
 	}
 	
 	public Solution solve() {
-		ESolvingPhase phase = ESolvingPhase.HARD_CONSTRAINT;
-		List<Exam> nonPlacedExams = s.getNonPlacedExams();
-		while (nonPlacedExams.size() > 0) {
-			int lastIndex = nonPlacedExams.size() - 1;
-			Exam currentExam = nonPlacedExams.get(lastIndex);
-			if (phase == ESolvingPhase.HARD_CONSTRAINT) {
-				if (currentExam.getNumberOfConstraints() == 0) {
-					phase = ESolvingPhase.LEFTOVER;
-				} else {
-					//test constraint
-					//loop through periods
-						//loop through rooms
+		List <ResultCouple> res = s.getResult();
+		List <Exam> NPE = (List<Exam>) ((ArrayList<Exam>) s.getNonPlacedExams()).clone(); 
+		Exam e = null;
+		
+		for( int i = 0; i< s.getNonPlacedExams().size();i++){
+			
+			int examId = s.getNonPlacedExams().get(i).getId();
+			List<Integer> listE = checkCoincidence(examId);
+			
+			// if the list has got more than 1 exam
+			if (listE.size() > 1){
+				// find a period for the list
+				int currentPeriod = getAvailablePeriod(listE);
+				// find rooms for the list and currentPeriod
+				List<Integer> currentRoomsList = findSuitable(listE, currentPeriod);
+			
+				// list
+				for(int j = 0; j < listE.size();j++){
+					//get the exam with its id into the ExamSession
+					for(int k = 0; k < s.getExamSession().getExams().size();k++){
+						if (s.getExamSession().getExams().get(k).getId() == listE.get(j))
+							e = s.getExamSession().getExams().get(k);
+					}
+					// res
+					for (int k = 0; k< res.size(); k++){
+						// if in res.get(k) period & room corresponds
+						if (res.get(k).getPeriod().getId() == currentPeriod
+						&& res.get(k).getRoom().getId() == currentRoomsList.get(j))
+							//add the exam j
+							res.get(k).getExamList().add(e);
+						
+						updateValidPeriods(e.getId(), currentPeriod );
+					}
+					NPE.remove(j);
 				}
 			}
-			if (phase == ESolvingPhase.LEFTOVER) {
-				
-			}
-			nonPlacedExams.remove(currentExam);//TODO:remove only if solved?
+			List<Exam> sNPE = s.getNonPlacedExams();
+			sNPE = NPE;
 		}
+		for( int i = 0; i< s.getNonPlacedExams().size();i++){
+			
+			int examId = s.getNonPlacedExams().get(i).getId();
+			List<Integer> listE = checkCoincidence(examId);
+			
+			// if the list has got more than 1 exam
+			if (listE.size() == 1){
+				// find a period for the list
+				int currentPeriod = getAvailablePeriod(listE);
+				// find rooms for the list and currentPeriod
+				List<Integer> currentRoomsList = findSuitable(listE, currentPeriod);
+			
+					int j=1;
+					for(int k = 0; k < s.getExamSession().getExams().size();k++){
+						if (s.getExamSession().getExams().get(k).getId() == listE.get(j))
+							e = s.getExamSession().getExams().get(k);
+					}
+					// res
+					for (int k = 0; k< res.size(); k++){
+						// if in res.get(k) period & room corresponds
+						if (res.get(k).getPeriod().getId() == currentPeriod
+						&& res.get(k).getRoom().getId() == currentRoomsList.get(j))
+							//add the exam j
+							res.get(k).getExamList().add(e);
+						
+						updateValidPeriods(e.getId(), currentPeriod );
+					}
+					NPE.remove(j);
+				}
+			}
 		return s;
 	}
 	
-	//TODO:test all that
+		public void updateValidPeriods(int examId, int periodId)
+		{
+			int [][] eP = s.getExamPeriodModif();
+			int [][] coincidence = s.getExamCoincidence();
+			for (int i = 1; i < s.getExamSession().getPeriods().size(); i++)
+				if( coincidence [examId][i] == 0)
+					eP [i][periodId] = 0;
+		}
+	
 	public boolean isSolutionValid(Feedback feedback) {
 		boolean res = true;
 		
@@ -212,6 +270,7 @@ public class HardConstraintsSolver {//TODO: interface solver
 		if (exam.hasPeriodHardConstraint(
 				EPeriodHardConstraint.EXAM_COINCIDENCE)) {
 			List<Integer> res = new LinkedList<Integer>();
+			res.add(examId);
 			// loop through the specified exam's constraints
 			for (PeriodHardConstraint currentConstraint :
 				exam.getConstraints()) {
@@ -447,4 +506,5 @@ public class HardConstraintsSolver {//TODO: interface solver
 			}
 		return list;
 	}	
+	
 }
