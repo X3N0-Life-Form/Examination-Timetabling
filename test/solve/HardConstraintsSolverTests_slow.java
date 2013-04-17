@@ -43,13 +43,13 @@ public class HardConstraintsSolverTests_slow {
 	/**
 	 * Does the solver remove all non placed exams?
 	 */
-	@Test @Ignore
+	@Test
 	public void solve_loop() {
 		Solution res = solver.solve();
 		assertFalse(res.getNonPlacedExams().size() > 0);
 	}
 	
-	@Test @Ignore
+	@Test
 	public void checkCoincidence() {
 		List<Integer> res = solver.checkCoincidence(306);
 		assertNotNull(res);
@@ -58,13 +58,13 @@ public class HardConstraintsSolverTests_slow {
 		assertTrue(res.get(1) == 306);
 	}
 
-	@Test @Ignore
+	@Test
 	public void canHost_singleTrue() {
 		boolean res = solver.canHost(1, 1, s.getResult());
 		assertTrue(res);
 	}
 	
-	@Test @Ignore
+	@Test
 	public void canHost_singleFalse() {
 		List<ResultCouple> results = s.getResult();
 		for (ResultCouple current : results) {
@@ -76,7 +76,7 @@ public class HardConstraintsSolverTests_slow {
 		assertFalse(res);
 	}
 	
-	@Test @Ignore
+	@Test
 	public void canHost_singleFalse_roomExclusive() {
 		List<ResultCouple> results = s.getResult();
 		for (ResultCouple current : results) {
@@ -92,7 +92,7 @@ public class HardConstraintsSolverTests_slow {
 		assertFalse(res);
 	}
 	
-	@Test @Ignore
+	@Test
 	public void canHost_multipleOK() {
 		List<Integer> exams = new ArrayList<Integer>();
 		exams.add(0);
@@ -101,7 +101,7 @@ public class HardConstraintsSolverTests_slow {
 		assertTrue(res);
 	}
 	
-	@Test @Ignore
+	@Test
 	public void canHost_multipleAllRoomFull() {
 		List<Integer> exams = new ArrayList<Integer>();
 		List<ResultCouple> results = s.getResult();
@@ -113,14 +113,14 @@ public class HardConstraintsSolverTests_slow {
 		assertFalse(res);
 	}
 	
-	@Test @Ignore
+	@Test
 	public void findSuitable_singleNormal() {
 		int res = solver.findSuitable(0, 0, s.getResult());
 		assertTrue(res != -1);
 		assertTrue(res == 0);
 	}
 	
-	@Test @Ignore
+	@Test
 	public void findSuitable_singleRoomNotFull() {
 		List<ResultCouple> results = s.getResult();
 		ResultCouple first = results.get(0);
@@ -133,7 +133,7 @@ public class HardConstraintsSolverTests_slow {
 		assertTrue(res == roomId);
 	}
 	
-	@Test @Ignore
+	@Test
 	public void findSuitable_multipleSameRoom() {
 		List<Integer> exams = new ArrayList<Integer>();
 		exams.add(306);
@@ -144,7 +144,7 @@ public class HardConstraintsSolverTests_slow {
 		assertTrue(res.get(1) == res.get(0));
 	}
 	
-	@Test @Ignore
+	@Test
 	public void findSuitable_multipleDifferentRooms() {
 		List<Integer> exams = new ArrayList<Integer>();
 		exams.add(0);
@@ -155,7 +155,7 @@ public class HardConstraintsSolverTests_slow {
 		assertTrue(res.get(1) == 1);
 	}
 	
-	@Test @Ignore
+	@Test
 	public void findSuitable_multipleOneAndTwoOccupied() {
 		List<ResultCouple> results = s.getResult();
 		Exam e0 = es.getExams().get(0);
@@ -171,12 +171,12 @@ public class HardConstraintsSolverTests_slow {
 		assertFalse(res.contains(1));
 	}
 	
-	@Test @Ignore
+	@Test
 	public void getAvailablePeriod_singleNormal() {
 		assertTrue(solver.getAvailablePeriod(0) == 0);
 	}
 	
-	@Test @Ignore
+	@Test
 	public void getAvailablePeriod_singleMutuallyExclusiveExams() {
 		List<ResultCouple> results = s.getResult();
 		ResultCouple first = results.get(0);
@@ -186,7 +186,7 @@ public class HardConstraintsSolverTests_slow {
 		assertTrue(res == 1);
 	}
 	
-	@Test @Ignore
+	@Test
 	public void getAvailablePeriod_multiple() {
 		List<Integer> coincidingExams = new ArrayList<Integer>();
 		coincidingExams.add(0);
@@ -195,7 +195,7 @@ public class HardConstraintsSolverTests_slow {
 		assertTrue(res == 0);
 	}
 	
-	@Test @Ignore
+	@Test
 	public void getAvailablePeriod_multipleMutuallyExclusiveExams() {
 		List<ResultCouple> results = s.getResult();
 		ResultCouple first = results.get(0);
