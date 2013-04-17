@@ -22,6 +22,15 @@ public class Feedback {
 	public static final String ROOM_SIZE_VIOLATION =
 			"Room size violation: the sum of exam sizes cannot exceed the " +
 			"room's size";
+
+	public static final String EXCLUSION_VIOLATION = "EXCLUSION violation: two mutually " +
+			"exclusive exams are in the same period";
+
+	public static final String EXAM_COINCIDENCE_VIOLATION = "EXAM_COINCIDENCE violation: " +
+			"two coinciding exams are in different periods";
+
+	public static final String AFTER_VIOLATION = "AFTER violation: one exam should be " +
+			"after another, but isn't";
 	
 	Map<ResultCouple, String> items;
 	
@@ -35,5 +44,10 @@ public class Feedback {
 	
 	public Map<ResultCouple, String> getItems() {
 		return items;
+	}
+
+	@Override
+	public String toString() {
+		return "Feedback [items=" + items + "]";
 	}
 }

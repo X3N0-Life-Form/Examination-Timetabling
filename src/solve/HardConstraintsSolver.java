@@ -100,36 +100,57 @@ public class HardConstraintsSolver {//TODO: interface solver
 										if(periodAfter.compareTo(periodBefore) <= 0)
 											notAfter = true;							
 						}
-						if (notAfter)
+						if (notAfter) {
 							res = false;
+							feedback.addItem(current, Feedback.AFTER_VIOLATION);
+						}
 				}
 				
 			}
 			//check EXAM_COINCIDENCE
 			// exam
-			for (int j = 0; j< current.getExamList().size(); j++){
-				constraintList = current.getExamList().get(j).getConstraints();
-				// constraint
-				for (int i = 0; i< constraintList.size(); i++){
-					// if constraint is EXAM_COINCIDENCE
-					if (constraintList.get(i).getConstraint() == 
-					EPeriodHardConstraint.EXAM_COINCIDENCE)
-						//get id of the 2nd exam (EXAM_COINCIDENCE)
-						//if e1Id = current exam id, var id = e2ID
-						if (constraintList.get(i).getE1Id() == 
-						current.getExamList().get(j).getId())
-							id = constraintList.get(i).getE2Id();
-						//else var id = e1ID
-						else id = constraintList.get(i).getE1Id();
+			for (ResultCouple currentBis : s.getResult()) {
+				for (int j = 0; j< currentBis.getExamList().size(); j++){
+					constraintList = currentBis.getExamList().get(j).getConstraints();
+					// constraint
+					for (int i = 0; i< constraintList.size(); i++){
+						// if constraint is EXAM_COINCIDENCE
+						int periodId = -1;
+						if (constraintList.get(i).getConstraint() == 
+								EPeriodHardConstraint.EXAM_COINCIDENCE) {
+							//get id of the 2nd exam (EXAM_COINCIDENCE)
+							//if e1Id = current exam id, var id = e2ID
+							periodId = currentBis.getPeriod().getId();
+							if (constraintList.get(i).getE1Id() == 
+									currentBis.getExamList().get(j).getId())
+								id = constraintList.get(i).getE2Id();
+							//else var id = e1ID
+							else
+								id = constraintList.get(i).getE1Id();
+						}
 						boolean present = false;
 						// check if id is present into list exam
-						for(int k = 0; k < current.getExamList().size();k++){
+						for(int k = 0; k < currentBis.getExamList().size();k++){
 							// if id is found : present = true
-							if (current.getExamList().get(k).getId() == id)
+							if (currentBis.getExamList().get(k).getId() == id) {
 								present = true; 
+							} else {
+								for(ResultCouple c : s.getResult()){
+									if (c.getPeriod().getId() == periodId) {
+										for (Exam e : c.getExamList()) {
+											if (e.getId() == id)
+												present = true;
+										}
+									}
+								}
 							}
-							// if !present, id's not found => false
-							if (!present) res = false;
+						}
+						// if !present, id's not found => false
+						if (!present) {
+							res = false;
+							feedback.addItem(currentBis, Feedback.EXAM_COINCIDENCE_VIOLATION);
+						}
+					}
 				}
 			}			
 			
@@ -150,8 +171,10 @@ public class HardConstraintsSolver {//TODO: interface solver
 								present = true; 
 						}
 						// if present, id's found => false because of the exclusion
-						if (present) 
+						if (present) {
 							res = false;
+							feedback.addItem(current, Feedback.EXCLUSION_VIOLATION);
+						}
 				}
 			}
 			int sizeSum = 0;

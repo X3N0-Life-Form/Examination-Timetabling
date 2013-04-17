@@ -61,8 +61,12 @@ public class ResultCouple {
 
 	@Override
 	public String toString() {
+		ArrayList<Integer> idList = new ArrayList<Integer>();
+		for (Exam current : examList) {
+			idList.add(current.getId());
+		}
 		return "ResultCouple [room=" + room + ", period=" + period
-				+ ", examList=" + examList + "]";
+				+ ", examList=" + idList + "]";
 	}
 	
 }
