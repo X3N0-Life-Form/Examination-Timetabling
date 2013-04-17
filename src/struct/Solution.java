@@ -1,6 +1,7 @@
 package struct;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,7 +18,17 @@ public class Solution {
 	/**
 	 * [id_exam][id_period]
 	 */
-	private int[][] examPeriod;
+	private int[][] examPeriodBase;
+	public int[][] getExamPeriodBase() {
+		return examPeriodBase;
+	}
+	public void setExamPeriodBase(int[][] examPeriod) {
+		this.examPeriodBase = examPeriod;
+	}
+	private int[][] examPeriodModif;
+	public int[][] getExamPeriodModif() {
+		return examPeriodModif;
+	}
 	
 	/**
 	 * [id_exam][id_room]
@@ -81,14 +92,16 @@ public class Solution {
 		int numberOfExams = examSession.getExams().size();
 		examCoincidence = new int[numberOfExams][numberOfExams];
 		int numberOfPeriods = examSession.getPeriods().size();
-		examPeriod = new int[numberOfExams][numberOfPeriods];
+		examPeriodBase = new int[numberOfExams][numberOfPeriods];
 		int numberOfRooms = examSession.getRooms().size();
 		examRoom = new int[numberOfExams][numberOfRooms];
 		
 		result = new ArrayList<ResultCouple>();
 		for (Period currentPeriod : examSession.getPeriods()) {
 			for (Room currentRoom : examSession.getRooms()) {
-				result.add(new ResultCouple(currentRoom, currentPeriod));
+				ResultCouple nuRC = new ResultCouple(currentRoom, currentPeriod);
+				nuRC.setSolution(this);
+				result.add(nuRC);
 			}
 		}
 		
@@ -167,26 +180,32 @@ public class Solution {
 		 * fills examPeriod
 		 */
 		
-		for (int i = 0; i< examSession.getExams().size();i++)
+		for (int i = 0; i< examSession.getExams().size();i++) {
 			for (int j = 0; j< examSession.getPeriods().size(); j++){
 				/**
 				 * cost = 0 & duration ok
 				 */
 				if ((examSession.getExams().get(i).getDuration() <= examSession.getPeriods().get(j).getDuration() &&
 						examSession.getPeriods().get(j).getCost() == 0))
-							examPeriod[i][j] = 2;
+							examPeriodBase[i][j] = 2;
 				/**
 				 * cost > 0 & duration ok
 				 */
 				else if ((examSession.getExams().get(i).getDuration() <= examSession.getPeriods().get(j).getDuration() &&
 						examSession.getPeriods().get(j).getCost() > 0))
-						examPeriod[i][j] = 1;
+						examPeriodBase[i][j] = 1;
 				/*
 				 * duration not ok
 				 */
 				else 
-					examPeriod[i][j] = 0;
+					examPeriodBase[i][j] = 0;
 			}
+		}
+		examPeriodModif = new int[numberOfExams][numberOfPeriods];
+		for (int i = 0; i < numberOfExams; i++) {
+			examPeriodModif[i] =
+					Arrays.copyOfRange(examPeriodBase[i], 0, numberOfPeriods);
+		}
 		
 		/**
 		 * fills examRoom
@@ -217,13 +236,7 @@ public class Solution {
 		this.examCoincidence = examCoincidence;
 	}
 
-	public int[][] getExamPeriod() {
-		return examPeriod;
-	}
 
-	public void setExamPeriod(int[][] examPeriod) {
-		this.examPeriod = examPeriod;
-	}
 
 	public int[][] getExamRoom() {
 		return examRoom;

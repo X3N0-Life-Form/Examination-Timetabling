@@ -30,6 +30,21 @@ public class SolutionTests {
 		assertTrue(s.getNonPlacedExams().size() == es.getExams().size());
 	}
 	
+	@Test
+	public void creation_examPeriodBase_equals_examPeriodModif() {
+		int[][] epb = s.getExamPeriodBase();
+		int[][] epm = s.getExamPeriodModif();
+		int i = 0;
+		for (int[] current : epb) {
+			int j = 0;
+			for (int c : epm[i]) {
+				assertTrue(current[j] == c);
+				j++;
+			}
+			i++;
+		}
+	}
+	
 	/**
 	 * Check various properties of the initial result list.
 	 */
