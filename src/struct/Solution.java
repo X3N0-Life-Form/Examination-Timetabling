@@ -48,10 +48,34 @@ public class Solution {
 		this.nonPlacedExams = nonPlacedExams;
 	}
 	
-	//TODO:optimisation réfléchir au type de liste
 	private List<ResultCouple> result = null;
 	public List<ResultCouple> getResult() {
 		return result;
+	}
+	public List<ResultCouple> getResultsForPeriod(int periodId) {
+		List<ResultCouple> res = new ArrayList<ResultCouple>();
+		for (ResultCouple currentRC : result) {
+			if (currentRC.getPeriod().getId() == periodId) {
+				res.add(currentRC);
+			}
+		}
+		return res;
+	}
+	/**
+	 * 
+	 * @param periodId
+	 * @param resIn
+	 * @return A List of ResultCouple of the specified period out ResultCouple
+	 * found in resIn.
+	 */
+	public List<ResultCouple> getResultsForPeriod(int periodId, List<ResultCouple> resIn) {
+		List<ResultCouple> resOut = new ArrayList<ResultCouple>();
+		for (ResultCouple currentRC : resIn) {
+			if (currentRC.getPeriod().getId() == periodId) {
+				resOut.add(currentRC);
+			}
+		}
+		return resOut;
 	}
 	public void setResult(ArrayList<ResultCouple> result) {
 		this.result = result;

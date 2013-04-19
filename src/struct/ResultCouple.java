@@ -23,15 +23,23 @@ public class ResultCouple {
 	}
 	
 	public void addExam(Exam e){
-		int[][] epm = s.getExamPeriodModif();
-		int eId = e.getId();
-		int pId = period.getId();
-		int[][] ec = s.getExamCoincidence();
-		for (int i = 0; i < s.getExamSession().getExams().size(); i++) {
-			if (ec[eId][i] == 0)
-				epm[i][pId] = 0;
+		//if exam not in the list
+		if (!examList.contains(e)) {
+			int[][] epm = s.getExamPeriodModif();
+			int eId = e.getId();
+			int pId = period.getId();
+			int[][] ec = s.getExamCoincidence();
+			for (int i = 0; i < s.getExamSession().getExams().size(); i++) {
+				if (ec[eId][i] == 0)
+					epm[i][pId] = 0;
+			}
+			examList.add(e);
 		}
-		examList.add(e);
+		//else do nothing
+	}
+	public void addExam(int examId) {
+		Exam e = s.getExamSession().getExams().get(examId);
+		this.addExam(e);
 	}
 	
 	public void removeExam(Exam e){
@@ -67,6 +75,17 @@ public class ResultCouple {
 		}
 		return "ResultCouple [room=" + room + ", period=" + period
 				+ ", examList=" + idList + "]";
+	}
+	
+	@Override
+	public ResultCouple clone() {
+		ResultCouple clone = new ResultCouple(room, period);
+		clone.examList = new ArrayList<Exam>();
+		for (Exam current : examList) {
+			clone.examList.add(current);
+		}
+		clone.s = s;
+		return clone;
 	}
 	
 }

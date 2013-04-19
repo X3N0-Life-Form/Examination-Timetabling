@@ -1,10 +1,11 @@
 package solve;
 
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
+
+import javax.swing.text.StyledEditorKit.BoldAction;
 
 import parse.ExamSessionParser;
 import struct.Exam;
@@ -26,7 +27,7 @@ import struct.EPeriodHardConstraint;
  * @see ExamSessionParser
  * @see Feedback
  */
-public class HardConstraintsSolver {//TODO: interface solver
+public class HardConstraintsSolver {
 	
 	private Solution s;
 	protected enum ESolvingPhase {
@@ -38,77 +39,130 @@ public class HardConstraintsSolver {//TODO: interface solver
 		this.s = solution;
 	}
 	
-	public Solution solve() {
-		List <ResultCouple> res = s.getResult();
-		List <Exam> NPE = (List<Exam>) ((ArrayList<Exam>) s.getNonPlacedExams()).clone(); 
-		Exam e = null;
-		
-		for( int i = 0; i< s.getNonPlacedExams().size();i++){
-			
-			int examId = s.getNonPlacedExams().get(i).getId();
-			List<Integer> listE = checkCoincidence(examId);
-			
-			// if the list has got more than 1 exam
-			if (listE.size() > 1){
-				// find a period for the list
-				int currentPeriod = getAvailablePeriod(listE);
-				// find rooms for the list and currentPeriod
-				List<Integer> currentRoomsList = findSuitable(listE, currentPeriod);
-			
-				// list
-				for(int j = 0; j < listE.size();j++){
-					//get the exam with its id into the ExamSession
-					for(int k = 0; k < s.getExamSession().getExams().size();k++){
-						if (s.getExamSession().getExams().get(k).getId() == listE.get(j))
-							e = s.getExamSession().getExams().get(k);
-					}
-					// res
-					for (int k = 0; k< res.size(); k++){
-						// if in res.get(k) period & room corresponds
-						if (res.get(k).getPeriod().getId() == currentPeriod
-						&& res.get(k).getRoom().getId() == currentRoomsList.get(j))
-							//add the exam j
-							res.get(k).getExamList().add(e);
-						
-						updateValidPeriods(e.getId(), currentPeriod );
-					}
-					NPE.remove(j);
-				}
+	/**
+	 * 
+	 * @param boolArray
+	 * @param NPE list of non placed exams
+	 * @return
+	 * @throws SolvingException If boolArray & NPE have different size.
+	 */
+	public boolean hasCoincidingExams(boolean[] boolArray, List<Exam> NPE) throws SolvingException {
+		if (boolArray.length != NPE.size())
+			throw new SolvingException("The specified list and array have different size.");
+		for (int i = 0; i < NPE.size(); i++) {
+			if (boolArray[i] == false && checkCoincidence(NPE.get(i).getId()).size() > 1) {
+				return true;
 			}
-			List<Exam> sNPE = s.getNonPlacedExams();
-			sNPE = NPE;
 		}
-		for( int i = 0; i< s.getNonPlacedExams().size();i++){
+		return false;
+	}
+	
+	public Solution solve() throws SolvingException {
+		List <ResultCouple> res = manualClone();
+		List <Exam> NPE = s.getNonPlacedExams();
+		
+		boolean[] boolArray = new boolean[NPE.size()];
+		for (int i = 0; i < NPE.size(); i++) {
+			boolArray[i] = false;
+		}
+		boolArray[2]=true;
+		
+		//loop through boolean array
+		while (hasFalse(boolArray) /*&& hasCoincidingExams(boolArray, NPE)*/) {
+			int c = -1;
+			System.out.println("boolArray:");
+			for (int i = 0; i < boolArray.length; i++) {
+				System.out.println("i=" + i + ";" + boolArray[i]);
+			}
 			
-			int examId = s.getNonPlacedExams().get(i).getId();
-			List<Integer> listE = checkCoincidence(examId);
-			
-			// if the list has got more than 1 exam
-			if (listE.size() == 1){
-				// find a period for the list
-				int currentPeriod = getAvailablePeriod(listE);
-				// find rooms for the list and currentPeriod
-				List<Integer> currentRoomsList = findSuitable(listE, currentPeriod);
-			
-					int j=1;
-					for(int k = 0; k < s.getExamSession().getExams().size();k++){
-						if (s.getExamSession().getExams().get(k).getId() == listE.get(j))
-							e = s.getExamSession().getExams().get(k);
+			if (hasCoincidingExams(boolArray, NPE)) {
+				c = findFalseCoinciding(boolArray, NPE);
+				System.out.println("trouvé !!!! " + c);
+			} else {
+				c = findFalse(boolArray);
+			}
+			int examId = NPE.get(c).getId();
+			List<Integer> cExams = checkCoincidence(examId);
+			//
+			System.out.println("c=" + c);
+			/*for (Integer zorg : cExams) {
+				System.out.println("###" + zorg);
+			}*/
+			int periodId = getAvailablePeriod(cExams);
+			List<Integer> rooms = findSuitable(cExams, periodId);
+			//place exams
+			for (int i = 0; i < cExams.size(); i++) {
+				int currentExam = cExams.get(i);
+				List<ResultCouple> resForPeriod = s.getResultsForPeriod(periodId, res);
+				for (int j = 0; j < resForPeriod.size(); j++) {
+					if (resForPeriod.get(j).getRoom().getId() == rooms.get(i)) {
+						System.out.println("currentExam" + currentExam);
+						resForPeriod.get(j).addExam(currentExam);
+						//int indexNPE = NPE.get(index)
+						System.out.println("index is : " + getIndex(NPE, currentExam)+ "place is : " );
+						boolArray[getIndex(NPE, currentExam)] = true;
+						updateValidPeriods(currentExam, periodId);
 					}
-					// res
-					for (int k = 0; k< res.size(); k++){
-						// if in res.get(k) period & room corresponds
-						if (res.get(k).getPeriod().getId() == currentPeriod
-						&& res.get(k).getRoom().getId() == currentRoomsList.get(j))
-							//add the exam j
-							res.get(k).getExamList().add(e);
-						
-						updateValidPeriods(e.getId(), currentPeriod );
-					}
-					NPE.remove(j);
 				}
 			}
+		}
+		System.out.println("final res:" + res);
+		s.setResult((ArrayList<ResultCouple>) res);
 		return s;
+	}
+	
+	
+
+	private int getIndex(List<Exam> nPE, int currentExam) {
+		for (int i = 0; i < nPE.size(); i++) {
+			System.out.println("getIndex of " + currentExam + " - checking NPE.get(" + i + ");");
+			if (nPE.get(i).getId() == currentExam) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	private int findFalseCoinciding(boolean[] boolArray, List<Exam> nPE) {
+		for (int i = 0; i < nPE.size(); i++) {
+			if (boolArray[i] == false && checkCoincidence(nPE.get(i).getId()).size() > 1) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	private int findFalse(boolean[] boolArray) {
+		for (int i = 0; i < boolArray.length; i++) {
+			if (boolArray[i] == false)
+				return i;
+		}
+		return -1;
+	}
+
+	private boolean hasFalse(boolean[] boolArray) {
+		for (int i =0; i < boolArray.length; i++) {
+			if (boolArray[i] == false)
+				return true;
+		}
+		return false;
+	}
+
+	@SuppressWarnings("unused")
+	private void printNPE_listE_suitableRooms(List<Exam> NPE,
+			List<Integer> listE, List<Integer> suitableRooms) {
+		System.out.print("\nListE:\n\t");
+		for (Integer ee : listE) {
+			System.out.print(ee + "; ");
+		}
+		System.out.print("\nsuitable rooms:\n\t");
+		for (Integer sr : suitableRooms) {
+			System.out.print(sr + "; ");
+		}
+		System.out.println("\nnon placed exams:\n\t");
+		for (Exam n : NPE) {
+			System.out.print(n.getId() + "; ");
+		}
 	}
 	
 		public void updateValidPeriods(int examId, int periodId)
@@ -221,7 +275,7 @@ public class HardConstraintsSolver {//TODO: interface solver
 				for (int j =0; j < s.getExamSession().getExams().size();j++ ){
 						boolean present = false;
 						// if exam i & j cannot take place at the same time
-						if (coincidence[i][j] == 0) 
+						if (coincidence[current.getExamList().get(i).getId()][j] == 0) 
 						// check if exam j is present 
 						for(int k = 0; k < current.getExamList().size();k++){
 							// if id is found : present = true
@@ -263,26 +317,26 @@ public class HardConstraintsSolver {//TODO: interface solver
 	/**
 	 * Check for exams coinciding with the specified id.
 	 * @param examId
-	 * @return List of exams or null.
+	 * @return A list containing examId and whatever other exam coinciding with it.
 	 */
 	public List<Integer> checkCoincidence(int examId) {
 		Exam exam = s.getExamSession().getExams().get(examId);
+		List<Integer> res = new ArrayList<Integer>();
+		res.add(examId);
 		if (exam.hasPeriodHardConstraint(
 				EPeriodHardConstraint.EXAM_COINCIDENCE)) {
-			List<Integer> res = new LinkedList<Integer>();
-			res.add(examId);
+
 			// loop through the specified exam's constraints
 			for (PeriodHardConstraint currentConstraint :
 				exam.getConstraints()) {
 				if (currentConstraint.getConstraint() ==
 						EPeriodHardConstraint.EXAM_COINCIDENCE) {
-					res.add(currentConstraint.getE2Id());
+					if (!res.contains(currentConstraint.getE2Id()))
+						res.add(currentConstraint.getE2Id());
 				}
 			}
-			return res;
-		} else {
-			return null;
 		}
+		return res;
 	}
 	
 	public int getAvailablePeriod(int examId) {
@@ -333,7 +387,8 @@ public class HardConstraintsSolver {//TODO: interface solver
 		boolean tmp = false;
 		ArrayList<Integer> e = (ArrayList<Integer>) ((ArrayList<Integer>) exams).clone();
 		//Collections.copy(e, exams);
-		ArrayList<ResultCouple> res = (ArrayList<ResultCouple>) ((ArrayList<ResultCouple>) s.getResult()).clone();
+		//ArrayList<ResultCouple> res = (ArrayList<ResultCouple>) ((ArrayList<ResultCouple>) s.getResult()).clone();
+		ArrayList<ResultCouple> res = manualClone();
 		//Collections.copy(res, s.getResult());
 		
 		int numberOfExams = exams.size();
@@ -363,9 +418,25 @@ public class HardConstraintsSolver {//TODO: interface solver
 		}
 		return tmp;
 	}
+
+	private ArrayList<ResultCouple> manualClone() {
+		ArrayList<ResultCouple> res = new ArrayList<ResultCouple>();
+		for (ResultCouple toClone : s.getResult()) {
+			res.add(toClone.clone());
+		}//manual cloning - lol
+		return res;
+	}
+	
+	private ArrayList<ResultCouple> manualClone(List<ResultCouple> resIn) {
+		ArrayList<ResultCouple> res = new ArrayList<ResultCouple>();
+		for (ResultCouple toClone : resIn) {
+			res.add(toClone.clone());
+		}//manual cloning - lol
+		return res;
+	}
 	
 	public boolean canHost(int examId, int periodId, List<ResultCouple> resIn) {
-		ArrayList<ResultCouple> res = (ArrayList<ResultCouple>) ((ArrayList<ResultCouple>) resIn).clone();
+		ArrayList<ResultCouple> res = manualClone(resIn);
 		boolean tmp = false;
 		boolean exclusive;
 		
@@ -474,7 +545,7 @@ public class HardConstraintsSolver {//TODO: interface solver
 		
 		ArrayList<Integer> e = (ArrayList<Integer>) ((ArrayList<Integer>) exams).clone();
 		//Collections.copy(e, exams);
-		ArrayList<ResultCouple> res = (ArrayList<ResultCouple>) ((ArrayList<ResultCouple>) s.getResult()).clone();
+		ArrayList<ResultCouple> res = manualClone();
 		//Collections.copy(res, s.getResult());
 		int numberOfExams = exams.size();
 		int index;

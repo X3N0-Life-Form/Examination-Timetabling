@@ -64,13 +64,21 @@ public class HardConstraintsSolverTests_solve {
 	
 	/**
 	 * A solved solution is valid.
+	 * @throws SolvingException 
 	 */
 	@Test
-	public void testSolve() {
+	public void testSolve() throws SolvingException {
 		Solution s = simpleSolver.solve();
 		Feedback feedback = new Feedback();
-		simpleSolver = new HardConstraintsSolver(s); //TODO: is it needed?
-		assertTrue(simpleSolver.isSolutionValid(feedback));
+		List<ResultCouple> rcs = s.getResult();
+		/*for (ResultCouple c : rcs) {
+			System.out.println(c.getExamList());
+		}*/
+		boolean res = simpleSolver.isSolutionValid(feedback);
+		if (!res) {
+			System.out.println(feedback);
+		}
+		assertTrue(res);
 	}
 
 }

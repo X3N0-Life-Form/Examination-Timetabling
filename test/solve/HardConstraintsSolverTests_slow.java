@@ -42,9 +42,10 @@ public class HardConstraintsSolverTests_slow {
 	
 	/**
 	 * Does the solver remove all non placed exams?
+	 * @throws SolvingException 
 	 */
 	@Test
-	public void solve_loop() {
+	public void solve_loop() throws SolvingException {
 		Solution res = solver.solve();
 		assertFalse(res.getNonPlacedExams().size() > 0);
 	}
