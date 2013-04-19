@@ -174,7 +174,7 @@ public class HardConstraintsSolverTests_slow {
 	
 	@Test
 	public void getAvailablePeriod_singleNormal() {
-		assertTrue(solver.getAvailablePeriod(0) == 0);
+		assertTrue(solver.getAvailablePeriod(0, s.getResult()) == 0);
 	}
 	
 	@Test
@@ -182,7 +182,7 @@ public class HardConstraintsSolverTests_slow {
 		List<ResultCouple> results = s.getResult();
 		ResultCouple first = results.get(0);
 		first.addExam(es.getExams().get(856));
-		int res = solver.getAvailablePeriod(246);
+		int res = solver.getAvailablePeriod(246, results);
 		assertTrue(res != 0);
 		assertTrue(res == 1);
 	}
@@ -192,7 +192,7 @@ public class HardConstraintsSolverTests_slow {
 		List<Integer> coincidingExams = new ArrayList<Integer>();
 		coincidingExams.add(0);
 		coincidingExams.add(1);
-		int res = solver.getAvailablePeriod(coincidingExams);
+		int res = solver.getAvailablePeriod(coincidingExams, s.getResult());
 		assertTrue(res == 0);
 	}
 	
@@ -204,7 +204,7 @@ public class HardConstraintsSolverTests_slow {
 		List<Integer> list = new ArrayList<Integer>();
 		list.add(246);
 		list.add(13);
-		int res = solver.getAvailablePeriod(list);
+		int res = solver.getAvailablePeriod(list, results);
 		assertTrue(res != 0);
 		assertTrue(res == 1);
 	}
