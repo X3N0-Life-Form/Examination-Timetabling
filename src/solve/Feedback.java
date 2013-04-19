@@ -54,7 +54,7 @@ public class Feedback {
 		for (ResultCouple item : keys) {
 			s += "\n\t" + items.get(item) + " ==> " + item;
 		}
-		s += "]";
+		s += "\n]";
 		return s;
 		/**/
 		//return "Feedback [items=" + items + "]";

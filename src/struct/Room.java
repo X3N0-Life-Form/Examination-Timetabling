@@ -17,7 +17,6 @@ public class Room {
 	}
 	
 	private int cost;
-	//TODO: make comparable according to size &/or cost?
 	
 	public Room(int id, int size, int cost) {
 		this.id = id;
@@ -27,7 +26,7 @@ public class Room {
 
 	@Override
 	public String toString() {
-		return "Room [size=" + size + ", cost=" + cost + "]";
+		return "Room [id=" + id + ", size=" + size + ", cost=" + cost + "]";
 	}
 
 	

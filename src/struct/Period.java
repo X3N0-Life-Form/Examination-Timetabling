@@ -49,7 +49,7 @@ public class Period  implements Comparable<Period> {
 
 	@Override
 	public String toString() {
-		return "Period [date_hour=" + date_hour + ", duration="
+		return "Period [id=" + id + ", date_hour=" + date_hour + ", duration="
 				+ duration + ", cost=" + cost + "]";
 	}
 
