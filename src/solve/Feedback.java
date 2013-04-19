@@ -2,6 +2,7 @@ package solve;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import struct.ResultCouple;
 
@@ -48,6 +49,14 @@ public class Feedback {
 
 	@Override
 	public String toString() {
-		return "Feedback [items=" + items + "]";
+		String s = "Feedback [items=";
+		Set<ResultCouple> keys = items.keySet();
+		for (ResultCouple item : keys) {
+			s += "\n\t" + items.get(item) + " ==> " + item;
+		}
+		s += "]";
+		return s;
+		/**/
+		//return "Feedback [items=" + items + "]";
 	}
 }
