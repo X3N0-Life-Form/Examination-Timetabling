@@ -86,15 +86,23 @@ public class HardConstraintsSolverTests_solve {
 		@SuppressWarnings("unused")
 		Solution s = simpleSolver.solve();
 		Feedback feedback = new Feedback();
-		//List<ResultCouple> rcs = s.getResult();
-		/*for (ResultCouple c : rcs) {
-			System.out.println(c.getExamList());
-		}*/
 		boolean res = simpleSolver.isSolutionValid(feedback);
 		if (!res) {
 			System.out.println(feedback);
 		}
 		assertTrue(res);
+	}
+	
+	@Test
+	public void testCanHost_periodUnavailable() {
+		List<ResultCouple> resIn = simpleSolution.getResult();
+		resIn.get(0).addExam(0); //room 0; period 0 --> occupied
+		for (ResultCouple c: resIn) {
+			if (c.getPeriod().getId() == 0) {
+				c.addExam(1);
+			}
+		}
+		assertFalse(simpleSolver.canHost(3, 0, resIn));
 	}
 	
 	@Test

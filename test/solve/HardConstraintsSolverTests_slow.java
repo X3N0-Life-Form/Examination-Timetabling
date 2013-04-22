@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import parse.ExamParsingException;
@@ -98,7 +97,7 @@ public class HardConstraintsSolverTests_slow {
 		List<Integer> exams = new ArrayList<Integer>();
 		exams.add(0);
 		exams.add(1);
-		boolean res = solver.canHost(exams, 0);
+		boolean res = solver.canHost(exams, 0, (ArrayList<ResultCouple>) s.getResult());
 		assertTrue(res);
 	}
 	
@@ -110,13 +109,13 @@ public class HardConstraintsSolverTests_slow {
 			currentRC.addExam(es.getExams().get(0));
 		}
 		exams.add(0);
-		boolean res = solver.canHost(exams, 0);
+		boolean res = solver.canHost(exams, 0, (ArrayList<ResultCouple>) s.getResult());
 		assertFalse(res);
 	}
 	
 	@Test
 	public void findSuitable_singleNormal() {
-		int res = solver.findSuitable(0, 0, s.getResult());
+		int res = solver.findSuitable(0, 0, s.getResult()).get(0);
 		assertTrue(res != -1);
 		assertTrue(res == 0);
 	}
@@ -129,7 +128,7 @@ public class HardConstraintsSolverTests_slow {
 		int periodId = first.getPeriod().getId();
 		first.addExam(es.getExams().get(0));
 		//exam 13's size = 4
-		int res = solver.findSuitable(13, periodId, s.getResult());
+		int res = solver.findSuitable(13, periodId, s.getResult()).get(0);
 		assertTrue(res != -1);
 		assertTrue(res == roomId);
 	}
@@ -139,7 +138,7 @@ public class HardConstraintsSolverTests_slow {
 		List<Integer> exams = new ArrayList<Integer>();
 		exams.add(306);
 		exams.add(307);
-		List<Integer> res = solver.findSuitable(exams, 0);
+		List<Integer> res = solver.findSuitable(exams, 0, s.getResult());
 		assertTrue(res.size() == 2);
 		assertTrue(res.get(0) == 0);
 		assertTrue(res.get(1) == res.get(0));
@@ -150,7 +149,7 @@ public class HardConstraintsSolverTests_slow {
 		List<Integer> exams = new ArrayList<Integer>();
 		exams.add(0);
 		exams.add(1);
-		List<Integer> res = solver.findSuitable(exams, 0);
+		List<Integer> res = solver.findSuitable(exams, 0, s.getResult());
 		assertTrue(res.get(0) != res.get(1));
 		assertTrue(res.get(0) == 0);
 		assertTrue(res.get(1) == 1);
@@ -167,14 +166,15 @@ public class HardConstraintsSolverTests_slow {
 		List<Integer> exams = new ArrayList<Integer>();
 		exams.add(0);
 		exams.add(1);
-		List<Integer> res = solver.findSuitable(exams, 0);
+		List<Integer> res = solver.findSuitable(exams, 0, s.getResult());
 		assertFalse(res.contains(0));
 		assertFalse(res.contains(1));
 	}
 	
 	@Test
 	public void getAvailablePeriod_singleNormal() {
-		assertTrue(solver.getAvailablePeriod(0, s.getResult()) == 0);
+		fail("TODO");
+		//assertTrue(solver.getAvailablePeriod(0, s.getResult()) == 0);
 	}
 	
 	@Test
@@ -182,9 +182,11 @@ public class HardConstraintsSolverTests_slow {
 		List<ResultCouple> results = s.getResult();
 		ResultCouple first = results.get(0);
 		first.addExam(es.getExams().get(856));
-		int res = solver.getAvailablePeriod(246, results);
+		fail("TODO");
+		/*int res = solver.getAvailablePeriod(246, results, s.getResult());
 		assertTrue(res != 0);
 		assertTrue(res == 1);
+		/**/
 	}
 	
 	@Test
@@ -192,8 +194,9 @@ public class HardConstraintsSolverTests_slow {
 		List<Integer> coincidingExams = new ArrayList<Integer>();
 		coincidingExams.add(0);
 		coincidingExams.add(1);
-		int res = solver.getAvailablePeriod(coincidingExams, s.getResult());
-		assertTrue(res == 0);
+		fail("TODO");
+		//int res = solver.getAvailablePeriod(coincidingExams, s.getResult(), s.getResult());
+		//assertTrue(res == 0);
 	}
 	
 	@Test
@@ -204,9 +207,11 @@ public class HardConstraintsSolverTests_slow {
 		List<Integer> list = new ArrayList<Integer>();
 		list.add(246);
 		list.add(13);
-		int res = solver.getAvailablePeriod(list, results);
+		fail("TODO");
+		/*int res = solver.getAvailablePeriod(list, results, s.getResult());
 		assertTrue(res != 0);
 		assertTrue(res == 1);
+		/**/
 	}
 	
 	
