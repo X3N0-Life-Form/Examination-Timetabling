@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import struct.Exam;
 import struct.ResultCouple;
 
 /**
@@ -52,7 +53,15 @@ public class Feedback {
 		String s = "Feedback [items=";
 		Set<ResultCouple> keys = items.keySet();
 		for (ResultCouple item : keys) {
-			s += "\n\t" + items.get(item) + " ==> " + item;
+			s += "\n\t" + items.get(item);
+			if (items.get(item).equals(ROOM_SIZE_VIOLATION)) {
+				int totalSize = 0;
+				for (Exam exam : item.getExamList()) {
+					totalSize += exam.getSize();
+				}
+				s += "; total size=" + totalSize;
+			}
+			s += " ==> " + item;
 		}
 		s += "\n]";
 		return s;

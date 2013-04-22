@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import parse.ExamParsingException;
@@ -30,6 +31,13 @@ public class HardConstraintsSolverTests_solve {
 	private String simpleFileName = "res/simple_set.exam";
 	private HardConstraintsSolver simpleSolver;
 	
+	
+	private ExamSessionParser normalParser;
+	private Solution normalSolution;
+	private ExamSession normalExamSession;
+	private String normalFileName = "res/exam_set_noAFTER.exam";
+	private HardConstraintsSolver normalSolver;
+	
 	/**
 	 * For the record:
 	 * id=0;size=220
@@ -50,6 +58,13 @@ public class HardConstraintsSolverTests_solve {
 		simpleSolver = new HardConstraintsSolver(simpleSolution);
 	}
 	
+	public void normalSolutionSetup() throws ExamParsingException, IOException {
+		normalParser = new ExamSessionParser(normalFileName);
+		normalExamSession = normalParser.parse();
+		normalSolution = new Solution(normalExamSession);
+		normalSolver = new HardConstraintsSolver(normalSolution);
+	}
+	
 	@SuppressWarnings("unused")
 	private void printSimpleSet(List<ResultCouple> results) {
 		int i =0;
@@ -66,11 +81,12 @@ public class HardConstraintsSolverTests_solve {
 	 * A solved solution is valid.
 	 * @throws SolvingException 
 	 */
-	@Test
-	public void testSolve() throws SolvingException {
+	@Test @Ignore
+	public void testSolveSimple() throws SolvingException {
+		@SuppressWarnings("unused")
 		Solution s = simpleSolver.solve();
 		Feedback feedback = new Feedback();
-		List<ResultCouple> rcs = s.getResult();
+		//List<ResultCouple> rcs = s.getResult();
 		/*for (ResultCouple c : rcs) {
 			System.out.println(c.getExamList());
 		}*/
@@ -80,5 +96,17 @@ public class HardConstraintsSolverTests_solve {
 		}
 		assertTrue(res);
 	}
-
+	
+	@Test
+	public void testSolveNormal() throws SolvingException, ExamParsingException, IOException {
+		normalSolutionSetup();
+		@SuppressWarnings("unused")
+		Solution s = normalSolver.solve();
+		Feedback feedback = new Feedback();
+		boolean res = normalSolver.isSolutionValid(feedback);
+		if (!res) {
+			System.out.println(feedback);
+		}
+		assertTrue(res);
+	}
 }

@@ -204,8 +204,9 @@ public class HardConstraintsSolver {
 			ArrayList<PeriodHardConstraint> constraintList = new ArrayList<PeriodHardConstraint>();
 			
 			//check AFTER
+			
 			for (ResultCouple current : s.getResult()) {
-				
+			/*	
 			for (int i = 0 ; i <current.getExamList().size(); i++){
 				// get constraints list
 				constraintList = current.getExamList().get(i).getConstraints();
@@ -238,6 +239,7 @@ public class HardConstraintsSolver {
 				}
 				
 			}
+			/**/
 			//check EXAM_COINCIDENCE
 			// exam
 			for (ResultCouple currentBis : s.getResult()) {
@@ -260,10 +262,14 @@ public class HardConstraintsSolver {
 								id = constraintList.get(i).getE1Id();
 						}
 						boolean present = false;
+
+						System.out.println(" 1st elem " +currentBis.getExamList().get(j).getId());
+						System.out.println(" ########## id coin" +id);
 						// check if id is present into list exam
 						for(int k = 0; k < currentBis.getExamList().size();k++){
 							// if id is found : present = true
 							if (currentBis.getExamList().get(k).getId() == id) {
+								System.out.println(" TROUVEEEEEEEEEEEEEEEEEEEEEEEEEEEEE " +id);
 								present = true; 
 							} else {
 								for(ResultCouple c : s.getResult()){
@@ -523,8 +529,7 @@ public class HardConstraintsSolver {
 		int sizeE = 0;
 		
 		//for (int i = 0; i< res.size();i++){
-			while( i < res.size() && tmp == -1)
-			{
+		while(i < res.size() && tmp == -1) {
 			exclusive = false;
 			// where the result period id = periodId
 			if (res.get(i).getPeriod().getId() == periodId){
@@ -535,8 +540,7 @@ public class HardConstraintsSolver {
 					for (int j = 0; j< res.get(i).getExamList().size(); j++){
 						sizeCounter += res.get(i).getExamList().get(j).getSize();
 					}
-							//get the capacity of the room
-
+					//get the capacity of the room
 					for (int k = 0; k < s.getExamSession().getExams().size(); k++){
 						if (s.getExamSession().getExams().get(k).getId() == examId){
 							sizeE = s.getExamSession().getExams().get(k).getSize();
@@ -549,13 +553,11 @@ public class HardConstraintsSolver {
 							exclusive = true;
 					}
 					
-				
 					//if the size of all the exams + size of our exam <= room capacity, get this id
 					if (sizeCounter+sizeE <= res.get(i).getRoom().getSize() 
 							&& !exclusive) {
-							tmp = res.get(i).getRoom().getId();
+							return res.get(i).getRoom().getId();
 					}
-						
 				}
 				else{
 					int roomSize = res.get(i).getRoom().getSize();
@@ -566,7 +568,7 @@ public class HardConstraintsSolver {
 							break;
 						}
 						if (currentExamSize <= roomSize)
-							tmp = res.get(i).getRoom().getId();
+							return res.get(i).getRoom().getId();
 					}
 					
 				}
@@ -580,11 +582,11 @@ public class HardConstraintsSolver {
 				//check size >< 
 				tmp = res.get(i).getRoom().getId();
 			}
-			i++;	
+			i++;
 		}
 	}
 	return tmp;
-	}	
+	}
 	
 	public List<Integer> findSuitable(List<Integer> exams, int periodId) {
 		List<Integer> list = new ArrayList<Integer>();
@@ -598,29 +600,36 @@ public class HardConstraintsSolver {
 		int count = 0;
 		Exam ex;
 				
-			//while exams != null
-			while(count < numberOfExams){
-				for(int j =0; j<res.size(); j++) {
-					if (list.size() == e.size())
-						break;
-					int pId = res.get(j).getPeriod().getId();
-					int rId = res.get(j).getRoom().getId();
-					int suitableId = findSuitable(e.get(count), periodId, res);
+		while(count < numberOfExams){
+			for(int j =0; j<res.size(); j++) {
+				if (list.size() == e.size())
+					break;
+				int pId = res.get(j).getPeriod().getId();
+				int rId = res.get(j).getRoom().getId();
+				int suitableId = findSuitable(e.get(count), periodId, res);
+				
+				if(pId == periodId && rId == suitableId){
+					index = j;
+					//get the exam 
+					ex = s.getExamSession().getExams().get(e.get(count));
+					//set the exam
 					
-					if(pId == periodId && rId == suitableId){
-						index = j;
-						//get the exam 
-						ex = s.getExamSession().getExams().get(e.get(count));
-						//set the exam
-						res.get(index).getExamList().add(ex);
-						
-						list.add(suitableId);
-						//remove from the list
-					//	e.remove(0);
+					int totalSize = 0;
+					for (Exam exam : res.get(j).getExamList()) {
+						totalSize += exam.getSize();
 					}
+					//if (res.get(j).getRoom().getSize() >= totalSize + ex.getSize()) {
+						System.out.println("totalSize=" + totalSize + "; Room size=" + res.get(j).getRoom().getSize()
+								+ "; ex.size()=" + ex.getSize());
+						res.get(index).getExamList().add(ex);
+						list.add(suitableId);
+						if (res.get(j).getRoom().getSize() < totalSize + ex.getSize())
+							System.out.println("c'est pas normal");
+					//}
 				}
-				count++;
 			}
+			count++;
+		}
 		return list;
 	}	
 	
