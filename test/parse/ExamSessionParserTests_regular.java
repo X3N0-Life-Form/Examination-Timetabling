@@ -25,7 +25,7 @@ import struct.RoomHardConstraint;
  * @author Adrien Droguet
  * @see ExamSessionParser
  */
-public class ExamSessionParserTests {
+public class ExamSessionParserTests_regular {
 
 	public static final String testfileName_1 = "res/exam_comp_set1.exam";
 	public static final String testfileName_2 = "res/exam_comp_set2.exam";

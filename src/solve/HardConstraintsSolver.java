@@ -1,19 +1,14 @@
 package solve;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
 
-import javax.swing.text.StyledEditorKit.BoldAction;
-
 import parse.ExamSessionParser;
 import struct.Exam;
 import struct.ExamSession;
-import struct.Period;
 import struct.PeriodHardConstraint;
 import struct.ResultCouple;
-import struct.Room;
 import struct.Solution;
 import struct.EPeriodHardConstraint;
 
@@ -452,6 +447,11 @@ public class HardConstraintsSolver {
 		return res;
 	}
 	
+	/**
+	 * Manually clones a list and its contents.
+	 * @param resIn
+	 * @return A list containing clones of resIn's elements.
+	 */
 	private ArrayList<ResultCouple> manualClone(List<ResultCouple> resIn) {
 		ArrayList<ResultCouple> res = new ArrayList<ResultCouple>();
 		for (ResultCouple toClone : resIn) {
@@ -515,10 +515,10 @@ public class HardConstraintsSolver {
 	}
 	
 	/**
-	 * Find a suitable room for the specified exam in the specified period.
+	 * Finds a suitable room for the specified exam in the specified period.
 	 * @param examId
 	 * @param periodId
-	 * @return
+	 * @return A suitable room id or -1.
 	 */
 	public int findSuitable(int examId, int periodId, List<ResultCouple> res) {
 		//note: prioritize rooms that are already in use.
@@ -587,6 +587,7 @@ public class HardConstraintsSolver {
 	}
 	return tmp;
 	}
+	
 	
 	public List<Integer> findSuitable(List<Integer> exams, int periodId) {
 		List<Integer> list = new ArrayList<Integer>();
