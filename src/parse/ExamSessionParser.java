@@ -139,15 +139,16 @@ public class ExamSessionParser {
 		int frontLoad_3 = 0;
 		while ((line = reader.readLine()) != null) {
 			int comaIndex = line.indexOf(',');
+			line = line.replaceAll(" ", "");
 			if (line.contains(IW_TWOINAROW)) {
 				twoInARow =
-						Integer.parseInt(line.substring(comaIndex + 2));
+						Integer.parseInt(line.substring(comaIndex + 1));
 			} else if (line.contains(IW_TWOINADAY)) {
 				twoInADay =
-						Integer.parseInt(line.substring(comaIndex + 2));
+						Integer.parseInt(line.substring(comaIndex + 1));
 			} else if (line.contains(IW_PERIODSPREAD)) {
 				periodSpread =
-						Integer.parseInt(line.substring(comaIndex + 2));
+						Integer.parseInt(line.substring(comaIndex + 1));
 			} else if (line.contains(IW_NONMIXEDDURATIONS)) {
 				nonMixedDurations =
 						Integer.parseInt(line.substring(comaIndex + 1));
@@ -183,7 +184,8 @@ public class ExamSessionParser {
 				.contains(ENTRY_INSTITUTIONAL_WEIGHTINGS)) {
 			int comaIndex = line.indexOf(',');
 			int id = Integer.parseInt(line.substring(0, comaIndex));
-			line = line.substring(comaIndex + 2);
+			line = line.substring(comaIndex + 1);
+			line = line.replaceAll(" ", "");
 			ERoomHardConstraint constraint = getERoomHardConstraint(line);
 			RoomHardConstraint currentRHC =
 					new RoomHardConstraint(id, constraint);
@@ -219,11 +221,12 @@ public class ExamSessionParser {
 				.contains(ENTRY_ROOM_HARD_CONSTRAINTS)) {
 			int comaIndex = line.indexOf(",");
 			int e1Id = Integer.parseInt(line.substring(0, comaIndex));
-			line = line.substring(comaIndex + 2);
+			line = line.substring(comaIndex + 1);
+			line = line.replaceAll(" ",	"");
 			comaIndex = line.indexOf(",");
 			EPeriodHardConstraint constraint =
 					getEPeriodHardConstraint(line.substring(0, comaIndex));
-			line = line.substring(comaIndex + 2);
+			line = line.substring(comaIndex + 1);
 			int e2Id = Integer.parseInt(line);
 			PeriodHardConstraint currentPHC =
 					new PeriodHardConstraint(e1Id, e2Id, constraint);
@@ -264,7 +267,8 @@ public class ExamSessionParser {
 			line = reader.readLine();
 			int comaIndex = line.indexOf(',');
 			int size = Integer.parseInt(line.substring(0, comaIndex));
-			line = line.substring(comaIndex + 2);
+			line = line.substring(comaIndex + 1);
+			line = line.replaceAll(" ", "");
 			int cost = Integer.parseInt(line);
 			Room currentRoom = new Room(i, size, cost);
 			rooms.add(currentRoom);
@@ -313,7 +317,8 @@ public class ExamSessionParser {
 			// get duration and cost //
 			///////////////////////////
 			int duration = Integer.parseInt(line.substring(0, comaIndex));
-			line = line.substring(comaIndex + 2); //", "
+			line = line.substring(comaIndex + 1);
+			line = line.replaceAll(" ", "");
 			int cost = Integer.parseInt(line);
 			
 			Period currentPeriod = new Period(i, date, duration, cost);
