@@ -15,6 +15,7 @@ import struct.Exam;
 import struct.ExamSession;
 import struct.ResultCouple;
 import struct.Solution;
+import util.Solving;
 
 /**
  * Tests concerning the solve() method. Note that this series of tests uses
@@ -105,7 +106,7 @@ public class HardConstraintsSolverTests_solve {
 				c.addExam(1);
 			}
 		}
-		assertFalse(simpleSolver.canHost(3, 0, resIn));
+		assertFalse(Solving.canHost(simpleSolution, 3, 0, resIn));
 	}
 	
 	@Test
