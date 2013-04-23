@@ -71,9 +71,9 @@ public class HardConstraintsSolver {
 			System.out.println("----Processing exam " + examId);
 			List<Integer> cExams = Solving.checkCoincidence(s, examId);
 			System.out.println("----Found " + cExams.size() + " coinciding exams");
-			List<Integer> periodIds = Solving.getAvailablePeriod(s, cExams, res);
-			System.out.println("----Found " + periodIds.size() + " periods capable of hosting these exams");
-			for (Integer periodId : periodIds) {
+			int periodId = Solving.getAvailablePeriod(s, cExams, res);
+			System.out.println("----Found " + periodId + " periods capable of hosting these exams");
+		//	for (Integer periodId : periodIds) {
 				System.out.println("------Processing period " + periodId);
 				List<Integer> rooms = Solving.findSuitable(s, cExams, periodId, res);
 				System.out.println("------Found " + rooms.size() + " suitable rooms for " + cExams.size() + " exams");
@@ -96,7 +96,7 @@ public class HardConstraintsSolver {
 						}
 					}
 				}
-			}
+			
 		}
 		//place exams (for real)	
 		System.out.println("--Final res:" + res);
