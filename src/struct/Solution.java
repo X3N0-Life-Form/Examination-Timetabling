@@ -68,7 +68,7 @@ public class Solution {
 	 * @return A List of ResultCouple of the specified period out ResultCouple
 	 * found in resIn.
 	 */
-	public List<ResultCouple> getResultsForPeriod(int periodId, List<ResultCouple> resIn) {
+	public List<ResultCouple> getResultsForPeriod(int periodId, List<ResultCouple> resIn) {//TODO:move that somewhere else
 		List<ResultCouple> resOut = new ArrayList<ResultCouple>();
 		for (ResultCouple currentRC : resIn) {
 			if (currentRC.getPeriod().getId() == periodId) {

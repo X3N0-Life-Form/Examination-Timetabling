@@ -1,16 +1,15 @@
 package solve;
 
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.List;
 
 import parse.ExamSessionParser;
+import struct.EPeriodHardConstraint;
 import struct.Exam;
 import struct.ExamSession;
 import struct.PeriodHardConstraint;
 import struct.ResultCouple;
 import struct.Solution;
-import struct.EPeriodHardConstraint;
 
 /**
  * Finds an initial Timetabling solution, which solves every hard constraints.
@@ -49,8 +48,18 @@ public class HardConstraintsSolver {
 	}
 	
 	public Solution solve() throws SolvingException {
-		List <ResultCouple> res = manualClone();
+		
+		
+		
+		return s;
+	}
+	
+	/*
+	public Solution solve() throws SolvingException {
+		System.out.println("Solving hard constraints:");
+		List <ResultCouple> res = manualClone(s.getResult());
 		List <Exam> NPE = s.getNonPlacedExams();
+		System.out.println("--Found " + NPE.size() + " non placed exams");
 		
 		boolean[] boolArray = new boolean[NPE.size()];
 		for (int i = 0; i < NPE.size(); i++) {
@@ -58,8 +67,8 @@ public class HardConstraintsSolver {
 		}
 		
 		//loop through boolean array
-		while (hasFalse(boolArray) /*&& hasCoincidingExams(boolArray, NPE)*/) {
-			int c = -1;
+		while (hasFalse(boolArray) /*&& hasCoincidingExams(boolArray, NPE)*//*) {
+		/*	int c = -1;
 			
 			if (hasCoincidingExams(boolArray, NPE)) {
 				c = findFalseCoinciding(boolArray, NPE);
@@ -68,76 +77,51 @@ public class HardConstraintsSolver {
 			}
 			
 			int examId = NPE.get(c).getId();
+			System.out.println("----Processing exam " + examId);
 			List<Integer> cExams = checkCoincidence(examId);
-			
-			List<Integer> periodId1 = getAvailablePeriod(cExams, res);
-			System.out.println(" ###################################");
-			boolean ch1 = canHost(cExams, periodId1.get(0), (ArrayList<ResultCouple>) res);
-			System.out.println("period : " + periodId1 + " canhost ? " +ch1);
-
-			if (cExams.size() >1){
-				List<Integer> periodIds = getAvailablePeriod(cExams, res);
-				int periodId = periodIds.get(0);
-				boolean ch = canHost(cExams, periodId, (ArrayList<ResultCouple>) res);
-				System.out.println("period : " + periodId + " canhost ? " +ch);
+			System.out.println("----Found " + cExams.size() + " coinciding exams");
+			List<Integer> periodIds = getAvailablePeriod(cExams, res);
+			System.out.println("----Found " + periodIds.size() + " periods capable of hosting these exams");
+			for (Integer periodId : periodIds) {
+				System.out.println("------Processing period " + periodId);
 				List<Integer> rooms = findSuitable(cExams, periodId, res);
-				
-				System.out.println(" rooms size " + rooms.size() + " cExams size " + cExams.size());
-				
+				System.out.println("------Found " + rooms.size() + " suitable rooms for " + cExams.size() + " exams");
+				System.out.println("------Assigning exams to result couples");
 				for (int i = 0; i < cExams.size(); i++) {
 					int currentExam = cExams.get(i);
+					System.out.println("--------Processing exam " + currentExam);
 					List<ResultCouple> resForPeriod = s.getResultsForPeriod(periodId, res);
+					System.out.println("--------Found " + resForPeriod.size() + " result couples matching this period");
 					for (int j = 0; j < resForPeriod.size(); j++) {
-						if (resForPeriod.get(j).getRoom().getId() == rooms.get(i)) {
-							System.out.println("currentExam" + currentExam);
+						int currentRoomId = resForPeriod.get(j).getRoom().getId();
+						System.out.println("----------Processing room " + currentRoomId);
+						if (currentRoomId == rooms.get(i)) {
+							System.out.println("----------Room " + currentRoomId + " was deemed suitable for exam " + currentExam);
 							resForPeriod.get(j).addExam(currentExam);
-							//int indexNPE = NPE.get(index)
-							//System.out.println("index is : " + getIndex(NPE, currentExam)+ "place is : " );
-							System.out.println("period is : " + periodId + " room is " + rooms.get(i));
 							boolArray[getIndex(NPE, currentExam)] = true;
 							updateValidPeriods(currentExam, periodId);
+						} else {
+							System.out.println("----------Room " + currentRoomId + " was rejected");
 						}
 					}
 				}
-			}
-			else{
-				List<Integer> periodIds = getAvailablePeriod(cExams.get(0), res);
-				int periodId = periodIds.get(0);
-				ArrayList<Integer> roomList = (ArrayList<Integer>) findSuitable(cExams.get(0), periodId, res);
-				boolean ch = canHost(cExams, periodId, (ArrayList<ResultCouple>) res);
-				System.out.println("period : " + periodId + " canhost ? " +ch);
-				
-				int room = roomList.get(0);
-				for (int i = 0; i < cExams.size(); i++) {
-					int currentExam = cExams.get(i);
-					List<ResultCouple> resForPeriod = s.getResultsForPeriod(periodId, res);
-					for (int j = 0; j < resForPeriod.size(); j++) {
-						if (resForPeriod.get(j).getRoom().getId() == room) {
-							System.out.println("currentExam" + currentExam);
-							resForPeriod.get(j).addExam(currentExam);
-							//int indexNPE = NPE.get(index)
-							//System.out.println("index is : " + getIndex(NPE, currentExam)+ "place is : " );
-							System.out.println("period is : " + periodId + " room is " + room);
-							boolArray[getIndex(NPE, currentExam)] = true;
-							updateValidPeriods(currentExam, periodId);
-						}
-					}
-				}
-									
 			}
 		}
-			//place exams
-			
-		System.out.println("final res:" + res);
+		//place exams (for real)	
+		System.out.println("--Final res:" + res);
 		s.setResult((ArrayList<ResultCouple>) res);
 		return s;
 	}
+	/**/
 	
-	
-
+	/**
+	 * 
+	 * @param nPE
+	 * @param currentExam
+	 * @return index of currentExam within the supplied List.
+	 */
 	private int getIndex(List<Exam> nPE, int currentExam) {
 		for (int i = 0; i < nPE.size(); i++) {
-			//System.out.println("getIndex of " + currentExam + " - checking NPE.get(" + i + ");");
 			if (nPE.get(i).getId() == currentExam) {
 				return i;
 			}
@@ -187,162 +171,18 @@ public class HardConstraintsSolver {
 		}
 	}
 	
-		public void updateValidPeriods(int examId, int periodId)
-		{
-			int [][] eP = s.getExamPeriodModif();
-			int [][] coincidence = s.getExamCoincidence();
-			for (int i = 1; i < s.getExamSession().getExams().size(); i++){
-				if( coincidence [examId][i] == 0){
-					eP [i][periodId] = 0;
-				}
+	public void updateValidPeriods(int examId, int periodId)
+	{
+		int [][] eP = s.getExamPeriodModif();
+		int [][] coincidence = s.getExamCoincidence();
+		for (int i = 1; i < s.getExamSession().getExams().size(); i++){
+			if( coincidence [examId][i] == 0){
+				eP [i][periodId] = 0;
 			}
 		}
-	
-	public boolean isSolutionValid(Feedback feedback) {
-		boolean res = true;
-		
-			// id : exam id, used for coincidence & exclusion
-			int id = 0;
-			boolean notAfter;
-			Date periodAfter = new Date();
-			Date periodBefore = new Date();
-			ArrayList<PeriodHardConstraint> constraintList = new ArrayList<PeriodHardConstraint>();
-			
-			//check AFTER
-			
-			for (ResultCouple current : s.getResult()) {
-			/*	
-			for (int i = 0 ; i <current.getExamList().size(); i++){
-				// get constraints list
-				constraintList = current.getExamList().get(i).getConstraints();
-				
-				for (int j = 0; j < constraintList.size(); j++){
-					notAfter = false ;
-					// pour chaque exam ayant un after, récupérer id2(before)
-					// if AFTER
-					if (constraintList.get(j).getConstraint() ==
-					EPeriodHardConstraint.AFTER)
-						// the second exam of after has to take place before the 1st
-						if(current.getExamList().get(i).getId() == 
-								constraintList.get(j).getE2Id()){
-							id = constraintList.get(j).getE2Id();
-							// period of current exam into periodAfter
-							periodAfter = current.getPeriod().getDate_hour();
-							// tests
-							for (ResultCouple currentBefore : s.getResult())
-								for(int k = 0; k< currentBefore.getExamList().size();k++)
-									if (currentBefore.getExamList().get(k).getId() == id)
-										// check date
-										periodBefore = currentBefore.getPeriod().getDate_hour();
-										if(periodAfter.compareTo(periodBefore) <= 0)
-											notAfter = true;							
-						}
-						if (notAfter) {
-							res = false;
-							feedback.addItem(current, Feedback.AFTER_VIOLATION);
-						}
-				}
-				
-			}
-			/**/
-			//check EXAM_COINCIDENCE
-			// exam
-			for (ResultCouple currentBis : s.getResult()) {
-				for (int j = 0; j< currentBis.getExamList().size(); j++){
-					constraintList = currentBis.getExamList().get(j).getConstraints();
-					// constraint
-					for (int i = 0; i< constraintList.size(); i++){
-						// if constraint is EXAM_COINCIDENCE
-						int periodId = -1;
-						if (constraintList.get(i).getConstraint() == 
-								EPeriodHardConstraint.EXAM_COINCIDENCE) {
-							//get id of the 2nd exam (EXAM_COINCIDENCE)
-							//if e1Id = current exam id, var id = e2ID
-							periodId = currentBis.getPeriod().getId();
-							if (constraintList.get(i).getE1Id() == 
-									currentBis.getExamList().get(j).getId())
-								id = constraintList.get(i).getE2Id();
-							//else var id = e1ID
-							else
-								id = constraintList.get(i).getE1Id();
-						}
-						boolean present = false;
-
-						System.out.println(" 1st elem " +currentBis.getExamList().get(j).getId());
-						System.out.println(" ########## id coin" +id);
-						// check if id is present into list exam
-						for(int k = 0; k < currentBis.getExamList().size();k++){
-							// if id is found : present = true
-							if (currentBis.getExamList().get(k).getId() == id) {
-								System.out.println(" TROUVEEEEEEEEEEEEEEEEEEEEEEEEEEEEE " +id);
-								present = true; 
-							} else {
-								for(ResultCouple c : s.getResult()){
-									if (c.getPeriod().getId() == periodId) {
-										for (Exam e : c.getExamList()) {
-											if (e.getId() == id)
-												present = true;
-										}
-									}
-								}
-							}
-						}
-						// if !present, id's not found => false
-						if (!present) {
-							res = false;
-							feedback.addItem(currentBis, Feedback.EXAM_COINCIDENCE_VIOLATION);
-						}
-					}
-				}
-			}			
-			
-			//check EXCLUSION
-			// coincidence matrix
-			int [][] coincidence = s.getExamCoincidence();
-			
-			for (int i = 0; i< current.getExamList().size(); i++){
-				// matrix
-				for (int j =0; j < s.getExamSession().getExams().size();j++ ){
-						boolean present = false;
-						// if exam i & j cannot take place at the same time
-						if (coincidence[current.getExamList().get(i).getId()][j] == 0) 
-						// check if exam j is present 
-						for(int k = 0; k < current.getExamList().size();k++){
-							// if id is found : present = true
-							if (current.getExamList().get(k).getId() == j)
-								present = true; 
-						}
-						// if present, id's found => false because of the exclusion
-						if (present) {
-							res = false;
-							feedback.addItem(current, Feedback.EXCLUSION_VIOLATION);
-						}
-				}
-			}
-			int sizeSum = 0;
-			for (Exam e : current.getExamList()) {
-				//check ROOM_EXCLUSIVE
-				if (e.getRoomHardConstraint() != null) {
-					if (current.getExamList().size() > 1) {
-						feedback.addItem(current, Feedback.ROOM_EXLUSIVE_VIOLATION);
-						return false;
-					}
-				}
-				//check duration
-				if (e.getDuration() > current.getPeriod().getDuration()) {
-					feedback.addItem(current, Feedback.DURATION_VIOLATION);
-					return false;
-				}
-				sizeSum += e.getSize();
-			}
-			//check size
-			if (sizeSum > current.getRoom().getSize()) {
-				feedback.addItem(current, Feedback.ROOM_SIZE_VIOLATION);
-				return false;
-			}
-		}
-		return res;
 	}
+	
+	
 	
 	/**
 	 * Check for exams coinciding with the specified id.
@@ -411,13 +251,11 @@ public class HardConstraintsSolver {
 	 * @param periodId
 	 * @return
 	 */
-	public boolean canHost(List<Integer> exams, int periodId, ArrayList<ResultCouple> resIn) {
+	public boolean canHost(List<Integer> exams, int periodId, List<ResultCouple> resIn) {
 		boolean tmp = false;
+		@SuppressWarnings("unchecked")
 		ArrayList<Integer> e = (ArrayList<Integer>) ((ArrayList<Integer>) exams).clone();
-		//Collections.copy(e, exams);
-		//ArrayList<ResultCouple> res = (ArrayList<ResultCouple>) ((ArrayList<ResultCouple>) s.getResult()).clone();
 		ArrayList<ResultCouple> res = manualClone(resIn);
-		//Collections.copy(res, s.getResult());
 		
 		int numberOfExams = exams.size();
 		int index;
@@ -425,9 +263,7 @@ public class HardConstraintsSolver {
 		Exam ex;				
 		
 		int suitablesFound = 0;
-		System.out.println("###### canHost stuff #########");
 		while(count < numberOfExams){
-			// if canHost the 1st exam from the list
 			if (canHost(e.get(count), periodId, res)){
 				for(int j =0; j<res.size(); j++) {
 					List<Integer> suitables = findSuitable(e.get(count), periodId, res);
@@ -441,7 +277,6 @@ public class HardConstraintsSolver {
 							res.get(index).getExamList().add(ex);
 							suitablesFound++;
 							if(e.size() == suitablesFound) {
-								System.out.println("period " + periodId + " can host exam" + e.get(count));
 								return true;
 							}
 							break;
@@ -452,14 +287,6 @@ public class HardConstraintsSolver {
 			count++;
 		}
 		return tmp;
-	}
-
-	private ArrayList<ResultCouple> manualClone() {
-		ArrayList<ResultCouple> res = new ArrayList<ResultCouple>();
-		for (ResultCouple toClone : s.getResult()) {
-			res.add(toClone.clone());
-		}//manual cloning - lol
-		return res;
 	}
 	
 	/**
@@ -479,11 +306,11 @@ public class HardConstraintsSolver {
 		ArrayList<ResultCouple> res = manualClone(resIn);
 		boolean tmp = false;
 		boolean exclusive;
-		
+
 		for (int i = 0; i< res.size();i++){
 			// where the result period id = periodId
 			if (res.get(i).getPeriod().getId() == periodId){
-				
+
 				// if there's no other exams
 				if (res.get(i).getExamList().size() == 0){
 					int sizeE = 0;
@@ -502,7 +329,7 @@ public class HardConstraintsSolver {
 					exclusive = false;
 					// get the sum of all the exams size for this room & this period
 					int cmp = 0;
-				//System.out.println("miaaaaou exam id is " + examId);
+					//System.out.println("miaaaaou exam id is " + examId);
 					for (int j = 0; j< res.get(i).getExamList().size(); j++){
 						cmp += res.get(i).getExamList().get(j).getSize();
 					}
@@ -522,10 +349,10 @@ public class HardConstraintsSolver {
 					//if the size of all the exams + size of our exam <= room capacity => true
 					if (cmp+sizeE <= res.get(i).getRoom().getSize() && !exclusive )
 						tmp = true;
-						
+
+				}
 			}
 		}
-	}
 		return tmp;
 	}
 	
@@ -542,7 +369,6 @@ public class HardConstraintsSolver {
 		int sizeE = 0;
 		List<Integer> tempList = new ArrayList<Integer>();
 		
-		System.out.println("examId : "+examId+" periodId : "+periodId+ " canhost ??" + canHost(examId, periodId, res));
 		// loop for res
 		for(int i = 0; i< res.size() ; i++){
 			int sizeExamList = res.get(i).getExamList().size();
@@ -551,10 +377,7 @@ public class HardConstraintsSolver {
 		
 				// if there's more than a single exam
 				exclusive = false;
-				System.out.println("exam ID" + examId);
 				if (sizeExamList > 0){
-				
-					System.out.println("size exam List > 0");
 					
 					int sizeCounter = 0;
 					// get the sum of all the exams size for this room & period
@@ -569,14 +392,11 @@ public class HardConstraintsSolver {
 						}
 					}
 					
-					System.out.println("size of the current exam" + sizeE);
 					// room exclusive or not 
 					for (int k = 0; k< s.getExamSession().getRoomHardConstraints().size(); k++){
 						if (s.getExamSession().getRoomHardConstraints().get(k).getId() == examId)
 							exclusive = true;
 					}
-					System.out.println("room id" +res.get(i).getRoom().getId());
-					System.out.println("size counter + sizeE" +(sizeCounter+sizeE) + " <= " +res.get(i).getRoom().getSize());
 					//if size of all the exams + size of our exam <= room capacity
 					if (sizeCounter + sizeE <= res.get(i).getRoom().getSize() 
 						&& !exclusive ){
@@ -590,11 +410,6 @@ public class HardConstraintsSolver {
 			// check the period
 			if (res.get(i).getPeriod().getId() == periodId){
 				if (sizeExamList == 0){
-					if (examId == 528){
-						System.out.println("YOUHOUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUu");
-						System.out.println("currentRoom : " +res.get(i).getRoom().getId());
-						System.out.println("size of the room : " + res.get(i).getRoom().getSize());
-					}
 					//get capacity of the exam
 					for (int k = 0; k < s.getExamSession().getExams().size();k++){
 						if (s.getExamSession().getExams().get(k).getId() == examId){
@@ -602,8 +417,6 @@ public class HardConstraintsSolver {
 							break;
 						}
 					}
-					if(examId == 528)
-						System.out.println("size of the current exam : " + sizeE);
 					if (sizeE <= res.get(i).getRoom().getSize())
 						tempList.add(res.get(i).getRoom().getId());
 				}
@@ -616,11 +429,10 @@ public class HardConstraintsSolver {
 	
 	public List<Integer> findSuitable(List<Integer> exams, int periodId, List<ResultCouple> resIn) {
 		List<Integer> list = new ArrayList<Integer>();
-		
+		@SuppressWarnings("unchecked")
 		ArrayList<Integer> examsClone = (ArrayList<Integer>) ((ArrayList<Integer>) exams).clone();
-		//Collections.copy(e, exams);
 		ArrayList<ResultCouple> res = manualClone(resIn);
-		//Collections.copy(res, s.getResult());
+		
 		int numberOfExams = exams.size();
 		int index;
 		int count = 0;
@@ -632,21 +444,15 @@ public class HardConstraintsSolver {
 					break;
 				int pId = res.get(j).getPeriod().getId();
 				int rId = res.get(j).getRoom().getId();
-				System.out.println("nbE=" + numberOfExams + " count=" + count);
-				//System.out.println("list size : " + list.size() + " exams clone size" + examsClone.size());
 				List<Integer> suitableId = findSuitable(examsClone.get(count), periodId, res);
-				System.out.println("suit size" + suitableId.size());
 				if (suitableId.size() == 0){
-					System.out.println("and the motherfuckin' period is : "+ periodId);
-					System.out.println("error for this id " + examsClone.get(count));
+					//System.out.println("and the motherfuckin' period is : "+ periodId);
+					//System.out.println("error for this id " + examsClone.get(count));
 					break;
 				}
 				for (int k = 0; k< suitableId.size();k++){
-					System.out.println("k = " +k);
 					if(pId == periodId && rId == suitableId.get(k)){
 						index = j;
-						
-						System.out.println("k = " +k+ " room for k " + suitableId.get(k));
 						//get the exam 
 						ex = s.getExamSession().getExams().get(examsClone.get(count));
 						//set the exam

@@ -21,7 +21,7 @@ import struct.Solution;
  * the simplified data set.
  * @author Adrien Droguet - Sara Tari
  * @see HardConstraintsSolver
- * @see HardConstraintsSolverTests_isSolutionValid
+ * @see HardConstraintsValidatorTests
  */
 public class HardConstraintsSolverTests_solve {
 
@@ -37,6 +37,8 @@ public class HardConstraintsSolverTests_solve {
 	private ExamSession normalExamSession;
 	private String normalFileName = "res/exam_set_noAFTER.exam";
 	private HardConstraintsSolver normalSolver;
+	
+	private HardConstraintsValidator HCV;
 	
 	/**
 	 * For the record:
@@ -56,6 +58,8 @@ public class HardConstraintsSolverTests_solve {
 		simpleExamSession = simpleParser.parse();
 		simpleSolution = new Solution(simpleExamSession);
 		simpleSolver = new HardConstraintsSolver(simpleSolution);
+		
+		HCV = new HardConstraintsValidator();
 	}
 	
 	public void normalSolutionSetup() throws ExamParsingException, IOException {
@@ -83,10 +87,9 @@ public class HardConstraintsSolverTests_solve {
 	 */
 	@Test @Ignore
 	public void testSolveSimple() throws SolvingException {
-		@SuppressWarnings("unused")
 		Solution s = simpleSolver.solve();
 		Feedback feedback = new Feedback();
-		boolean res = simpleSolver.isSolutionValid(feedback);
+		boolean res = HCV.isSolutionValid(s, feedback);
 		if (!res) {
 			System.out.println(feedback);
 		}
@@ -108,10 +111,9 @@ public class HardConstraintsSolverTests_solve {
 	@Test
 	public void testSolveNormal() throws SolvingException, ExamParsingException, IOException {
 		normalSolutionSetup();
-		@SuppressWarnings("unused")
 		Solution s = normalSolver.solve();
 		Feedback feedback = new Feedback();
-		boolean res = normalSolver.isSolutionValid(feedback);
+		boolean res = HCV.isSolutionValid(s, feedback);
 		if (!res) {
 			System.out.println(feedback);
 		}

@@ -21,7 +21,7 @@ import struct.Solution;
  * These tests take a long time to run.
  * @author Adrien Droguet - Sara Tari
  * @see HardConstraintsSolver
- * @see HardConstraintsSolverTests_isSolutionValid
+ * @see HardConstraintsValidatorTests
  */
 public class HardConstraintsSolverTests_slow {
 	private Solution s;

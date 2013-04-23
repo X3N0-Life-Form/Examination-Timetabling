@@ -23,13 +23,13 @@ import struct.Solution;
  * @see HardConstraintsSolver
  * @see HardConstraintsSolverTests_slow
  */
-public class HardConstraintsSolverTests_isSolutionValid {
+public class HardConstraintsValidatorTests {
 	
 	private ExamSessionParser simpleParser;
 	private Solution simpleSolution;
 	private ExamSession simpleExamSession;
 	private String simpleFileName = "res/simple_set.exam";
-	private HardConstraintsSolver simpleSolver;
+	private HardConstraintsValidator HCV;
 	
 	/**
 	 * For the record:
@@ -48,7 +48,9 @@ public class HardConstraintsSolverTests_isSolutionValid {
 		simpleParser = new ExamSessionParser(simpleFileName);
 		simpleExamSession = simpleParser.parse();
 		simpleSolution = new Solution(simpleExamSession);
-		simpleSolver = new HardConstraintsSolver(simpleSolution);
+		new HardConstraintsSolver(simpleSolution);
+		
+		HCV = new HardConstraintsValidator();
 	}
 	
 	@SuppressWarnings("unused")
@@ -73,7 +75,7 @@ public class HardConstraintsSolverTests_isSolutionValid {
 		//printSimpleSet(results);
 		//left: result couple						;right: examId
 		prepareValidResults(results);
-		boolean res = simpleSolver.isSolutionValid(feedback);
+		boolean res = HCV.isSolutionValid(simpleSolution, feedback);
 		if (!res) {
 			System.out.println(feedback);
 		}
@@ -121,7 +123,7 @@ public class HardConstraintsSolverTests_isSolutionValid {
 		
 		results.get(0).addExam(simpleExamSession.getExams().get(3));
 		results.get(12).addExam(simpleExamSession.getExams().get(4)); 
-		boolean res = simpleSolver.isSolutionValid(feedback);
+		boolean res = HCV.isSolutionValid(simpleSolution, feedback);
 		assertFalse(res);
 	}
 	
@@ -138,7 +140,7 @@ public class HardConstraintsSolverTests_isSolutionValid {
 		
 		results.get(0).addExam(simpleExamSession.getExams().get(4));
 		results.get(0).addExam(simpleExamSession.getExams().get(6)); 
-		boolean res = simpleSolver.isSolutionValid(feedback);
+		boolean res = HCV.isSolutionValid(simpleSolution, feedback);
 		assertFalse(res);
 	}
 	
@@ -154,7 +156,7 @@ public class HardConstraintsSolverTests_isSolutionValid {
 		results.get(6).removeExam(simpleExamSession.getExams().get(6)); //4, EXCLUSION, 6
 		
 		results.get(12).addExam(simpleExamSession.getExams().get(6)); //in big room 0 (also 1, ROOM_EXCLUSIVE)
-		boolean res = simpleSolver.isSolutionValid(feedback);
+		boolean res = HCV.isSolutionValid(simpleSolution, feedback);
 		assertFalse(res);
 	}
 	
@@ -181,7 +183,7 @@ public class HardConstraintsSolverTests_isSolutionValid {
 		results.get(2).addExam(simpleExamSession.getExams().get(4)); //
 		results.get(7).addExam(simpleExamSession.getExams().get(5)); //5, EXAM_COINCIDENCE, 6 + 
 		results.get(6).addExam(simpleExamSession.getExams().get(6)); //4, EXCLUSION, 6
-		boolean res = simpleSolver.isSolutionValid(feedback);
+		boolean res = HCV.isSolutionValid(simpleSolution, feedback);
 		assertFalse(res);
 	}
 	
@@ -200,7 +202,7 @@ public class HardConstraintsSolverTests_isSolutionValid {
 		results.get(29).addExam(simpleExamSession.getExams().get(3)); //3, EXAM_COINCIDENCE, 4
 		results.get(29).addExam(simpleExamSession.getExams().get(4)); //
 		
-		boolean res = simpleSolver.isSolutionValid(feedback);
+		boolean res = HCV.isSolutionValid(simpleSolution, feedback);
 		assertFalse(res);
 	}
 }

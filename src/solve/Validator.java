@@ -9,5 +9,5 @@ import struct.Solution;
  * @see Solution
  */
 public interface Validator {
-	public boolean isSolutionValid(Solution s);
+	public boolean isSolutionValid(Solution s, Feedback feedback);
 }
