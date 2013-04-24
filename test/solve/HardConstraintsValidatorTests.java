@@ -21,7 +21,7 @@ import struct.Solution;
  * Contains all tests related to the isSolutionValid method.
  * @author Adrien Droguet - Sara Tari
  * @see HardConstraintsSolver
- * @see HardConstraintsSolverTests_slow
+ * @see HCS_Tests_slow
  */
 public class HardConstraintsValidatorTests {
 	

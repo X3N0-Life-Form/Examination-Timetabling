@@ -18,7 +18,7 @@ public class Zorg {
 	
 	private ExamSession es;
 	private ExamSessionParser esp;
-	private String fileName = "res/exam_comp_set1.exam";
+	private String fileName = "res/exam_comp_set4.exam";
 	
 	/**
 	 * powerful
@@ -32,8 +32,10 @@ public class Zorg {
 		
 		for (Exam currentExam : es.getExamsAsList()) {
 			System.out.println("id=" + currentExam.getId() + ";size=" + currentExam.getSize()
+					+ ";duration=" + currentExam.getDuration()
 					+ ";period constraints:" + currentExam.getConstraints()
-					+ ";The Matrix:");
+					+ ";The Matrix:"
+					);
 		}
 	}
 }

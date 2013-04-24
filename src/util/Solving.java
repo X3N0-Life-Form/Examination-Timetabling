@@ -13,7 +13,7 @@ import struct.Solution;
 
 public class Solving {
 	
-	private static final int MAX_GET_AVAILABLE_PERIOD = 8;
+	private static final int MAX_GET_AVAILABLE_PERIOD = 10;
 
 	/**
 	 * Manually clones a list and its contents.
@@ -276,8 +276,8 @@ public class Solving {
 		ArrayList<Integer> availablePeriods = new ArrayList<Integer>();
 		int[][] eP = s.getExamPeriodModif();
 		
-		for (int i = 0; i< res.size();i++){
-			int periodId = res.get(i).getPeriod().getId();
+		for (int i = 0; i< s.getExamSession().getPeriods().size();i++){
+			int periodId = s.getExamSession().getPeriods().get(i).getId();
 			if (canHost(s, examId, periodId, res) && (eP[examId][periodId] != 0)){
 					availablePeriods.add(periodId);
 			}
@@ -295,24 +295,32 @@ public class Solving {
 		boolean isHere;
 		
 		ArrayList<Integer> firstExamPeriods = (ArrayList<Integer>) getAvailablePeriod(s, coincidingExams.get(0), res);
+		System.out.println("first exam periods " +firstExamPeriods);
+		
 		for (int i = 0 ; i < firstExamPeriods.size(); i++){
 			int currentFirstExamPeriod = firstExamPeriods.get(i);
+			System.out.println("current first " +currentFirstExamPeriod);
 			isHere = true;
-			for (int j = 0 ; j < coincidingExams.size(); j++){
+			for (int j = 1 ; j < coincidingExams.size(); j++){
 				isHereForExam = false;
 				ArrayList<Integer> currentExamPeriods = (ArrayList<Integer>) getAvailablePeriod(s, coincidingExams.get(j), res);
 				for (int k = 0; k< currentExamPeriods.size(); k++){
 					if (currentExamPeriods.get(k) == currentFirstExamPeriod){
 						isHereForExam = true;
+						System.out.println(" Trouvé ####################### pour "+currentFirstExamPeriod);
 					}
 				}
 				if (isHereForExam == false){
 					isHere = false;
+					break;
 				}
+				System.out.println("is Here ? " +isHere);
 			}
+			System.out.println("is here ? " +isHere);
 			if (isHere){
 				// ajouter condition ????
 				if (canHost(s, coincidingExams, currentFirstExamPeriod, res)){
+					System.out.println(" period : " +currentFirstExamPeriod+ " HOST  " + canHost(s, coincidingExams, currentFirstExamPeriod, res));
 					availablePeriods = currentFirstExamPeriod;
 				}
 			}

@@ -130,7 +130,9 @@ public class HardConstraintsValidator implements Validator {
 						// if present, id's found => false because of the exclusion
 						if (present) {
 							res = false;
-							feedback.addItem(current, Feedback.EXCLUSION_VIOLATION);
+							feedback.addItem(current, Feedback.EXCLUSION_VIOLATION/*
+									+ constraintList.get(i).getE1Id() + " - "
+									+ constraintList.get(i).getE2Id()*/);
 						}
 				}
 			}

@@ -26,7 +26,7 @@ public class Feedback {
 			"room's size";
 
 	public static final String EXCLUSION_VIOLATION = "EXCLUSION violation: two mutually " +
-			"exclusive exams are in the same period";
+			"exclusive exams are in the same period: ";
 
 	public static final String EXAM_COINCIDENCE_VIOLATION = "EXAM_COINCIDENCE violation: " +
 			"two coinciding exams are in different periods: ";

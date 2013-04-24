@@ -72,8 +72,24 @@ public class HardConstraintsSolver {
 			List<Integer> cExams = Solving.checkCoincidence(s, examId);
 			System.out.println("----Found " + cExams.size() + " coinciding exams");
 			int periodId = Solving.getAvailablePeriod(s, cExams, res);
+			///////////////////////////////////////
+			if (examId == 411) {
+				for (int jj = 0; jj < s.getExamSession().getPeriods().size(); jj++) {
+					System.out.println("period " + jj + "; 411: " + s.getExamPeriodModif()[411][jj]
+							+ "; 418: " + s.getExamPeriodModif()[418][jj]);
+				}
+				/*
+				for (ResultCouple hjvo : res) {
+					if (hjvo.getPeriod().getDuration() >= 180) {
+						System.out.println(hjvo);
+					}
+				}*/
+				System.out.println("411:" + Solving.findSuitable(s, 411, periodId, res));
+				System.out.println("418:" + Solving.findSuitable(s, 418, periodId, res));
+			}
+			////////////////////////////////////////
 			if (periodId == -1)
-				throw new SolvingException("Incorrect period id: " + periodId);
+				throw new SolvingException("Incorrect period id: " + periodId); //see Solving.MAX_GET_AVAILABLE_PERIOD
 			System.out.println("----Found " + periodId + " periods capable of hosting these exams");
 		//	for (Integer periodId : periodIds) {
 				System.out.println("------Processing period " + periodId);
