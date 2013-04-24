@@ -1,7 +1,9 @@
 package util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import struct.EPeriodHardConstraint;
 import struct.Exam;
@@ -11,6 +13,8 @@ import struct.Solution;
 
 public class Solving {
 	
+	private static final int MAX_GET_AVAILABLE_PERIOD = 8;
+
 	/**
 	 * Manually clones a list and its contents.
 	 * @param resIn
@@ -155,42 +159,89 @@ public class Solving {
 		ArrayList<Integer> examsClone = (ArrayList<Integer>) ((ArrayList<Integer>) exams).clone();
 		ArrayList<ResultCouple> res = manualClone(resIn);
 		
+		ArrayList<Integer> isAdd = new ArrayList<Integer>();
+		
 		int numberOfExams = exams.size();
-		int index;
+		int index = -1;
 		int count = 0;
 		Exam ex;
+		Map<Integer, Integer> mapOfDoom = new HashMap<Integer, Integer>(); //id exam, id room
 		
-		while(count < numberOfExams){
-			for(int j =0; j<res.size(); j++) {
-				if (list.size() == examsClone.size())
-					break;
-				int pId = res.get(j).getPeriod().getId();
-				int rId = res.get(j).getRoom().getId();
-				List<Integer> suitableId = findSuitable(s, examsClone.get(count), periodId, res);
-				if (suitableId.size() == 0){
-					//System.out.println("and the motherfuckin' period is : "+ periodId);
-					//System.out.println("error for this id " + examsClone.get(count));
-					break;
+		// exams
+		for (int i = 0 ; i < exams.size();i++){
+			ArrayList<Integer> suitable = (ArrayList<Integer>) findSuitable (s, exams.get(i), periodId, res);
+		
+			//if the current exam has only one room
+			if (findSuitable (s, exams.get(i), periodId, res).size() == 1){
+				if (exams.get(i)==528){
+					System.out.println("#########################################################");
+					System.out.println(" 528 " +suitable.get(0));
 				}
-				for (int k = 0; k< suitableId.size();k++){
-					if(pId == periodId && rId == suitableId.get(k)){
-						index = j;
-						//get the exam 
-						ex = s.getExamSession().getExams().get(examsClone.get(count));
-						//set the exam
+				for ( int j = 0; j< res.size(); j++){
+					if (res.get(j).getPeriod().getId() == periodId 
+					&& res.get(j).getRoom().getId() == suitable.get(0) ){
+						index = j;						
+					
+						// get variables for size's verification
+						ex = s.getExamSession().getExams().get(examsClone.get(i));
 						int totalSize = 0;
-						for (Exam exam : res.get(j).getExamList()) {
+						
+						for (Exam exam : res.get(index).getExamList()) {
 							totalSize += exam.getSize();
 						}
-						if (res.get(j).getRoom().getSize() >= totalSize + ex.getSize()) {
+						// verification
+						if (res.get(index).getRoom().getSize() >= totalSize + ex.getSize()) {
 							res.get(index).getExamList().add(ex);
-							list.add(suitableId.get(k));
-							count++;
-							System.out.println(" add : " + ex.getId());
-							break;
+							// ICI ON EST CONS ><
+							mapOfDoom.put(exams.get(i), suitable.get(0));
+							//list.add(suitable.get(0));
+							isAdd.add(exams.get(i));
 						}
 					}	
+				}				
+			}
+		}
+		boolean alreadyAdded = false;
+		
+		for (int i = 0; i< exams.size();i++){
+			alreadyAdded = false;
+			for (int j = 0; j< isAdd.size();j++){
+				if (isAdd.get(j) == exams.get(i)){
+					alreadyAdded = true;
 				}
+			}
+			if (alreadyAdded){
+				// ICIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+				//System.out.println(mapOfDoom.);
+				list.add(mapOfDoom.get(exams.get(i)));
+			}
+			else if (!alreadyAdded){
+				ArrayList<Integer> suitable = (ArrayList<Integer>) findSuitable(s, exams.get(i), periodId, res);
+				boolean exitK = false;
+				for (int k = 0; k< suitable.size();k++){
+					for ( int j = 0; j< res.size(); j++){
+						if (res.get(j).getPeriod().getId() == periodId 
+						&& res.get(j).getRoom().getId() == suitable.get(0/*k*/) ){
+							index = j;						
+						
+							// get variables for size's verification
+							ex = s.getExamSession().getExams().get(examsClone.get(i));
+							int totalSize = 0;
+							
+							for (Exam exam : res.get(index).getExamList()) {
+								totalSize += exam.getSize();
+							}
+							// verification
+							if (res.get(index).getRoom().getSize() >= totalSize + ex.getSize()) {
+								res.get(index).getExamList().add(ex);
+								list.add(suitable.get(0));
+								exitK = true;
+							}
+						}
+					}
+					if (exitK)
+						break; //!!!!!!!!!!!!!!!
+				}		
 			}
 		}
 		return list;
@@ -230,7 +281,9 @@ public class Solving {
 			if (canHost(s, examId, periodId, res) && (eP[examId][periodId] != 0)){
 					availablePeriods.add(periodId);
 			}
-		
+			if (availablePeriods.size() >= MAX_GET_AVAILABLE_PERIOD){
+				break;
+			}
 		}
 		return availablePeriods;
 	}
