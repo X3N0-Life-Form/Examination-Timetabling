@@ -97,16 +97,16 @@ public class HardConstraintsValidator implements Validator {
 										}
 									}
 								}
+								
+								// if !present, id's not found => false
+								if (!present) {
+									res = false;
+									feedback.addItem(currentBis, Feedback.EXAM_COINCIDENCE_VIOLATION
+											+ constraintList.get(i).getE1Id() + " - "
+											+ constraintList.get(i).getE2Id());
+								}
 							}
 							
-							
-							// if !present, id's not found => false
-							if (!present) {
-								res = false;
-								feedback.addItem(currentBis, Feedback.EXAM_COINCIDENCE_VIOLATION
-										+ constraintList.get(i).getE1Id() + " - "
-										+ constraintList.get(i).getE2Id());
-							}
 						}
 					}
 				}			
