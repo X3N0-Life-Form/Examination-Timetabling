@@ -25,7 +25,7 @@ public class HardConstraintsValidator implements Validator {
 			//check AFTER
 			
 			for (ResultCouple current : s.getResult()) {
-			/*	
+			/*
 			for (int i = 0 ; i <current.getExamList().size(); i++){
 				// get constraints list
 				constraintList = current.getExamList().get(i).getConstraints();
@@ -61,51 +61,55 @@ public class HardConstraintsValidator implements Validator {
 			/**/
 			//check EXAM_COINCIDENCE
 			// exam
-			for (ResultCouple currentBis : s.getResult()) {
-				for (int j = 0; j< currentBis.getExamList().size(); j++){
-					constraintList = currentBis.getExamList().get(j).getConstraints();
-					// constraint
-					for (int i = 0; i< constraintList.size(); i++){
-						// if constraint is EXAM_COINCIDENCE
-						int periodId = -1;
-						if (constraintList.get(i).getConstraint() == 
-								EPeriodHardConstraint.EXAM_COINCIDENCE) {
-							//get id of the 2nd exam (EXAM_COINCIDENCE)
-							//if e1Id = current exam id, var id = e2ID
-							periodId = currentBis.getPeriod().getId();
-							if (constraintList.get(i).getE1Id() == 
-									currentBis.getExamList().get(j).getId())
-								id = constraintList.get(i).getE2Id();
-							//else var id = e1ID
-							else
-								id = constraintList.get(i).getE1Id();
-						}
-						boolean present = false;
-						
-						// check if id is present into list exam
-						for(int k = 0; k < currentBis.getExamList().size();k++){
-							// if id is found : present = true
-							if (currentBis.getExamList().get(k).getId() == id) {
-								present = true; 
-							} else {
-								for(ResultCouple c : s.getResult()){
-									if (c.getPeriod().getId() == periodId) {
-										for (Exam e : c.getExamList()) {
-											if (e.getId() == id)
-												present = true;
+				for (ResultCouple currentBis : s.getResult()) {
+					for (int j = 0; j< currentBis.getExamList().size(); j++){
+						constraintList = currentBis.getExamList().get(j).getConstraints();
+						// constraint
+						for (int i = 0; i< constraintList.size(); i++){
+							// if constraint is EXAM_COINCIDENCE
+							int periodId = -1;
+							boolean present = false;
+							if (constraintList.get(i).getConstraint() == 
+									EPeriodHardConstraint.EXAM_COINCIDENCE) {
+								//get id of the 2nd exam (EXAM_COINCIDENCE)
+								//if e1Id = current exam id, var id = e2ID
+								periodId = currentBis.getPeriod().getId();
+								if (constraintList.get(i).getE1Id() == 
+										currentBis.getExamList().get(j).getId())
+									id = constraintList.get(i).getE2Id();
+								//else var id = e1ID
+								else
+									id = constraintList.get(i).getE1Id();
+								
+								// check if id is present into list exam
+								for(int k = 0; k < currentBis.getExamList().size();k++){
+									// if id is found : present = true
+									if (currentBis.getExamList().get(k).getId() == id) {
+										present = true; 
+									} else {
+										for(ResultCouple c : s.getResult()){
+											if (c.getPeriod().getId() == periodId) {
+												for (Exam e : c.getExamList()) {
+													if (e.getId() == id)
+														present = true;
+												}
+											}
 										}
 									}
 								}
 							}
-						}
-						// if !present, id's not found => false
-						if (!present) {
-							res = false;
-							feedback.addItem(currentBis, Feedback.EXAM_COINCIDENCE_VIOLATION);
+							
+							
+							// if !present, id's not found => false
+							if (!present) {
+								res = false;
+								feedback.addItem(currentBis, Feedback.EXAM_COINCIDENCE_VIOLATION
+										+ constraintList.get(i).getE1Id() + " - "
+										+ constraintList.get(i).getE2Id());
+							}
 						}
 					}
-				}
-			}			
+				}			
 			
 			//check EXCLUSION
 			// coincidence matrix

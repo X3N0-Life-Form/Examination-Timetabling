@@ -203,21 +203,23 @@ public class SolvingTests {
 	 * 3 can be placed in period 0 room 4, but 4 can't.
 	 */
 	@Test
-	public void getAvailablePeriod_multiple_() {
+	public void getAvailablePeriod_multiple_tooSmallForBoth() {
 		List<ResultCouple> res = s.getResult();
 		ResultCouple target = null;
 		//fill up period 0's rooms
 		for (ResultCouple rc : res) {
 			if (rc.getPeriod().getId() == 0) {
 				rc.addExam(0);
+				rc.addExam(1);
 				//target = room 4 (size=40)
 				if (rc.getRoom().getId() == 4)
 					target = rc;
 			}
 		}
 		target.getExamList().clear();
-		List<Integer> available = Solving.getAvailablePeriod(s, 3, res);
-		System.out.println(available);
+		fail("TODO");
+		//int available = Solving.getAvailablePeriod(s, 3, res);
+		//System.out.println(available);
 		//assertFalse(available.contains(0));
 	}
 }

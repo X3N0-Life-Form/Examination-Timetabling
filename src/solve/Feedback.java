@@ -29,7 +29,7 @@ public class Feedback {
 			"exclusive exams are in the same period";
 
 	public static final String EXAM_COINCIDENCE_VIOLATION = "EXAM_COINCIDENCE violation: " +
-			"two coinciding exams are in different periods";
+			"two coinciding exams are in different periods: ";
 
 	public static final String AFTER_VIOLATION = "AFTER violation: one exam should be " +
 			"after another, but isn't";

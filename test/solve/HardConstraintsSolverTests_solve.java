@@ -36,7 +36,8 @@ public class HardConstraintsSolverTests_solve {
 	private ExamSessionParser normalParser;
 	private Solution normalSolution;
 	private ExamSession normalExamSession;
-	private String normalFileName = "res/exam_set_noAFTER.exam";
+	//private String normalFileName = "res/exam_set_noAFTER.exam";
+	private String normalFileName = "res/exam_comp_set1.exam";
 	private HardConstraintsSolver normalSolver;
 	
 	private HardConstraintsValidator HCV;
