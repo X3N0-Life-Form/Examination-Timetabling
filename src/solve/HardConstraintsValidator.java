@@ -118,22 +118,27 @@ public class HardConstraintsValidator implements Validator {
 			for (int i = 0; i< current.getExamList().size(); i++){
 				// matrix
 				for (int j =0; j < s.getExamSession().getExams().size();j++ ){
-						boolean present = false;
-						// if exam i & j cannot take place at the same time
-						if (coincidence[current.getExamList().get(i).getId()][j] == 0) 
+					boolean present = false;
+					// if exam i & j cannot take place at the same time
+					if (coincidence[current.getExamList().get(i).getId()][j] == 0) 
 						// check if exam j is present 
 						for(int k = 0; k < current.getExamList().size();k++){
 							// if id is found : present = true
-							if (current.getExamList().get(k).getId() == j)
-								present = true; 
+							if (current.getExamList().get(k).getId() == j) {
+								present = true;
+								System.out.println("present! --> id=" + j +" " + current.getExamList().get(i).getId());
+								for (Integer kStudent: current.getExamList().get(k).getStudents()) {
+									if (s.getExamSession().getExams().get(j).getStudents().contains(kStudent)) {
+										System.out.println("  Found one! --> " + kStudent);
+									}
+								}
+							}
 						}
-						// if present, id's found => false because of the exclusion
-						if (present) {
-							res = false;
-							feedback.addItem(current, Feedback.EXCLUSION_VIOLATION/*
-									+ constraintList.get(i).getE1Id() + " - "
-									+ constraintList.get(i).getE2Id()*/);
-						}
+					// if present, id's found => false because of the exclusion
+					if (present) {
+						res = false;
+						feedback.addItem(current, Feedback.EXCLUSION_VIOLATION);
+					}
 				}
 			}
 			int sizeSum = 0;

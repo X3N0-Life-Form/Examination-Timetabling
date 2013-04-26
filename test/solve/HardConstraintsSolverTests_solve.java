@@ -119,6 +119,12 @@ public class HardConstraintsSolverTests_solve {
 		if (!res) {
 			System.out.println(feedback);
 		}
+		for (int i = 0; i < s.getExamPeriodModif().length; i++) {
+			System.out.print("\ni=" + i + " ==> ");
+			for (int j = 0; j < s.getExamPeriodModif()[i].length; j++) {
+				System.out.print(s.getExamPeriodModif()[i][j] + "; ");
+			}
+		}
 		assertTrue(res);
 	}
 }

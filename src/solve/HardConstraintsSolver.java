@@ -86,6 +86,9 @@ public class HardConstraintsSolver {
 				}*/
 				System.out.println("411:" + Solving.findSuitable(s, 411, periodId, res));
 				System.out.println("418:" + Solving.findSuitable(s, 418, periodId, res));
+			} else if (examId == 71) {
+				System.out.println("exam period " + s.getExamPeriodModif()[220][5]);
+				System.out.println("getAvailable for exam 71=" + periodId);
 			}
 			////////////////////////////////////////
 			if (periodId == -1)
@@ -109,6 +112,12 @@ public class HardConstraintsSolver {
 							resForPeriod.get(j).addExam(currentExam);
 							boolArray[getIndex(NPE, currentExam)] = true;
 							updateValidPeriods(currentExam, periodId);
+							if (currentExam == 71) {
+								List<Integer> zorg = new ArrayList<Integer>();
+								zorg.add(270);
+								System.out.println("exam 71 has been placed, getting available period for 270: " + Solving.getAvailablePeriod(s, zorg, res));
+								System.out.println("[270][5]" + s.getExamPeriodModif()[270][5]);
+							}
 						} else {
 							System.out.println("----------Room " + currentRoomId + " was rejected");
 						}
@@ -182,11 +191,13 @@ public class HardConstraintsSolver {
 	
 	public void updateValidPeriods(int examId, int periodId)
 	{
+		System.out.println("!! updateValidPeriod(" + examId + ", " + periodId + ")");
 		int [][] eP = s.getExamPeriodModif();
 		int [][] coincidence = s.getExamCoincidence();
 		for (int i = 1; i < s.getExamSession().getExams().size(); i++){
 			if( coincidence [examId][i] == 0){
 				eP [i][periodId] = 0;
+				System.out.println("updated exam " + i);
 			}
 		}
 	}
