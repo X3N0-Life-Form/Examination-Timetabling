@@ -37,7 +37,7 @@ public class HardConstraintsSolverTests_solve {
 	private Solution normalSolution;
 	private ExamSession normalExamSession;
 	//private String normalFileName = "res/exam_set_noAFTER.exam";
-	private String normalFileName = "res/exam_comp_set4.exam";
+	private String normalFileName = "res/exam_comp_set3_.exam";
 	private HardConstraintsSolver normalSolver;
 	
 	private HardConstraintsValidator HCV;
@@ -119,12 +119,12 @@ public class HardConstraintsSolverTests_solve {
 		if (!res) {
 			System.out.println(feedback);
 		}
-		for (int i = 0; i < s.getExamPeriodModif().length; i++) {
+		/*for (int i = 0; i < s.getExamPeriodModif().length; i++) {
 			System.out.print("\ni=" + i + " ==> ");
 			for (int j = 0; j < s.getExamPeriodModif()[i].length; j++) {
 				System.out.print(s.getExamPeriodModif()[i][j] + "; ");
 			}
-		}
+		}*/
 		assertTrue(res);
 	}
 }

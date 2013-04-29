@@ -72,28 +72,11 @@ public class HardConstraintsSolver {
 			List<Integer> cExams = Solving.checkCoincidence(s, examId);
 			System.out.println("----Found " + cExams.size() + " coinciding exams");
 			int periodId = Solving.getAvailablePeriod(s, cExams, res);
-			///////////////////////////////////////
-			if (examId == 411) {
-				for (int jj = 0; jj < s.getExamSession().getPeriods().size(); jj++) {
-					System.out.println("period " + jj + "; 411: " + s.getExamPeriodModif()[411][jj]
-							+ "; 418: " + s.getExamPeriodModif()[418][jj]);
-				}
-				/*
-				for (ResultCouple hjvo : res) {
-					if (hjvo.getPeriod().getDuration() >= 180) {
-						System.out.println(hjvo);
-					}
-				}*/
-				System.out.println("411:" + Solving.findSuitable(s, 411, periodId, res));
-				System.out.println("418:" + Solving.findSuitable(s, 418, periodId, res));
-			} else if (examId == 71) {
-				System.out.println("exam period " + s.getExamPeriodModif()[220][5]);
-				System.out.println("getAvailable for exam 71=" + periodId);
-			}
+			////////////////////////////////////////
 			////////////////////////////////////////
 			if (periodId == -1)
 				throw new SolvingException("Incorrect period id: " + periodId); //see Solving.MAX_GET_AVAILABLE_PERIOD
-			System.out.println("----Found " + periodId + " periods capable of hosting these exams");
+			System.out.println("----Found that period " + periodId + " is capable of hosting these exams");
 		//	for (Integer periodId : periodIds) {
 				System.out.println("------Processing period " + periodId);
 				List<Integer> rooms = Solving.findSuitable(s, cExams, periodId, res);
@@ -194,8 +177,8 @@ public class HardConstraintsSolver {
 		System.out.println("!! updateValidPeriod(" + examId + ", " + periodId + ")");
 		int [][] eP = s.getExamPeriodModif();
 		int [][] coincidence = s.getExamCoincidence();
-		for (int i = 1; i < s.getExamSession().getExams().size(); i++){
-			if( coincidence [examId][i] == 0){
+		for (int i = 0; i < s.getExamSession().getExams().size(); i++){
+			if( coincidence [examId][i] == 0 || coincidence [i][examId] == 0){
 				eP [i][periodId] = 0;
 				System.out.println("updated exam " + i);
 			}

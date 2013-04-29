@@ -13,7 +13,7 @@ import struct.Solution;
 
 public class Solving {
 	
-	private static final int MAX_GET_AVAILABLE_PERIOD = 10;
+	protected static int MAX_GET_AVAILABLE_PERIOD = 10;
 
 	/**
 	 * Manually clones a list and its contents.
@@ -82,6 +82,64 @@ public class Solving {
 	}
 	
 	/**
+	 * Can this period host the specified list of exams.
+	 * @param exams
+	 * @param periodId
+	 * @return True is the period can host the exams.
+	 */
+	public static boolean canHost(Solution s, List<Integer> exams, int periodId, List<ResultCouple> resIn) {
+		boolean tmp = false;
+		@SuppressWarnings("unchecked")
+		ArrayList<Integer> e = (ArrayList<Integer>) ((ArrayList<Integer>) exams).clone();
+		ArrayList<ResultCouple> res = manualClone(resIn);
+		
+		int numberOfExams = exams.size();
+		int index;
+		Exam ex;				
+		
+		int suitablesFound = 0;
+		
+		for (int i = 0; i< numberOfExams; i++){
+			if (!canHost(s, exams.get(i), periodId, res)){
+				//System.out.println(" ## CAN HOST " + exams.get(i) + " = FALSE");
+				return false;
+			}
+		}
+		
+		for (int i = 0; i< numberOfExams; i++){
+			if (!canHost(s, e.get(i), periodId, res)){
+				//System.out.println("RETURN FALSE FOR EXAM "+ e.get(i));
+				return false;
+			}
+			if (canHost(s, e.get(i), periodId, res)){
+				//System.out.println("CAN HOST "+ e.get(i) + " FOR PERIOD " + periodId);
+				for(int j =0; j<res.size(); j++) {
+					List<Integer> suitables = findSuitable(s, e.get(i), periodId, res);
+					for (int k=0; k < suitables.size(); k++) {
+						if(res.get(j).getPeriod().getId() == periodId
+						&& res.get(j).getRoom().getId() == suitables.get(k)){
+							index = j;
+							//get the exam 
+							ex = s.getExamSession().getExams().get(e.get(i));
+							res.get(index).getExamList().add(ex);
+							suitablesFound++;
+							
+							if(e.size() == suitablesFound) {
+								//System.out.println(" -------------- RETURN TRUE !");
+								return true;
+							}
+							break;
+						}
+					}
+				}
+			}
+		}
+		
+		//System.out.println(("---------------------RETURN " + tmp));
+		return tmp;
+	}
+	
+	/**
 	 * Finds a suitable room for the specified exam in the specified period.
 	 * @param examId
 	 * @param periodId
@@ -93,17 +151,25 @@ public class Solving {
 		boolean exclusive;
 		int sizeE = 0;
 		List<Integer> tempList = new ArrayList<Integer>();
-		
+
 		// loop for res
 		for(int i = 0; i< res.size() ; i++){
-			int sizeExamList = res.get(i).getExamList().size();
 			// check the period
 			if (res.get(i).getPeriod().getId() == periodId){
-		
+				int sizeExamList = res.get(i).getExamList().size();
 				// if there's more than a single exam
 				exclusive = false;
+				
+				//if the exam already present is room exclusive --> look for another
+				if (sizeExamList == 1) {
+					Exam loneExam = res.get(i).getExamList().get(0);
+					if (loneExam.getRoomHardConstraint() != null) {
+						continue;
+					}
+				}
+				
 				if (sizeExamList > 0){
-					
+
 					int sizeCounter = 0;
 					// get the sum of all the exams size for this room & period
 					for (int j = 0 ; j < sizeExamList ; j++){
@@ -116,20 +182,22 @@ public class Solving {
 							break;
 						}
 					}
-					
-					// room exclusive or not 
+
+					// is our exam room exclusive? 
 					for (int k = 0; k< s.getExamSession().getRoomHardConstraints().size(); k++){
 						if (s.getExamSession().getRoomHardConstraints().get(k).getId() == examId)
 							exclusive = true;
 					}
+					
 					//if size of all the exams + size of our exam <= room capacity
 					if (sizeCounter + sizeE <= res.get(i).getRoom().getSize() 
-						&& !exclusive ){
+							&& !exclusive ){
 						tempList.add(res.get(i).getRoom().getId());
 					}
 				}
 			}
 		}
+
 		for (int i = 0; i< res.size(); i++){
 			int sizeExamList = res.get(i).getExamList().size();
 			// check the period
@@ -147,8 +215,7 @@ public class Solving {
 				}
 			}
 		}
-		
-	return tempList;
+		return tempList;
 	}
 	
 	
@@ -161,9 +228,9 @@ public class Solving {
 		
 		ArrayList<Integer> isAdd = new ArrayList<Integer>();
 		
-		int numberOfExams = exams.size();
+		//int numberOfExams = exams.size();
 		int index = -1;
-		int count = 0;
+		//int count = 0;
 		Exam ex;
 		Map<Integer, Integer> mapOfDoom = new HashMap<Integer, Integer>(); //id exam, id room
 		
@@ -173,10 +240,6 @@ public class Solving {
 		
 			//if the current exam has only one room
 			if (findSuitable (s, exams.get(i), periodId, res).size() == 1){
-				if (exams.get(i)==528){
-					System.out.println("#########################################################");
-					System.out.println(" 528 " +suitable.get(0));
-				}
 				for ( int j = 0; j< res.size(); j++){
 					if (res.get(j).getPeriod().getId() == periodId 
 					&& res.get(j).getRoom().getId() == suitable.get(0) ){
@@ -192,7 +255,6 @@ public class Solving {
 						// verification
 						if (res.get(index).getRoom().getSize() >= totalSize + ex.getSize()) {
 							res.get(index).getExamList().add(ex);
-							// ICI ON EST CONS ><
 							mapOfDoom.put(exams.get(i), suitable.get(0));
 							//list.add(suitable.get(0));
 							isAdd.add(exams.get(i));
@@ -211,7 +273,6 @@ public class Solving {
 				}
 			}
 			if (alreadyAdded){
-				// ICIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
 				//System.out.println(mapOfDoom.);
 				list.add(mapOfDoom.get(exams.get(i)));
 			}
@@ -240,7 +301,7 @@ public class Solving {
 						}
 					}
 					if (exitK)
-						break; //!!!!!!!!!!!!!!!
+						break;
 				}		
 			}
 		}
@@ -290,16 +351,16 @@ public class Solving {
 	
 	public static int getAvailablePeriod(Solution s, List<Integer> coincidingExams, List<ResultCouple> res) {
 		int availablePeriods = -1;
-		int [][] eP = s.getExamPeriodModif();
+		//int [][] eP = s.getExamPeriodModif();
 		boolean isHereForExam = false;
 		boolean isHere;
 		
 		ArrayList<Integer> firstExamPeriods = (ArrayList<Integer>) getAvailablePeriod(s, coincidingExams.get(0), res);
-		System.out.println("first exam periods " +firstExamPeriods);
+		//System.out.println("first exam periods " +firstExamPeriods);
 		
 		for (int i = 0 ; i < firstExamPeriods.size(); i++){
 			int currentFirstExamPeriod = firstExamPeriods.get(i);
-			System.out.println("current first " +currentFirstExamPeriod);
+			//System.out.println("current first " +currentFirstExamPeriod);
 			isHere = true;
 			for (int j = 1 ; j < coincidingExams.size(); j++){
 				isHereForExam = false;
@@ -307,20 +368,20 @@ public class Solving {
 				for (int k = 0; k< currentExamPeriods.size(); k++){
 					if (currentExamPeriods.get(k) == currentFirstExamPeriod){
 						isHereForExam = true;
-						System.out.println(" Trouvé ####################### pour "+currentFirstExamPeriod);
+						//System.out.println(" Trouvé ####################### pour "+currentFirstExamPeriod);
 					}
 				}
 				if (isHereForExam == false){
 					isHere = false;
 					break;
 				}
-				System.out.println("is Here ? " +isHere);
+				//System.out.println("is Here ? " +isHere);
 			}
-			System.out.println("is here ? " +isHere);
+			//System.out.println("is here ? " +isHere);
 			if (isHere){
 				// ajouter condition ????
 				if (canHost(s, coincidingExams, currentFirstExamPeriod, res)){
-					System.out.println(" period : " +currentFirstExamPeriod+ " HOST  " + canHost(s, coincidingExams, currentFirstExamPeriod, res));
+					//System.out.println(" period : " +currentFirstExamPeriod+ " HOST  " + canHost(s, coincidingExams, currentFirstExamPeriod, res));
 					availablePeriods = currentFirstExamPeriod;
 				}
 			}
@@ -328,67 +389,5 @@ public class Solving {
 		return availablePeriods;
 	}
 	
-	/**
-	 * Can this period host the specified list of exams.
-	 * @param exams
-	 * @param periodId
-	 * @return
-	 */
-	public static boolean canHost(Solution s, List<Integer> exams, int periodId, List<ResultCouple> resIn) {
-		boolean tmp = false;
-		@SuppressWarnings("unchecked")
-		ArrayList<Integer> e = (ArrayList<Integer>) ((ArrayList<Integer>) exams).clone();
-		ArrayList<ResultCouple> res = manualClone(resIn);
-		
-		int numberOfExams = exams.size();
-		int index;
-		Exam ex;				
-		
-		int suitablesFound = 0;
-		
-		for (int i = 0; i< numberOfExams; i++){
-			if (!canHost(s, exams.get(i), periodId, res)){
-				System.out.println(" ## CAN HOST " + exams.get(i) + " = FALSE");
-				return false;
-			}
-		}
-		
-		for (int i = 0; i< numberOfExams; i++){
-			if (!canHost(s, e.get(i), periodId, res)){
-				System.out.println("RETURN FALSE FOR EXAM "+ e.get(i));
-				return false;
-			}
-			if (canHost(s, e.get(i), periodId, res)){
-				System.out.println("CAN HOST "+ e.get(i) + " FOR PERIOD " + periodId);
-				for(int j =0; j<res.size(); j++) {
-					List<Integer> suitables = findSuitable(s, e.get(i), periodId, res);
-					for (int k=0; k < suitables.size(); k++) {
-						if(res.get(j).getPeriod().getId() == periodId
-						&& res.get(j).getRoom().getId() == suitables.get(k)){
-							index = j;
-							//get the exam 
-							ex = s.getExamSession().getExams().get(e.get(i));
-							/*int sizeE = ex.getSize();
-							//set the exam
-							int cmp = 0;
-							for (int l = 0; l< res.get(j).getExamList().size();l++){
-								cmp += res.get(j).getExamList().get(l).getSize();
-							}
-							if ((sizeE + cmp) )*/
-							res.get(index).getExamList().add(ex);
-							suitablesFound++;
-							if(e.size() == suitablesFound) {
-								System.out.println(" -------------- RETURN TRUE !");
-								return true;
-							}
-							break;
-						}
-					}
-				}
-			}
-		}
-		
-		System.out.println(("---------------------RETURN " + tmp));
-		return tmp;
-	}
+	
 }

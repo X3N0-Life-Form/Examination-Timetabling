@@ -47,6 +47,7 @@ public class ExamSessionParser {
 	public static final String ENTRY_INSTITUTIONAL_WEIGHTINGS = "InstitutionalWeightings";
 	
 	private String fileName;
+	private boolean gotoRoomHardConstraint = false;
 	
 	public ExamSessionParser(String fileName) {
 		this.fileName = fileName;
@@ -83,7 +84,7 @@ public class ExamSessionParser {
 				} else if (line.contains(ENTRY_PERIOD_HARD_CONSTRAINTS)) {
 					periodHardConstraints =
 							parsePeriodHardConstraints(reader, line);
-				} else if (line.contains(ENTRY_ROOM_HARD_CONSTRAINTS)) {
+				} else if (line.contains(ENTRY_ROOM_HARD_CONSTRAINTS) || gotoRoomHardConstraint ) {
 					roomHardConstraints =
 							parseRoomHardConstraints(reader, line);
 				} else if (line.contains(ENTRY_INSTITUTIONAL_WEIGHTINGS)) {
@@ -177,11 +178,9 @@ public class ExamSessionParser {
 	private ArrayList<RoomHardConstraint> parseRoomHardConstraints(
 			BufferedReader reader, String line)
 					throws IOException, ExamParsingException {
-		reader.mark(1);
-		ArrayList<RoomHardConstraint> roomHardConstraints =
-				new ArrayList<RoomHardConstraint>();
-		while (!(line = reader.readLine())
-				.contains(ENTRY_INSTITUTIONAL_WEIGHTINGS)) {
+		reader.mark(1);//TODO: do the same kind of trick
+		ArrayList<RoomHardConstraint> roomHardConstraints =	new ArrayList<RoomHardConstraint>();
+		while (!(line = noReadIfAlreadyReadRHCEntry(reader, line)).contains(ENTRY_INSTITUTIONAL_WEIGHTINGS)) {
 			int comaIndex = line.indexOf(',');
 			int id = Integer.parseInt(line.substring(0, comaIndex));
 			line = line.substring(comaIndex + 1);
@@ -193,6 +192,23 @@ public class ExamSessionParser {
 		}
 		reader.reset();
 		return roomHardConstraints;
+	}
+	
+	/**
+	 * Stupid method.
+	 * @param reader
+	 * @param line
+	 * @return either the current line, or reder.readLine()
+	 * @throws IOException
+	 */
+	private String noReadIfAlreadyReadRHCEntry(BufferedReader reader, String line)
+			throws IOException {
+		if (gotoRoomHardConstraint) {
+			gotoRoomHardConstraint = false;
+			return line;
+		} else {
+			return reader.readLine();
+		}
 	}
 
 	/**
@@ -216,7 +232,7 @@ public class ExamSessionParser {
 					throws IOException, ExamParsingException {
 		ArrayList<PeriodHardConstraint> periodHardConstraints =
 				new ArrayList<PeriodHardConstraint>();
-		reader.mark(1);
+		//reader.mark(1);
 		while (!(line = reader.readLine())
 				.contains(ENTRY_ROOM_HARD_CONSTRAINTS)) {
 			int comaIndex = line.indexOf(",");
@@ -232,7 +248,8 @@ public class ExamSessionParser {
 					new PeriodHardConstraint(e1Id, e2Id, constraint);
 			periodHardConstraints.add(currentPHC);
 		}
-		reader.reset();
+		//reader.reset();
+		gotoRoomHardConstraint = true;
 		return periodHardConstraints;
 	}
 
