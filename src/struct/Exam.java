@@ -7,6 +7,16 @@ public class Exam implements Comparable<Exam>{
 	 * Starts at 0.
 	 */
 	private int id;
+	
+
+	@Override
+	public Exam clone() {
+		Exam clone = new Exam(id, duration, size, students);
+		clone.roomHardConstraint = roomHardConstraint;
+		clone.constraints = constraints;
+		return clone;
+	}
+
 	private int duration;
 	private int size;
 	private ArrayList<Integer> students;

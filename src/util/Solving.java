@@ -28,6 +28,14 @@ public class Solving {
 		return res;
 	}
 	
+	public static ArrayList<Exam> manualCloneExam(List<Exam> resIn) {
+		ArrayList<Exam> res = new ArrayList<Exam>();
+		for (Exam toClone : resIn) {
+			res.add(toClone.clone());
+		}//manual cloning - lol
+		return res;
+	}
+	
 	public static boolean canHost(Solution s, int examId, int periodId, List<ResultCouple> resIn) {
 		ArrayList<ResultCouple> res = manualClone(resIn);
 		boolean tmp = false;
@@ -82,7 +90,7 @@ public class Solving {
 					if (examSizeSum + sizeE <= res.get(i).getRoom().getSize() && !exclusive )
 						tmp = true;
 					////////////////////////////////
-					if (examId == 535) {
+					/*if (examId == 535) {
 						System.out.println("canHost 535: checking room " + res.get(i).getRoom().getId());
 						System.out.println("canHost 535: test " + examSizeSum + " + " + sizeE + " <= " + res.get(i).getRoom().getSize()
 								+ " --> " + (examSizeSum + sizeE <= res.get(i).getRoom().getSize()));
@@ -93,7 +101,7 @@ public class Solving {
 						}
 						System.out.println("size of the exams in there: " + demSize);
 						System.out.println("canHost 535: exclusive? " + exclusive);
-					}
+					}*/
 					////////////////////////////////
 				}
 			}
@@ -157,6 +165,71 @@ public class Solving {
 		
 		//System.out.println(("---------------------RETURN " + tmp));
 		return tmp;
+	}
+	
+	/**
+	 * 
+	 * @param s
+	 * @param examId
+	 * @param periodId
+	 * @param res
+	 * @param returnCouple A list of examId returned by the method
+	 * @param returnList 
+	 * @return True if a swap operation can be done, as well as a
+	 *  List of exams satisfying the swap prerequisites.
+	 */
+	public static boolean canSwap(Solution s, int examId, List<ResultCouple> resIn, ResultCouple returnCouple, List<Integer> returnList){
+		List<ResultCouple> res = manualClone(resIn);
+		int sizeExam = -1;
+		List<Exam> listExams = new ArrayList<Exam>(); 
+		List<Integer> currentList = new ArrayList<Integer>();
+		
+		// get the size of the current exam
+		for (int i = 0; i < s.getExamSession().getExams().size(); i++){
+			if ( s.getExamSession().getExams().get(i).getId() == examId){
+				sizeExam = s.getExamSession().getExams().get(i).getSize();
+				break;
+			}
+		}
+
+		// loop
+		for (int i = 0 ; i < res.size(); i++){
+			// size of the current room
+			int roomSize = res.get(i).getRoom().getSize();
+			int currentRoomOccupation = 0;
+			
+			for (int r = 0 ; r < res.get(i).getExamList().size(); r++){
+				currentRoomOccupation += res.get(i).getExamList().get(r).getSize();
+			}
+			
+			int periodId = res.get(i).getPeriod().getId();
+			System.out.println("period : " + periodId + "roomSize :" +roomSize);
+			// if period is OK & size is OK
+			if (sizeExam <= roomSize && s.getExamPeriodModif()[examId][periodId]!=0){
+				listExams = manualCloneExam(res.get(i).getExamList());
+				int currentSum = 0;
+				currentList = new ArrayList<Integer>();
+				for (int j = 0; j< listExams.size() ; j++){
+					currentSum += listExams.get(j).getSize();
+					currentList.add(listExams.get(j).getId());
+					System.out.println(" currentSum " + currentSum);
+					System.out.println(" exams : " + currentList);
+					
+					if (currentRoomOccupation - currentSum + sizeExam <= roomSize) {
+						res.removeAll(currentList);
+						System.out.println(" canHost " + canHost(s, currentList, periodId, res));
+						if (canHost (s, currentList, periodId, res)) {
+							returnCouple = resIn.get(i);
+							returnList = currentList;
+							return true;
+						}
+					}
+				}
+			}
+		}
+		
+		
+		return false;
 	}
 	
 	/**
@@ -396,13 +469,13 @@ public class Solving {
 		for (int i = 0; i < s.getExamSession().getPeriods().size(); i++){
 			int periodId = s.getExamSession().getPeriods().get(i).getId();
 			///////////////////////
-			if (examId == 535) {
+		/*	if (examId == 535) {
 				System.out.println("## ##");
 				//System.out.println("## hasAfter=" + hasAfter);
 				System.out.println("## periodId=" + periodId);
 				//System.out.println("## checkBeforeAfter=" + checkBeforeAfter(s, examId, periodId, res));
 				System.out.println("## canHost=" + canHost(s, examId, periodId, res));
-			}
+			}*/
 			///////////////////////
 			
 			if (hasAfter && !checkBeforeAfter(s, examId, periodId, res)) {

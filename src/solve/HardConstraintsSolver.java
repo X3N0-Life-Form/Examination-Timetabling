@@ -118,6 +118,18 @@ public class HardConstraintsSolver {
 				}
 			}
 			////////////////////////////////////////
+			if (periodId == -1) {
+				System.out.println("----No available period was found; trying to swap with already placed exams");
+				ResultCouple swapCouple = null;
+				List<Integer> swapIds = null;
+				boolean canSwap = Solving.canSwap(s, examId, res, swapCouple, swapIds);
+				System.out.println("roomId " + swapCouple.getRoom().getId() + "; periodId " + swapCouple.getPeriod().getId());
+				if (canSwap) {
+					System.out.println("----It is possible to swap the current exam with already " +
+							"placed exams in room " + canSwap);
+				}
+			}
+			//even with swap, no period was found
 			if (periodId == -1)
 				throw new SolvingException("Incorrect period id: " + periodId); //see Solving.MAX_GET_AVAILABLE_PERIOD
 			System.out.println("----Found that period " + periodId + " is capable of hosting these exams");
