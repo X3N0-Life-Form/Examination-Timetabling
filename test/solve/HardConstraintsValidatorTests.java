@@ -104,9 +104,25 @@ public class HardConstraintsValidatorTests {
 	/**
 	 * Exams with AFTER constraint are in the wrong order.
 	 */
-	@Test @Ignore
+	@Test
 	public void isSolutionValid_AFTER_wrongOrder() {
+		List<ResultCouple> results = simpleSolution.getResult();
+		Feedback feedback = new Feedback();
+		prepareValidResults(results);
 		
+		results.get(2).removeExam(simpleExamSession.getExams().get(3)); //3, EXAM_COINCIDENCE, 4
+		results.get(2).removeExam(simpleExamSession.getExams().get(4)); //
+		results.get(7).removeExam(simpleExamSession.getExams().get(5)); //5, EXAM_COINCIDENCE, 6 + 
+		results.get(6).removeExam(simpleExamSession.getExams().get(6)); //4, EXCLUSION, 6
+		
+		results.get(6).addExam(simpleExamSession.getExams().get(3)); //3, EXAM_COINCIDENCE, 4
+		results.get(6).addExam(simpleExamSession.getExams().get(4)); //
+		results.get(3).addExam(simpleExamSession.getExams().get(5)); //5, EXAM_COINCIDENCE, 6 + 
+		results.get(2).addExam(simpleExamSession.getExams().get(6)); //4, EXCLUSION, 6
+		
+		boolean res = HCV.isSolutionValid(simpleSolution, feedback);
+		printSimpleSet(simpleSolution.getResult());
+		assertFalse(res);
 	}
 	
 	/**

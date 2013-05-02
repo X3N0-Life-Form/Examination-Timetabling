@@ -32,7 +32,7 @@ public class Feedback {
 			"two coinciding exams are in different periods: ";
 
 	public static final String AFTER_VIOLATION = "AFTER violation: one exam should be " +
-			"after another, but isn't";
+			"after another, but isn't: ";
 	
 	Map<ResultCouple, String> items;
 	

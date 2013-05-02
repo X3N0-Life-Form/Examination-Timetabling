@@ -3,6 +3,7 @@ package struct;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -270,7 +271,75 @@ public class Solution {
 		this.examRoom = examRoom;
 	}
 	
+	/**
+	 * 
+	 * @return A sorted list of all exams with an AFTER constraint.
+	 */
+	public List<Exam> getBeforeExams() {
+		List<Exam> beforeExams = new ArrayList<Exam>();
+		
+		for (Exam currentExam : examSession.getExamsAsList()) {
+			if (currentExam.hasPeriodHardConstraint(EPeriodHardConstraint.AFTER)) {
+				beforeExams.add(currentExam);
+				//add second exam to the list as well
+				for (PeriodHardConstraint constraint : currentExam.getConstraints()) {
+					if (constraint.getConstraint() == EPeriodHardConstraint.AFTER
+							&& !beforeExams.contains(examSession.getExams().get(constraint.getE2Id()))) {
+						beforeExams.add(examSession.getExams().get(constraint.getE2Id()));
+					}
+				}
+			}
+		}//TODO: think about coincidences
+		//got every after, now sort them
+		//sortBeforeAfter(beforeExams);
+		
+		Collections.sort(beforeExams, new Comparator<Exam>() {
 
-
+			/**
+			 * Compares two exams according to their AFTER constraints
+			 * @param o1
+			 * @param o2
+			 * @return 1 if o1 AFTER o2,
+			 * -1 if o2 AFTER o1,
+			 * 0 if these exams have nothing in common
+			 */
+			@Override
+			public int compare(Exam o1, Exam o2) {
+				int id1 = o1.getId();
+				int id2 = o2.getId();
+				//check o1
+				for (PeriodHardConstraint o1c : o1.getConstraints()) {
+					if (o1c.getConstraint() == EPeriodHardConstraint.AFTER) {
+						if (o1c.getE1Id() == id1 && o1c.getE2Id() == id2) {
+							//if o1 AFTER o2
+							return 1;
+						} else if (o1c.getE1Id() == id2 && o1c.getE2Id() == id1) {
+							//if o2 AFTER o1
+							return -1;
+						}
+					}
+				}
+				
+				//check o2
+				for (PeriodHardConstraint o2c : o2.getConstraints()) {
+					if (o2c.getConstraint() == EPeriodHardConstraint.AFTER) {
+						if (o2c.getE1Id() == id1 && o2c.getE2Id() == id2) {
+							//if o1 AFTER o2
+							return 1;
+						} else if (o2c.getE1Id() == id2 && o2c.getE2Id() == id1) {
+							//if o2 AFTER o1
+							return -1;
+						}
+					}
+				}
+				
+				//these exams have no AFTER in common, ==
+				return 0;
+			}
+			
+		});
+		
+		return beforeExams;
+	}
 	
 }
