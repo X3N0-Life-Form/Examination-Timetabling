@@ -22,7 +22,7 @@ import util.Solving;
  * the simplified data set.
  * @author Adrien Droguet - Sara Tari
  * @see HardConstraintsSolver
- * @see HardConstraintsValidatorTests
+ * @see HCV_Tests
  */
 public class HardConstraintsSolverTests_solve {
 
