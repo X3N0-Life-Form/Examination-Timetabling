@@ -167,6 +167,42 @@ public class Solving {
 		return tmp;
 	}
 	
+	public static boolean checkSizeExam( Solution s, int examId, List<ResultCouple> res){
+		int examSize = -1;
+		
+			int count = 0;
+			for (int i = 0 ; i< s.getExamSession().getExams().size(); i++){
+				if (s.getExamSession().getExams().get(i).getId() == examId){
+					Exam currentExam = s.getExamSession().getExams().get(i);
+					examSize = currentExam.getSize();
+					boolean isAfter = false;
+					for (int j = 0 ; j < currentExam.getConstraints().size() ; j++){
+						if (currentExam.getConstraints().get(j).getConstraint() == EPeriodHardConstraint.AFTER
+								&& currentExam.getConstraints().get(j).getE1Id() == currentExam.getId()){							
+								isAfter = true;
+						}
+					}
+					if (checkCoincidence(s, examId).size() != 1 || isAfter ){
+						return false;
+					}
+					break;
+				}
+			}
+			
+			for (int j = 0 ; j < s.getExamSession().getRooms().size() ; j++){
+				int roomSize = s.getExamSession().getRooms().get(j).getSize();
+				if (examSize <= roomSize){
+					count++;
+				}			
+			}
+			
+			if (count == 1){
+				return true;
+			}
+		
+		return false;
+	}
+	
 	/**
 	 * 
 	 * @param s

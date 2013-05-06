@@ -21,13 +21,13 @@ import util.Solving;
  * @see Feedback
  */
 public class HardConstraintsSolver {
-	
+
 	private Solution s;
-	
+
 	public HardConstraintsSolver(Solution solution) {
 		this.s = solution;
 	}
-	
+
 	/**
 	 * 
 	 * @param boolArray
@@ -45,8 +45,8 @@ public class HardConstraintsSolver {
 		}
 		return false;
 	}
-	
-	
+
+
 	public boolean hasCoincidingExamsBefore(boolean[] boolArray,
 			List<Exam> nPE, List<Exam> beforeExams) throws SolvingException {
 		if (boolArray.length != nPE.size())
@@ -59,26 +59,63 @@ public class HardConstraintsSolver {
 		}
 		return false;
 	}
-	
+
 	public Solution solve() throws SolvingException {
 		System.out.println("Solving hard constraints:");
 		List <ResultCouple> res = Solving.manualClone(s.getResult());
 		List <Exam> NPE = s.getNonPlacedExams();
 		System.out.println("--Found " + NPE.size() + " non placed exams");
-		
+
 		List<Exam> beforeExams = s.getBeforeExams();
 		System.out.println("--Found " + beforeExams.size() + " exams with AFTER constraint(s)");
-		
-		
+
+
 		boolean[] boolArray = new boolean[NPE.size()];
 		for (int i = 0; i < NPE.size(); i++) {
 			boolArray[i] = false;
 		}
-		
+
+		for (int k = 0; k< boolArray.length; k++){
+			if (Solving.checkSizeExam( s, NPE.get(k).getId(), res)){
+
+				System.out.println(" Found one : " + NPE.get(k).getId());
+				int examId = NPE.get(k).getId();
+				List <Integer> examList = Solving.checkCoincidence(s, examId);
+				int periodId = Solving.getAvailablePeriod(s, examList, res);
+
+				if (periodId == -1)
+					throw new SolvingException("Incorrect period id: " + periodId); //see Solving.MAX_GET_AVAILABLE_PERIOD
+				System.out.println("----Found that period " + periodId + " is capable of hosting these exams");
+				System.out.println("------Processing period " + periodId);
+				List<Integer> rooms = Solving.findSuitable(s, examList, periodId, res);
+				System.out.println("------Found " + rooms.size() + " suitable rooms for " + examList.size() + " exams");
+				System.out.println("------Assigning exams to result couples");
+				for (int i = 0; i < examList.size(); i++) {
+					int currentExam = examList.get(i);
+					System.out.println("--------Processing exam " + currentExam);
+					List<ResultCouple> resForPeriod = s.getResultsForPeriod(periodId, res);
+					System.out.println("--------Found " + resForPeriod.size() + " result couples matching this period");
+					for (int j = 0; j < resForPeriod.size(); j++) {
+						int currentRoomId = resForPeriod.get(j).getRoom().getId();
+						System.out.println("----------Processing room " + currentRoomId);
+						if (currentRoomId == rooms.get(i)) {
+							System.out.println("----------Room " + currentRoomId + " was deemed suitable for exam " + currentExam);
+							resForPeriod.get(j).addExam(currentExam);
+							boolArray[getIndex(NPE, currentExam)] = true;
+							updateValidPeriods(currentExam, periodId);
+
+						} else {
+							System.out.println("----------Room " + currentRoomId + " was rejected");
+						}
+					}
+				}
+			}
+		}
+
 		//loop through boolean array
 		while (hasFalse(boolArray)) {
 			int c = -1;
-			
+
 			/*
 			 * priority:
 			 * AFTER w/ EXAM_COINCIDENCE
@@ -87,9 +124,9 @@ public class HardConstraintsSolver {
 			 * the rest
 			 */
 			boolean isBeforeExam = false;
-			for (Exam x : beforeExams) {
+			/*for (Exam x : beforeExams) {
 				System.out.println("##" + x);
-			}
+			}*/
 			if (beforeExams.size() > 0) {
 				if (hasCoincidingExamsBefore(boolArray, NPE, beforeExams)) {
 					c = findFalseCoincidingBefore(boolArray, NPE, beforeExams);
@@ -102,7 +139,7 @@ public class HardConstraintsSolver {
 			} else {
 				c = findFalse(boolArray);
 			}
-			
+
 			int examId = NPE.get(c).getId();
 			System.out.println("----Processing exam " + examId);
 			List<Integer> cExams = Solving.checkCoincidence(s, examId);
@@ -159,14 +196,14 @@ public class HardConstraintsSolver {
 					}
 				}
 			}
-
 		}
+
 		//place exams (for real)	
 		System.out.println("--Final res:" + res);
 		s.setResult((ArrayList<ResultCouple>) res);
 		return s;
 	}
-	
+
 
 
 	/**
@@ -184,7 +221,7 @@ public class HardConstraintsSolver {
 		return -1;
 	}
 
-	
+
 	private int findFalseCoincidingBefore(boolean[] boolArray, List<Exam> nPE,
 			List<Exam> beforeExams) {
 		for (int i = 0; i < nPE.size(); i++) {
@@ -199,7 +236,7 @@ public class HardConstraintsSolver {
 		}
 		return -1;
 	}
-	
+
 	private int findFalseCoinciding(boolean[] boolArray, List<Exam> nPE) {
 		for (int i = 0; i < nPE.size(); i++) {
 			if (boolArray[i] == false && Solving.checkCoincidence(s, nPE.get(i).getId()).size() > 1) {
@@ -208,7 +245,7 @@ public class HardConstraintsSolver {
 		}
 		return -1;
 	}
-	
+
 	private int findFalseBefore(boolean[] boolArray,List<Exam> nPE,  List<Exam> beforeExams) {
 		for (int i = 0; i < boolArray.length; i++) {
 			//same check as findFalse, but return i only if it is in beforeExams
@@ -219,7 +256,7 @@ public class HardConstraintsSolver {
 		}
 		return -1;
 	}
-	
+
 	private int findFalse(boolean[] boolArray) {
 		for (int i = 0; i < boolArray.length; i++) {
 			if (boolArray[i] == false)
@@ -252,7 +289,7 @@ public class HardConstraintsSolver {
 			System.out.print(n.getId() + "; ");
 		}
 	}
-	
+
 	public void updateValidPeriods(int examId, int periodId)
 	{
 		//System.out.println("!! updateValidPeriod(" + examId + ", " + periodId + ")");
@@ -265,5 +302,5 @@ public class HardConstraintsSolver {
 			}
 		}
 	}
-	
+
 }
