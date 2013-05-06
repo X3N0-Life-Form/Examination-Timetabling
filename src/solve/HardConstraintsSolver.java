@@ -80,6 +80,10 @@ public class HardConstraintsSolver {
 
 				System.out.println(" Found one : " + NPE.get(k).getId());
 				int examId = NPE.get(k).getId();
+			/*	if (boolArray[k]){
+					System.out.println("already placed");
+					continue;
+				}*/
 				List <Integer> examList = Solving.checkCoincidence(s, examId);
 				int periodId = Solving.getAvailablePeriod(s, examList, res);
 
@@ -124,9 +128,6 @@ public class HardConstraintsSolver {
 			 * the rest
 			 */
 			boolean isBeforeExam = false;
-			/*for (Exam x : beforeExams) {
-				System.out.println("##" + x);
-			}*/
 			if (beforeExams.size() > 0) {
 				if (hasCoincidingExamsBefore(boolArray, NPE, beforeExams)) {
 					c = findFalseCoincidingBefore(boolArray, NPE, beforeExams);
@@ -139,12 +140,20 @@ public class HardConstraintsSolver {
 			} else {
 				c = findFalse(boolArray);
 			}
-
+			if (NPE.get(c).getId() == 528){
+				System.out.println(" 528 findFALSE");
+			}
+			if (boolArray[c]){
+				System.out.println("already placed");
+				continue;
+			}
 			int examId = NPE.get(c).getId();
 			System.out.println("----Processing exam " + examId);
 			List<Integer> cExams = Solving.checkCoincidence(s, examId);
 			System.out.println("----Found " + cExams.size() + " coinciding exams");
 			int periodId = Solving.getAvailablePeriod(s, cExams, res);
+		
+			System.out.println("period is " + periodId);
 			////////////////////////////////////////
 			if (periodId == -1) {
 				int[][] ep = s.getExamPeriodModif();
@@ -154,19 +163,6 @@ public class HardConstraintsSolver {
 					System.out.println("available period "+Solving.getAvailablePeriod(s, examId, res));
 				}
 			}
-			////////////////////////////////////////
-			if (periodId == -1) {
-				System.out.println("----No available period was found; trying to swap with already placed exams");
-				ResultCouple swapCouple = null;
-				List<Integer> swapIds = null;
-				boolean canSwap = Solving.canSwap(s, examId, res, swapCouple, swapIds);
-				System.out.println("roomId " + swapCouple.getRoom().getId() + "; periodId " + swapCouple.getPeriod().getId());
-				if (canSwap) {
-					System.out.println("----It is possible to swap the current exam with already " +
-							"placed exams in room " + canSwap);
-				}
-			}
-			//even with swap, no period was found
 			if (periodId == -1)
 				throw new SolvingException("Incorrect period id: " + periodId); //see Solving.MAX_GET_AVAILABLE_PERIOD
 			System.out.println("----Found that period " + periodId + " is capable of hosting these exams");
