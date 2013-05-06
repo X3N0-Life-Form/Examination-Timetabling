@@ -182,6 +182,22 @@ public class Solving {
 								isAfter = true;
 						}
 					}
+					if (examId == 529){
+						System.out.println("###########################################");
+						System.out.println("###########################################");
+						System.out.println("###########################################");
+						System.out.println("###########################################");
+						System.out.println("###########################################");
+						System.out.println("529");
+						System.out.println("coin " + checkCoincidence(s, examId));
+						System.out.println("is after ?" + isAfter);
+						System.out.println("###########################################");
+						System.out.println("###########################################");
+						System.out.println("###########################################");
+						System.out.println("###########################################");
+						System.out.println("###########################################");
+					}
+					
 					if (checkCoincidence(s, examId).size() != 1 || isAfter ){
 						return false;
 					}
@@ -458,8 +474,14 @@ public class Solving {
 				exam.getConstraints()) {
 				if (currentConstraint.getConstraint() ==
 						EPeriodHardConstraint.EXAM_COINCIDENCE) {
-					if (!res.contains(currentConstraint.getE2Id()))
-						res.add(currentConstraint.getE2Id());
+					if (examId == currentConstraint.getE1Id()){
+						if (!res.contains(currentConstraint.getE2Id()))
+							res.add(currentConstraint.getE2Id());
+					}
+					else if (examId == currentConstraint.getE2Id()){
+						if (!res.contains(currentConstraint.getE1Id()))
+							res.add(currentConstraint.getE1Id());
+					}
 				}
 			}
 		}
