@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import parse.ExamSessionParser;
+import struct.EPeriodHardConstraint;
 import struct.Exam;
 import struct.ExamSession;
 import struct.ResultCouple;
@@ -68,8 +69,7 @@ public class HardConstraintsSolver {
 
 		List<Exam> beforeExams = s.getBeforeExams();
 		System.out.println("--Found " + beforeExams.size() + " exams with AFTER constraint(s)");
-
-
+		
 		boolean[] boolArray = new boolean[NPE.size()];
 		for (int i = 0; i < NPE.size(); i++) {
 			boolArray[i] = false;
@@ -80,10 +80,6 @@ public class HardConstraintsSolver {
 
 				System.out.println(" Found one : " + NPE.get(k).getId());
 				int examId = NPE.get(k).getId();
-			/*	if (boolArray[k]){
-					System.out.println("already placed");
-					continue;
-				}*/
 				List <Integer> examList = Solving.checkCoincidence(s, examId);
 				int periodId = Solving.getAvailablePeriod(s, examList, res);
 
@@ -115,7 +111,33 @@ public class HardConstraintsSolver {
 				}
 			}
 		}
-
+		
+		System.out.println("###############################");
+		System.out.println("###############################");
+		System.out.println("###############################");
+		System.out.println("###############################");
+		System.out.println("###############################");
+		System.out.println("###############################");
+		System.out.println("###############################");
+		System.out.println("###############################");
+		System.out.println("###############################");
+		System.out.println("###############################");
+		System.out.println("###############################");
+		System.out.println("###############################");
+		System.out.println("###############################");
+		System.out.println("###############################");
+		System.out.println("###############################");
+		System.out.println("###############################");
+		System.out.println("###############################");
+		System.out.println("###############################");
+		System.out.println("###############################");
+		System.out.println("###############################");
+		System.out.println("###############################");
+		System.out.println("###############################");
+		System.out.println("###############################");
+		System.out.println("###############################");
+		
+		int count = 0;
 		//loop through boolean array
 		while (hasFalse(boolArray)) {
 			int c = -1;
@@ -128,7 +150,7 @@ public class HardConstraintsSolver {
 			 * the rest
 			 */
 			boolean isBeforeExam = false;
-			if (beforeExams.size() > 0) {
+			if (beforeExams.size() > count) {
 				if (hasCoincidingExamsBefore(boolArray, NPE, beforeExams)) {
 					c = findFalseCoincidingBefore(boolArray, NPE, beforeExams);
 				} else {
@@ -140,9 +162,6 @@ public class HardConstraintsSolver {
 			} else {
 				c = findFalse(boolArray);
 			}
-			if (NPE.get(c).getId() == 528){
-				System.out.println(" 528 findFALSE");
-			}
 			if (boolArray[c]){
 				System.out.println("already placed");
 				continue;
@@ -152,8 +171,6 @@ public class HardConstraintsSolver {
 			List<Integer> cExams = Solving.checkCoincidence(s, examId);
 			System.out.println("----Found " + cExams.size() + " coinciding exams");
 			int periodId = Solving.getAvailablePeriod(s, cExams, res);
-		
-			System.out.println("period is " + periodId);
 			////////////////////////////////////////
 			if (periodId == -1) {
 				int[][] ep = s.getExamPeriodModif();
@@ -183,9 +200,7 @@ public class HardConstraintsSolver {
 						resForPeriod.get(j).addExam(currentExam);
 						boolArray[getIndex(NPE, currentExam)] = true;
 						updateValidPeriods(currentExam, periodId);
-						if (isBeforeExam) {
-							beforeExams.remove(s.getExamSession().getExams().get(currentExam));
-						}
+						count++;
 						break;
 					} else {
 						System.out.println("----------Room " + currentRoomId + " was rejected");
@@ -288,13 +303,39 @@ public class HardConstraintsSolver {
 
 	public void updateValidPeriods(int examId, int periodId)
 	{
-		//System.out.println("!! updateValidPeriod(" + examId + ", " + periodId + ")");
 		int [][] eP = s.getExamPeriodModif();
 		int [][] coincidence = s.getExamCoincidence();
+		Exam currentExam = null;
+		int idAfterExam = -1;
+		
+		// get the exam
+		for (int i = 0 ; i< s.getExamSession().getExams().size() ; i++){
+			if (s.getExamSession().getExams().get(i).getId() == examId){
+				currentExam = s.getExamSession().getExams().get(i);
+				break;
+			}
+		}
+		
+		// check after 
+		if (currentExam.hasPeriodHardConstraint(EPeriodHardConstraint.AFTER)){
+			System.out.println("current exam " + examId);
+			for (int j = 0 ; j < currentExam.getConstraints().size();j++){
+				if (currentExam.getConstraints().get(j).getConstraint() == EPeriodHardConstraint.AFTER){
+					if (currentExam.getConstraints().get(j).getE2Id() == examId){
+						idAfterExam = currentExam.getConstraints().get(j).getE1Id();
+						for (int k = 0 ; k <= periodId ; k++){
+							eP[idAfterExam][k]=0;
+							System.out.println("eP updated for exam "+idAfterExam + " & period " + periodId);
+						}
+					}
+				}
+			}
+		}
+		
+		// check exclusion
 		for (int i = 0; i < s.getExamSession().getExams().size(); i++){
 			if( coincidence [examId][i] == 0 || coincidence [i][examId] == 0){
 				eP [i][periodId] = 0;
-				//System.out.println("updated exam " + i);
 			}
 		}
 	}
