@@ -23,7 +23,7 @@ import struct.Solution;
  * @see HardConstraintsSolver
  * @see HCS_Tests_slow
  */
-public class HardConstraintsValidatorTests {
+public class HCV_Tests {
 	
 	private ExamSessionParser simpleParser;
 	private Solution simpleSolution;

@@ -18,7 +18,7 @@ public class Zorg {
 	
 	private ExamSession es;
 	private ExamSessionParser esp;
-	private String fileName = "res/exam_comp_set4.exam";
+	private String fileName = "res/exam_comp_set1.exam";
 	
 	/**
 	 * powerful
