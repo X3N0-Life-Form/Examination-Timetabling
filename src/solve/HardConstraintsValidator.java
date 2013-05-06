@@ -18,8 +18,8 @@ public class HardConstraintsValidator implements Validator {
 		// id : exam id, used for coincidence & exclusion
 		int id = 0;
 		boolean notAfter;
-		Date periodAfter = new Date();
-		Date periodBefore = new Date();
+		int periodAfter = -1;
+		int periodBefore = -1;
 		ArrayList<PeriodHardConstraint> constraintList = new ArrayList<PeriodHardConstraint>();
 
 		//check AFTER
@@ -31,6 +31,9 @@ public class HardConstraintsValidator implements Validator {
 				Exam currentExam = currentRC.getExamList().get(i);
 				constraintList = currentExam.getConstraints();
 
+				periodAfter = -1;
+				periodBefore = -1;
+				
 				for (int j = 0; j < constraintList.size(); j++){
 					notAfter = false;
 					// if AFTER
@@ -38,18 +41,16 @@ public class HardConstraintsValidator implements Validator {
 					if (constraintList.get(j).getConstraint() == EPeriodHardConstraint.AFTER) {
 						int afterId = constraintList.get(j).getE1Id();
 						int beforeId = constraintList.get(j).getE2Id();
-						Date dateBefore = null;
-						Date dateAfter = null;
-						boolean found = true;
+						boolean found = false;
 						
 						for (ResultCouple rc : s.getResult()) {
 							for (int k = 0; k < rc.getExamList().size(); k++) {
 								if (rc.getExamList().get(k).getId() == beforeId) {
-									dateBefore = rc.getPeriod().getDate_hour();
+									periodBefore = rc.getPeriod().getId();
 								} else if (rc.getExamList().get(k).getId() == afterId) {
-									dateAfter = rc.getPeriod().getDate_hour();
+									periodAfter = rc.getPeriod().getId();
 								}
-								if (dateBefore != null && dateAfter != null) {
+								if (periodBefore != -1 && periodAfter != -1) {
 									found = true;
 									break;
 								}
@@ -57,8 +58,14 @@ public class HardConstraintsValidator implements Validator {
 							if (found)
 								break;
 						}
-						if(periodAfter.compareTo(periodBefore) <= 0)
-							notAfter = true;	
+						if(periodAfter <= periodBefore) {
+							notAfter = true;
+							System.out.println("exam after " +afterId);
+							System.out.println("period after " +periodAfter);
+							System.out.println("exam before " +beforeId);
+							System.out.println("period before " + periodBefore);
+							
+						}
 					}
 					
 					if (notAfter) {

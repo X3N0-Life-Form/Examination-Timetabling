@@ -519,23 +519,10 @@ public class Solving {
 		ArrayList<Integer> availablePeriods = new ArrayList<Integer>();
 		int[][] eP = s.getExamPeriodModif();
 		boolean hasAfter = hasConstraint(s, examId, EPeriodHardConstraint.AFTER);
-		////////////////
-		if (examId == 535)
-			System.out.println("535 - get available period");;
-		////////////////
-		
+				
 		for (int i = 0; i < s.getExamSession().getPeriods().size(); i++){
 			int periodId = s.getExamSession().getPeriods().get(i).getId();
-			///////////////////////
-		/*	if (examId == 535) {
-				System.out.println("## ##");
-				//System.out.println("## hasAfter=" + hasAfter);
-				System.out.println("## periodId=" + periodId);
-				//System.out.println("## checkBeforeAfter=" + checkBeforeAfter(s, examId, periodId, res));
-				System.out.println("## canHost=" + canHost(s, examId, periodId, res));
-			}*/
-			///////////////////////
-			
+	
 			if (hasAfter && !checkBeforeAfter(s, examId, periodId, res)) {
 				continue;
 			}
