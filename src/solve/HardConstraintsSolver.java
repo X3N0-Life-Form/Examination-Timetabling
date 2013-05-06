@@ -316,7 +316,7 @@ public class HardConstraintsSolver {
 			}
 		}
 		
-		// check after 
+		// check after & before
 		if (currentExam.hasPeriodHardConstraint(EPeriodHardConstraint.AFTER)){
 			System.out.println("current exam " + examId);
 			for (int j = 0 ; j < currentExam.getConstraints().size();j++){
@@ -325,7 +325,14 @@ public class HardConstraintsSolver {
 						idAfterExam = currentExam.getConstraints().get(j).getE1Id();
 						for (int k = 0 ; k <= periodId ; k++){
 							eP[idAfterExam][k]=0;
-							System.out.println("eP updated for exam "+idAfterExam + " & period " + periodId);
+							System.out.println("(after) eP updated for exam "+idAfterExam + " & period " + periodId);
+						}
+					}
+					else if (currentExam.getConstraints().get(j).getE1Id() == examId ){
+						int idBeforeExam = currentExam.getConstraints().get(j).getE2Id();
+						for (int k = s.getExamSession().getPeriods().size()-1 ; k >= periodId; k--){
+							eP[idBeforeExam][k] = 0;
+							System.out.println("(before) eP updated for exam "+idAfterExam + " & period " + periodId);
 						}
 					}
 				}
