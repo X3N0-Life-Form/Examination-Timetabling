@@ -114,6 +114,16 @@ public class ExamSessionParser {
 				exams.get(index).setRoomHardConstraint(current);
 			}
 			
+			/////////////////////////////////////////////
+			// add AFTER constraints to 'before' exams //
+			/////////////////////////////////////////////
+			for (PeriodHardConstraint constraint : periodHardConstraints) {
+				if (constraint.getConstraint() == EPeriodHardConstraint.AFTER) {
+					int beforeId = constraint.getE2Id();
+					exams.get(beforeId).addConstraint(constraint);
+				}
+			}
+			
 			ExamSession res = new ExamSession(exams,
 					periods,
 					rooms,

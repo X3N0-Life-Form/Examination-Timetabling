@@ -13,7 +13,7 @@ import struct.Solution;
 
 public class Solving {
 	
-	protected static int MAX_GET_AVAILABLE_PERIOD = 10;
+	protected static int MAX_GET_AVAILABLE_PERIOD = 7;
 
 	/**
 	 * Manually clones a list and its contents.
