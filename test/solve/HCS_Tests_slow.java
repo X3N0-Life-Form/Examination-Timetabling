@@ -1,20 +1,15 @@
 package solve;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import parse.ExamParsingException;
 import parse.ExamSessionParser;
-
-import struct.Exam;
 import struct.ExamSession;
-import struct.ResultCouple;
 import struct.Solution;
 
 /**

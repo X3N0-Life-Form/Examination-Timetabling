@@ -10,7 +10,6 @@ import org.junit.Test;
 
 import parse.ExamParsingException;
 import parse.ExamSessionParser;
-import solve.HardConstraintsSolver;
 
 public class Exam_ComparisonTests {
 	
@@ -35,6 +34,7 @@ public class Exam_ComparisonTests {
 		System.out.println(normalExamSession.getExams());
 		System.out.println("Exam as List");
 		System.out.println(normalExamSession.getExamsAsList());
+		assertTrue(true);
 	}
 
 }

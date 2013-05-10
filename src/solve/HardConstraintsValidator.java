@@ -1,7 +1,6 @@
 package solve;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 import struct.EPeriodHardConstraint;
 import struct.Exam;

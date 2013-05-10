@@ -53,7 +53,6 @@ public class HCV_Tests {
 		HCV = new HardConstraintsValidator();
 	}
 	
-	@SuppressWarnings("unused")
 	private void printSimpleSet(List<ResultCouple> results) {
 		int i =0;
 		for (ResultCouple currentRC : results) {
