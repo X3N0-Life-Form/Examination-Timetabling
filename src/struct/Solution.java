@@ -12,36 +12,37 @@ import java.util.List;
  *
  */
 public class Solution {
-	/**
-	 * List of coinciding exams [id1][id2].
-	 */
+	
 	private int[][] examCoincidence;
-	/**
-	 * [id_exam][id_period]
-	 */
 	private int[][] examPeriodBase;
+	private int[][] examPeriodModif;
+	private int[][] examRoom;	
+	private List<Exam> nonPlacedExams = null;
+	private List<ResultCouple> result = null;
+	private List<Exam> coincidingExams;
+	private ExamSession examSession;
+	private List<Exam> afterExams;
+	private List<Student> studentList;
+	
+	public List<Student> getStudentList() {
+		return studentList;
+	}
+	
+	public void setStudentList(List<Student> studentList) {
+		this.studentList = studentList;
+	}
+	
 	public int[][] getExamPeriodBase() {
 		return examPeriodBase;
 	}
 	public void setExamPeriodBase(int[][] examPeriod) {
 		this.examPeriodBase = examPeriod;
 	}
-	private int[][] examPeriodModif;
+	
 	public int[][] getExamPeriodModif() {
 		return examPeriodModif;
 	}
 	
-	/**
-	 * [id_exam][id_room]
-	 */
-	private int[][] examRoom;
-	/**
-	 * [id_exam] True if the exam has been placed on the timetable.
-	 */
-	/**
-	 * List of exams that still need to be placed.
-	 */
-	private List<Exam> nonPlacedExams = null;
 	public List<Exam> getNonPlacedExams() {
 		return nonPlacedExams;
 	}
@@ -49,10 +50,41 @@ public class Solution {
 		this.nonPlacedExams = nonPlacedExams;
 	}
 	
-	private List<ResultCouple> result = null;
 	public List<ResultCouple> getResult() {
 		return result;
+	}	
+	
+	public void setResult(ArrayList<ResultCouple> result) {
+		this.result = result;
 	}
+	
+	public ExamSession getExamSession() {
+		return examSession;
+	}
+	public void setExamSession(ExamSession examSession) {
+		this.examSession = examSession;
+	}
+	
+	public int[][] getExamCoincidence() {
+		return examCoincidence;
+	}
+
+	public void setExamCoincidence(int[][] examCoincidence) {
+		this.examCoincidence = examCoincidence;
+	}
+	
+	public List<Exam> getAfterExams() {
+		return afterExams;
+	}
+	
+
+	public List<Exam> getCoincidingExams() {
+		return coincidingExams;
+	}
+	public void setCoincidingExams(List<Exam> coincidingExams) {
+		this.coincidingExams = coincidingExams;
+	}
+	
 	public List<ResultCouple> getResultsForPeriod(int periodId) {
 		List<ResultCouple> res = new ArrayList<ResultCouple>();
 		for (ResultCouple currentRC : result) {
@@ -78,30 +110,7 @@ public class Solution {
 		}
 		return resOut;
 	}
-	public void setResult(ArrayList<ResultCouple> result) {
-		this.result = result;
-	}
-	
-	private ExamSession examSession;
-	public ExamSession getExamSession() {
-		return examSession;
-	}
-	public void setExamSession(ExamSession examSession) {
-		this.examSession = examSession;
-	}
-	
-	private List<Exam> afterExams;
-	public List<Exam> getAfterExams() {
-		return afterExams;
-	}
-	
-	private List<Exam> coincidingExams;
-	public List<Exam> getCoincidingExams() {
-		return coincidingExams;
-	}
-	public void setCoincidingExams(List<Exam> coincidingExams) {
-		this.coincidingExams = coincidingExams;
-	}
+
 	
 	/**
 	 * Must at least be passed through a HardConstraintSolver
@@ -253,23 +262,6 @@ public class Solution {
 		Collections.sort(nonPlacedExams);
 	}
 	
-	public int[][] getExamCoincidence() {
-		return examCoincidence;
-	}
-
-	public void setExamCoincidence(int[][] examCoincidence) {
-		this.examCoincidence = examCoincidence;
-	}
-
-
-
-	public int[][] getExamRoom() {
-		return examRoom;
-	}
-
-	public void setExamRoom(int[][] examRoom) {
-		this.examRoom = examRoom;
-	}
 	
 	/**
 	 * 
@@ -331,8 +323,7 @@ public class Solution {
 							return -1;
 						}
 					}
-				}
-				
+				}				
 				//these exams have no AFTER in common, ==
 				return 0;
 			}
