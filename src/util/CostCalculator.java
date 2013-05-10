@@ -1,5 +1,7 @@
 package util;
 
+import struct.Period;
+import struct.Room;
 import struct.Solution;
 
 /**
@@ -28,13 +30,27 @@ public class CostCalculator {
 	}
 
 	public static int calculatePeriodCost(Solution s) {
-		// TODO Auto-generated method stub
-		return 0;
+		int cost = 0;
+		for (int i = 0; i<s.getResult().size();i++){
+			Period currentPeriod = s.getResult().get(i).getPeriod();
+			if (currentPeriod.getCost()> 0){
+				int examListSize = s.getResult().get(i).getExamList().size();
+				cost += currentPeriod.getCost() * examListSize;
+			}
+		}
+		return cost;
 	}
 
 	public static int calculateRoomCost(Solution s) {
-		// TODO Auto-generated method stub
-		return 0;
+		int cost = 0;
+		for (int i = 0 ; i< s.getResult().size();i++){
+			Room currentRoom = s.getResult().get(i).getRoom();
+			if (currentRoom.getCost() > 0){
+				int examListSize = s.getResult().get(i).getExamList().size();
+				cost += currentRoom.getCost() * examListSize;
+			}
+		}
+		return cost;
 	}
 
 	public static int calculateNonMixedDuration(Solution s) {
