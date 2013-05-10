@@ -1,5 +1,6 @@
 package struct;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,8 +12,12 @@ import java.util.List;
  * @author Adrien Droguet - Sara Tari
  *
  */
-public class Solution {
+public class Solution implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1550068663997242407L;
 	private int[][] examCoincidence;
 	private int[][] examPeriodBase;
 	private int[][] examPeriodModif;
@@ -101,7 +106,7 @@ public class Solution {
 	 * @return A List of ResultCouple of the specified period out ResultCouple
 	 * found in resIn.
 	 */
-	public List<ResultCouple> getResultsForPeriod(int periodId, List<ResultCouple> resIn) {//TODO:move that somewhere else
+	public List<ResultCouple> getResultsForPeriod(int periodId, List<ResultCouple> resIn) {
 		List<ResultCouple> resOut = new ArrayList<ResultCouple>();
 		for (ResultCouple currentRC : resIn) {
 			if (currentRC.getPeriod().getId() == periodId) {
@@ -189,8 +194,7 @@ public class Solution {
 						loopCounter++;
 					}
 			}
-			//System.out.println("i=" + i + ";numberOfExams=" + numberOfExams);
-		}//TODO: mirror values to fully initialize the matrix
+		}
 		System.out.println(" - done\n--Looped " + loopCounter + " times.\n");
 		
 		/**
@@ -260,6 +264,10 @@ public class Solution {
 		 */
 		nonPlacedExams = examSession.getExamsAsList();
 		Collections.sort(nonPlacedExams);
+		
+		//
+		//
+		//
 	}
 	
 	
@@ -281,9 +289,7 @@ public class Solution {
 					}
 				}
 			}
-		}//TODO: think about coincidences
-		//got every after, now sort them
-		//sortBeforeAfter(beforeExams);
+		}
 		
 		Collections.sort(beforeExams, new Comparator<Exam>() {
 
