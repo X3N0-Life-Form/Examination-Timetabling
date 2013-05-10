@@ -361,9 +361,22 @@ public class Solution implements Serializable {
 		return beforeExams;
 	}
 
-	public void updateStudentMap() {
-		// TODO Auto-generated method stub
-		
+	/**
+	 * Update the each Student's ResultCouple list.
+	 */
+	public void updateStudentRCLists() {
+		//empty previous RC lists
+		for (Integer studentId : students.navigableKeySet()) {
+			students.get(studentId).getExamRes().clear();
+		}
+		//fill them with fresh ResultCouples
+		for (ResultCouple rc : result) {
+			for (Exam e : rc.getExamList()) {
+				for (Integer studentId : e.getStudents()) {
+					students.get(studentId).addResultCouple(rc);
+				}
+			}
+		}
 	}
 	
 }

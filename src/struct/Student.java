@@ -43,6 +43,10 @@ public class Student {
 	public void addExamId(int examId) {
 		examIds.add(examId);
 	}
+
+	public void addResultCouple(ResultCouple rc) {
+		examRes.add(rc);
+	}
 	
 
 }
