@@ -39,6 +39,10 @@ public class Student {
 		return "Student [id=" + id + ", examIds=" + examIds + ", examRes="
 				+ examRes + "]";
 	}
+
+	public void addExamId(int examId) {
+		examIds.add(examId);
+	}
 	
 
 }

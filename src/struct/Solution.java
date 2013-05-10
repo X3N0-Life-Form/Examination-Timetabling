@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.TreeMap;
 
 /**
  * 
@@ -27,14 +28,14 @@ public class Solution implements Serializable {
 	private List<Exam> coincidingExams;
 	private ExamSession examSession;
 	private List<Exam> afterExams;
-	private List<Student> studentList;
+	private TreeMap<Integer, Student> students;
 	
-	public List<Student> getStudentList() {
-		return studentList;
+	public TreeMap<Integer,Student> getStudentList() {
+		return students;
 	}
 	
-	public void setStudentList(List<Student> studentList) {
-		this.studentList = studentList;
+	public void setStudentList(TreeMap<Integer, Student> studentList) {
+		this.students = studentList;
 	}
 	
 	public int[][] getExamPeriodBase() {
@@ -147,20 +148,7 @@ public class Solution implements Serializable {
 		/////////////////////////////////////
 		// create constraint-related lists //
 		/////////////////////////////////////
-		afterExams = new ArrayList<Exam>();
-		coincidingExams = new ArrayList<Exam>();
-		for (Exam currentExam : examSession.getExamsAsList()) {
-			for (PeriodHardConstraint c : currentExam.getConstraints()) {
-				if (c.getConstraint() == EPeriodHardConstraint.AFTER) {
-					afterExams.add(currentExam);
-				} else if (c.getConstraint() ==
-						EPeriodHardConstraint.EXAM_COINCIDENCE) {
-					coincidingExams.add(currentExam);
-				}
-			}
-		}
-
-		
+		initConstraintLists(examSession);
 		
 		/**
 		 * fills examCoincidence 
@@ -218,6 +206,51 @@ public class Solution implements Serializable {
 		 * fills examPeriod
 		 */
 		
+		initFillExamPeriod(examSession, numberOfExams, numberOfPeriods);
+		
+		/**
+		 * fills examRoom
+		 */
+		initFillExamRoom(examSession);
+			
+		/**
+		 * initialise results 
+		 */
+		nonPlacedExams = examSession.getExamsAsList();
+		Collections.sort(nonPlacedExams);
+		
+		/////////////////////////
+		// create Student list //
+		/////////////////////////
+		students = new TreeMap<Integer, Student>();
+		for (Exam currentExam : examSession.getExamsAsList()) {
+			for (Integer currentStudent : currentExam.getStudents()) {
+				if (!students.containsKey(currentStudent)) {
+					students.put(currentStudent, new Student(currentStudent));
+				}
+				//note: not checking if exam already present
+				students.get(currentStudent).addExamId(currentExam.getId());
+			}
+		}
+	}
+
+	private void initConstraintLists(ExamSession examSession) {
+		afterExams = new ArrayList<Exam>();
+		coincidingExams = new ArrayList<Exam>();
+		for (Exam currentExam : examSession.getExamsAsList()) {
+			for (PeriodHardConstraint c : currentExam.getConstraints()) {
+				if (c.getConstraint() == EPeriodHardConstraint.AFTER) {
+					afterExams.add(currentExam);
+				} else if (c.getConstraint() ==
+						EPeriodHardConstraint.EXAM_COINCIDENCE) {
+					coincidingExams.add(currentExam);
+				}
+			}
+		}
+	}
+
+	private void initFillExamPeriod(ExamSession examSession, int numberOfExams,
+			int numberOfPeriods) {
 		for (int i = 0; i< examSession.getExams().size();i++) {
 			for (int j = 0; j< examSession.getPeriods().size(); j++){
 				/**
@@ -244,10 +277,9 @@ public class Solution implements Serializable {
 			examPeriodModif[i] =
 					Arrays.copyOfRange(examPeriodBase[i], 0, numberOfPeriods);
 		}
-		
-		/**
-		 * fills examRoom
-		 */
+	}
+
+	private void initFillExamRoom(ExamSession examSession) {
 		for (int i = 0; i <examSession.getExams().size() ; i++)
 			for (int j =0; j< examSession.getRooms().size(); j++)
 				if ((examSession.getExams().get(i).getSize() <= examSession.getRooms().get(j).getSize() &&
@@ -257,17 +289,7 @@ public class Solution implements Serializable {
 				examSession.getRooms().get(j).getCost() > 0))
 					examRoom[i][j] = 1;
 				else 
-					examRoom[i][j] = 0; 
-			
-		/**
-		 * initialise results 
-		 */
-		nonPlacedExams = examSession.getExamsAsList();
-		Collections.sort(nonPlacedExams);
-		
-		//
-		//
-		//
+					examRoom[i][j] = 0;
 	}
 	
 	
