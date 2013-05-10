@@ -112,31 +112,6 @@ public class HardConstraintsSolver {
 			}
 		}
 		
-		System.out.println("###############################");
-		System.out.println("###############################");
-		System.out.println("###############################");
-		System.out.println("###############################");
-		System.out.println("###############################");
-		System.out.println("###############################");
-		System.out.println("###############################");
-		System.out.println("###############################");
-		System.out.println("###############################");
-		System.out.println("###############################");
-		System.out.println("###############################");
-		System.out.println("###############################");
-		System.out.println("###############################");
-		System.out.println("###############################");
-		System.out.println("###############################");
-		System.out.println("###############################");
-		System.out.println("###############################");
-		System.out.println("###############################");
-		System.out.println("###############################");
-		System.out.println("###############################");
-		System.out.println("###############################");
-		System.out.println("###############################");
-		System.out.println("###############################");
-		System.out.println("###############################");
-		
 		int count = 0;
 		//loop through boolean array
 		while (hasFalse(boolArray)) {
@@ -149,7 +124,6 @@ public class HardConstraintsSolver {
 			 * EXAM_COINCIDENCE
 			 * the rest
 			 */
-			boolean isBeforeExam = false;
 			if (beforeExams.size() > count) {
 				if (hasCoincidingExamsBefore(boolArray, NPE, beforeExams)) {
 					c = findFalseCoincidingBefore(boolArray, NPE, beforeExams);
@@ -157,7 +131,6 @@ public class HardConstraintsSolver {
 					c = findFalseBefore(boolArray, NPE, beforeExams);
 					System.out.println("c is : " + NPE.get(c).getId());
 				}
-				isBeforeExam = true;
 			} else if (hasCoincidingExams(boolArray, NPE)) {
 				c = findFalseCoinciding(boolArray, NPE);
 			} else {
@@ -205,9 +178,9 @@ public class HardConstraintsSolver {
 		//place exams (for real)	
 		System.out.println("--Final res:" + res);
 		s.setResult((ArrayList<ResultCouple>) res);
+		s.updateStudentMap();
 		return s;
 	}
-
 
 
 	/**
@@ -230,9 +203,6 @@ public class HardConstraintsSolver {
 			List<Exam> beforeExams) {
 		for (int i = 0; i < nPE.size(); i++) {
 			//same check as findFalseCoinciding, but return i only if it is in beforeExams
-			System.out.println(s.getExamSession().getExams().get(i));
-			System.out.println(boolArray[i]);
-			System.out.println(beforeExams.contains(s.getExamSession().getExams().get(i)));
 			if (boolArray[i] == false && Solving.checkCoincidence(s, nPE.get(i).getId()).size() > 1
 					&& beforeExams.contains(s.getExamSession().getExams().get(nPE.get(i).getId()))) {
 				return i;
@@ -255,27 +225,13 @@ public class HardConstraintsSolver {
 		for (int i = 0; i < beforeExams.size(); i++) {
 			//same check as findFalse, but return i only if it is in beforeExams
 			int currentExam = beforeExams.get(i).getId();
-			System.out.println("current exam in beforeExams : " + currentExam);
 			int index = getIndex(nPE, currentExam);
 			if (boolArray[index] == false
 					&& beforeExams.contains(s.getExamSession().getExams().get(nPE.get(index).getId()))) {
-				System.out.println("i is returned ");
 				return index;
 			}
 		}
 		return -1;
-	/*	for (int i = 0; i < boolArray.length; i++) {
-			//same check as findFalse, but return i only if it is in beforeExams
-			System.out.println("current exam in findFalseBefore : " + nPE.get(i).getId());
-			if (boolArray[i] == false
-					&& beforeExams.contains(s.getExamSession().getExams().get(nPE.get(i).getId()))) {
-				System.out.println("i is returned ");
-				return i;
-			}
-		}
-		return -1; */
-		
-		
 	}
 
 	private int findFalse(boolean[] boolArray) {
@@ -328,21 +284,18 @@ public class HardConstraintsSolver {
 		
 		// check after & before
 		if (currentExam.hasPeriodHardConstraint(EPeriodHardConstraint.AFTER)){
-			System.out.println("current exam " + examId);
 			for (int j = 0 ; j < currentExam.getConstraints().size();j++){
 				if (currentExam.getConstraints().get(j).getConstraint() == EPeriodHardConstraint.AFTER){
 					if (currentExam.getConstraints().get(j).getE2Id() == examId){
 						idAfterExam = currentExam.getConstraints().get(j).getE1Id();
 						for (int k = 0 ; k <= periodId ; k++){
 							eP[idAfterExam][k]= 0;
-							System.out.println("(after) eP updated for exam "+idAfterExam + " & period " + k);
 						}
 					}
 					else if (currentExam.getConstraints().get(j).getE1Id() == examId ){
 						int idBeforeExam = currentExam.getConstraints().get(j).getE2Id();
 						for (int k = s.getExamSession().getPeriods().size()-1 ; k >= periodId; k--){
 							eP[idBeforeExam][k] = 0;
-							System.out.println("(before) eP updated for exam "+idBeforeExam + " & period " + k);
 						}
 					}
 				}

@@ -360,5 +360,10 @@ public class Solution implements Serializable {
 		
 		return beforeExams;
 	}
+
+	public void updateStudentMap() {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }
