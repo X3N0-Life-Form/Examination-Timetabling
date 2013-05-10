@@ -1,2 +1,7 @@
 bin/
 /doc
+.settings/
+*.patch
+junit/
+build.xml
+
