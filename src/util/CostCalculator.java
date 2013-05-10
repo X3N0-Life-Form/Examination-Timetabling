@@ -25,8 +25,14 @@ public class CostCalculator {
 		res += calculateNonMixedDuration(s);
 		res += calculateRoomCost(s);
 		res += calculatePeriodCost(s);
+		res += calculateFrontLoad(s);
 		
 		return res;
+	}
+
+	public static int calculateFrontLoad(Solution s) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	public static int calculatePeriodCost(Solution s) {
