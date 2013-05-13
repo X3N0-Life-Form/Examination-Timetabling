@@ -29,7 +29,17 @@ public class Solution implements Serializable {
 	private ExamSession examSession;
 	private List<Exam> afterExams;
 	private TreeMap<Integer, Student> students;
+	private List<Integer> biggerExams = null;
 	
+	
+	public List<Integer> getBiggerExams() {
+		return biggerExams;
+	}
+
+	public void setBiggerExams(List<Integer> biggerExams) {
+		this.biggerExams = biggerExams;
+	}
+
 	public TreeMap<Integer,Student> getStudentList() {
 		return students;
 	}
@@ -232,6 +242,119 @@ public class Solution implements Serializable {
 				students.get(currentStudent).addExamId(currentExam.getId());
 			}
 		}
+		
+		/////////////////////////////
+		// create BiggerExams List //
+		/////////////////////////////
+		biggerExams = new ArrayList<Integer>();
+		boolean[] alreadyAdded = new boolean[examSession.getExams().size()];
+		
+		for (int i = 0 ; i < examSession.getExams().size();i++){
+			alreadyAdded[i] = false;
+		}
+		int count = 0;
+		
+		System.out.println("FL1 " + examSession.getInstitutionalWeightings().getFrontLoad_1());
+		System.out.println("FL2 " + examSession.getInstitutionalWeightings().getFrontLoad_2());
+		System.out.println("FL3 " + examSession.getInstitutionalWeightings().getFrontLoad_3());
+		
+		while (count< examSession.getInstitutionalWeightings().getFrontLoad_1()){
+			Exam biggest = examSession.getExams().get(0);
+			int index = 0;
+			for (int i = 0; i < examSession.getExams().size();i++){
+				if (alreadyAdded[i]){
+					break;
+				}
+				
+				if (biggest.getSize() < examSession.getExams().get(i).getSize()){
+					biggest = examSession.getExams().get(i);
+					index = i;
+				}
+			}
+			biggerExams.add(biggest.getId());
+			alreadyAdded[index] = true;
+			count++;
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((afterExams == null) ? 0 : afterExams.hashCode());
+		result = prime * result
+				+ ((biggerExams == null) ? 0 : biggerExams.hashCode());
+		result = prime * result
+				+ ((coincidingExams == null) ? 0 : coincidingExams.hashCode());
+		result = prime * result + Arrays.hashCode(examCoincidence);
+		result = prime * result + Arrays.hashCode(examPeriodBase);
+		result = prime * result + Arrays.hashCode(examPeriodModif);
+		result = prime * result + Arrays.hashCode(examRoom);
+		result = prime * result
+				+ ((examSession == null) ? 0 : examSession.hashCode());
+		result = prime * result
+				+ ((nonPlacedExams == null) ? 0 : nonPlacedExams.hashCode());
+		result = prime * result
+				+ ((this.result == null) ? 0 : this.result.hashCode());
+		result = prime * result
+				+ ((students == null) ? 0 : students.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Solution other = (Solution) obj;
+		if (afterExams == null) {
+			if (other.afterExams != null)
+				return false;
+		} else if (!afterExams.equals(other.afterExams))
+			return false;
+		if (biggerExams == null) {
+			if (other.biggerExams != null)
+				return false;
+		} else if (!biggerExams.equals(other.biggerExams))
+			return false;
+		if (coincidingExams == null) {
+			if (other.coincidingExams != null)
+				return false;
+		} else if (!coincidingExams.equals(other.coincidingExams))
+			return false;
+		if (!Arrays.equals(examCoincidence, other.examCoincidence))
+			return false;
+		if (!Arrays.equals(examPeriodBase, other.examPeriodBase))
+			return false;
+		if (!Arrays.equals(examPeriodModif, other.examPeriodModif))
+			return false;
+		if (!Arrays.equals(examRoom, other.examRoom))
+			return false;
+		if (examSession == null) {
+			if (other.examSession != null)
+				return false;
+		} else if (!examSession.equals(other.examSession))
+			return false;
+		if (nonPlacedExams == null) {
+			if (other.nonPlacedExams != null)
+				return false;
+		} else if (!nonPlacedExams.equals(other.nonPlacedExams))
+			return false;
+		if (result == null) {
+			if (other.result != null)
+				return false;
+		} else if (!result.equals(other.result))
+			return false;
+		if (students == null) {
+			if (other.students != null)
+				return false;
+		} else if (!students.equals(other.students))
+			return false;
+		return true;
 	}
 
 	private void initConstraintLists(ExamSession examSession) {
