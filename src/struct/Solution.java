@@ -8,6 +8,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.TreeMap;
 
+import util.OurArrays;
+
 /**
  * 
  * @author Adrien Droguet - Sara Tari
@@ -326,13 +328,13 @@ public class Solution implements Serializable {
 				return false;
 		} else if (!coincidingExams.equals(other.coincidingExams))
 			return false;
-		if (!Arrays.equals(examCoincidence, other.examCoincidence))
+		if (!OurArrays.equals(examCoincidence, other.examCoincidence))
 			return false;
-		if (!Arrays.equals(examPeriodBase, other.examPeriodBase))
+		if (!OurArrays.equals(examPeriodBase, other.examPeriodBase))
 			return false;
-		if (!Arrays.equals(examPeriodModif, other.examPeriodModif))
+		if (!OurArrays.equals(examPeriodModif, other.examPeriodModif))
 			return false;
-		if (!Arrays.equals(examRoom, other.examRoom))
+		if (!OurArrays.equals(examRoom, other.examRoom))
 			return false;
 		if (examSession == null) {
 			if (other.examSession != null)

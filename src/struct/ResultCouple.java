@@ -130,8 +130,8 @@ public class ResultCouple implements Serializable {
 		if (s == null) {
 			if (other.s != null)
 				return false;
-		} else if (!s.equals(other.s))
-			return false;
+		}/* else if (!s.equals(other.s))
+			return false;*/
 		return true;
 	}
 	

@@ -18,6 +18,12 @@ import parse.ExamSessionParser;
 import struct.ExamSession;
 import struct.Solution;
 
+/**
+ * Tests the serialization/deserialization of the 4 main exam sets. The serialized Solution
+ * files remain in res/solutions/ once the tests are done.
+ * @author Adrien Droguet - Sara Tari
+ *
+ */
 public class HCS_serializeSolutions {
 
 	///////////////////////////////////////////////////////////
@@ -134,10 +140,10 @@ public class HCS_serializeSolutions {
 		fis.close();
 		
 		assertNotNull(toLoad);
-		assertTrue(toSave.equals(toLoad));
+		assertEquals(toSave, toLoad);
 	}
 	
-	@Test @Ignore
+	@Test
 	public void set1() throws IOException, ExamParsingException, SolvingException, ClassNotFoundException {
 		File file = new File(set1SerializedName);
 		//safety
@@ -168,7 +174,7 @@ public class HCS_serializeSolutions {
 		assertEquals(toSave, toLoad);
 	}
 	
-	@Test @Ignore
+	@Test
 	public void set2() throws IOException, ExamParsingException, SolvingException, ClassNotFoundException {
 		File file = new File(set2SerializedName);
 		//safety
@@ -199,7 +205,7 @@ public class HCS_serializeSolutions {
 		assertEquals(toSave, toLoad);
 	}
 	
-	@Test @Ignore
+	@Test
 	public void set3() throws IOException, ExamParsingException, SolvingException, ClassNotFoundException {
 		File file = new File(set3SerializedName);
 		//safety
