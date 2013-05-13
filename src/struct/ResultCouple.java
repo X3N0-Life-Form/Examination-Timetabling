@@ -100,7 +100,7 @@ public class ResultCouple implements Serializable {
 				+ ((examList == null) ? 0 : examList.hashCode());
 		result = prime * result + ((period == null) ? 0 : period.hashCode());
 		result = prime * result + ((room == null) ? 0 : room.hashCode());
-		result = prime * result + ((s == null) ? 0 : s.hashCode());
+		//result = prime * result + ((s == null) ? 0 : s.hashCode());
 		return result;
 	}
 	@Override
