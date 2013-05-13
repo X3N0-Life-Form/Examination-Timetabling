@@ -1,8 +1,13 @@
 package struct;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class ResultCouple {
+public class ResultCouple implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	
 	private Room room;
 	private Period period;

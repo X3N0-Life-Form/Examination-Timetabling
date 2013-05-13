@@ -1,8 +1,14 @@
 package struct;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Exam implements Comparable<Exam>{
+public class Exam implements Comparable<Exam>, Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	/**
 	 * Starts at 0.
 	 */

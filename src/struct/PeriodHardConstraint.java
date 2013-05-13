@@ -1,6 +1,14 @@
 package struct;
+
+import java.io.Serializable;
+
 //TODO: constraint interface? + hard constraint interface?
-public class PeriodHardConstraint {
+public class PeriodHardConstraint implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private int e1Id;
 	private int e2Id;
 	private EPeriodHardConstraint constraint;

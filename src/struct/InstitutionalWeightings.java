@@ -1,6 +1,13 @@
 package struct;
 
-public class InstitutionalWeightings {
+import java.io.Serializable;
+
+public class InstitutionalWeightings implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private int twoInARow;
 	private int twoInADay;
 	private int periodSpread;

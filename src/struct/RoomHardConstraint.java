@@ -1,6 +1,13 @@
 package struct;
 
-public class RoomHardConstraint {
+import java.io.Serializable;
+
+public class RoomHardConstraint implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private int id;
 	private ERoomHardConstraint constraint;
 	
