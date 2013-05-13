@@ -48,6 +48,7 @@ public class ExamSessionParser {
 	
 	private String fileName;
 	private boolean gotoRoomHardConstraint = false;
+	private boolean gotoInsttitutionalWeightings = false;
 	
 	public ExamSessionParser(String fileName) {
 		this.fileName = fileName;
@@ -87,7 +88,7 @@ public class ExamSessionParser {
 				} else if (line.contains(ENTRY_ROOM_HARD_CONSTRAINTS) || gotoRoomHardConstraint ) {
 					roomHardConstraints =
 							parseRoomHardConstraints(reader, line);
-				} else if (line.contains(ENTRY_INSTITUTIONAL_WEIGHTINGS)) {
+				} else if (line.contains(ENTRY_INSTITUTIONAL_WEIGHTINGS) || gotoInsttitutionalWeightings) {
 					institutionalWeightings =
 							parseInstitutionalWeightings(reader, line);
 				} else {
@@ -148,7 +149,7 @@ public class ExamSessionParser {
 		int frontLoad_1 = 0;
 		int frontLoad_2 = 0;
 		int frontLoad_3 = 0;
-		while ((line = reader.readLine()) != null) {
+		while ((line = noReadIfAlreadyReadIWEntry(reader, line)) != null) {
 			int comaIndex = line.indexOf(',');
 			line = line.replaceAll(" ", "");
 			if (line.contains(IW_TWOINAROW)) {
@@ -188,7 +189,7 @@ public class ExamSessionParser {
 	private ArrayList<RoomHardConstraint> parseRoomHardConstraints(
 			BufferedReader reader, String line)
 					throws IOException, ExamParsingException {
-		reader.mark(1);//TODO: do the same kind of trick
+		//reader.mark(1);
 		ArrayList<RoomHardConstraint> roomHardConstraints =	new ArrayList<RoomHardConstraint>();
 		while (!(line = noReadIfAlreadyReadRHCEntry(reader, line)).contains(ENTRY_INSTITUTIONAL_WEIGHTINGS)) {
 			int comaIndex = line.indexOf(',');
@@ -200,7 +201,8 @@ public class ExamSessionParser {
 					new RoomHardConstraint(id, constraint);
 			roomHardConstraints.add(currentRHC);
 		}
-		reader.reset();
+		//reader.reset();
+		gotoInsttitutionalWeightings  = true;
 		return roomHardConstraints;
 	}
 	
@@ -208,13 +210,30 @@ public class ExamSessionParser {
 	 * Stupid method.
 	 * @param reader
 	 * @param line
-	 * @return either the current line, or reder.readLine()
+	 * @return either the current line, or reader.readLine()
 	 * @throws IOException
 	 */
 	private String noReadIfAlreadyReadRHCEntry(BufferedReader reader, String line)
 			throws IOException {
 		if (gotoRoomHardConstraint) {
 			gotoRoomHardConstraint = false;
+			return line;
+		} else {
+			return reader.readLine();
+		}
+	}
+	
+	/**
+	 * Stupid method.
+	 * @param reader
+	 * @param line
+	 * @return either the current line, or reader.readLine()
+	 * @throws IOException
+	 */
+	private String noReadIfAlreadyReadIWEntry(BufferedReader reader, String line)
+			throws IOException {
+		if (gotoInsttitutionalWeightings) {
+			gotoInsttitutionalWeightings = false;
 			return line;
 		} else {
 			return reader.readLine();

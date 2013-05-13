@@ -7,6 +7,6 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({ ExamSessionParserTests_regular.class,
 		ExamSessionPerserTests_flexibility.class })
-public class ExamSessionParserTests_AllTests {
+public class ESP_AllTests {
 
 }
