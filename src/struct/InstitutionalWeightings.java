@@ -3,6 +3,46 @@ package struct;
 import java.io.Serializable;
 
 public class InstitutionalWeightings implements Serializable {
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + frontLoad_1;
+		result = prime * result + frontLoad_2;
+		result = prime * result + frontLoad_3;
+		result = prime * result + nonMixedDurations;
+		result = prime * result + periodSpread;
+		result = prime * result + twoInADay;
+		result = prime * result + twoInARow;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		InstitutionalWeightings other = (InstitutionalWeightings) obj;
+		if (frontLoad_1 != other.frontLoad_1)
+			return false;
+		if (frontLoad_2 != other.frontLoad_2)
+			return false;
+		if (frontLoad_3 != other.frontLoad_3)
+			return false;
+		if (nonMixedDurations != other.nonMixedDurations)
+			return false;
+		if (periodSpread != other.periodSpread)
+			return false;
+		if (twoInADay != other.twoInADay)
+			return false;
+		if (twoInARow != other.twoInARow)
+			return false;
+		return true;
+	}
+
 	/**
 	 * 
 	 */

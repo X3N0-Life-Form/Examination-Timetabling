@@ -4,6 +4,35 @@ import java.io.Serializable;
 
 //TODO: constraint interface? + hard constraint interface?
 public class PeriodHardConstraint implements Serializable {
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((constraint == null) ? 0 : constraint.hashCode());
+		result = prime * result + e1Id;
+		result = prime * result + e2Id;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PeriodHardConstraint other = (PeriodHardConstraint) obj;
+		if (constraint != other.constraint)
+			return false;
+		if (e1Id != other.e1Id)
+			return false;
+		if (e2Id != other.e2Id)
+			return false;
+		return true;
+	}
+
 	/**
 	 * 
 	 */

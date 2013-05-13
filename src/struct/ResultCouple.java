@@ -92,5 +92,47 @@ public class ResultCouple implements Serializable {
 		clone.s = s;
 		return clone;
 	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((examList == null) ? 0 : examList.hashCode());
+		result = prime * result + ((period == null) ? 0 : period.hashCode());
+		result = prime * result + ((room == null) ? 0 : room.hashCode());
+		result = prime * result + ((s == null) ? 0 : s.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ResultCouple other = (ResultCouple) obj;
+		if (examList == null) {
+			if (other.examList != null)
+				return false;
+		} else if (!examList.equals(other.examList))
+			return false;
+		if (period == null) {
+			if (other.period != null)
+				return false;
+		} else if (!period.equals(other.period))
+			return false;
+		if (room == null) {
+			if (other.room != null)
+				return false;
+		} else if (!room.equals(other.room))
+			return false;
+		if (s == null) {
+			if (other.s != null)
+				return false;
+		} else if (!s.equals(other.s))
+			return false;
+		return true;
+	}
 	
 }

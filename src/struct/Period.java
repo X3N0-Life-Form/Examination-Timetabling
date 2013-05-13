@@ -4,6 +4,40 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class Period  implements Comparable<Period>, Serializable {
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + cost;
+		result = prime * result
+				+ ((date_hour == null) ? 0 : date_hour.hashCode());
+		result = prime * result + duration;
+		result = prime * result + id;
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Period other = (Period) obj;
+		if (cost != other.cost)
+			return false;
+		if (date_hour == null) {
+			if (other.date_hour != null)
+				return false;
+		} else if (!date_hour.equals(other.date_hour))
+			return false;
+		if (duration != other.duration)
+			return false;
+		if (id != other.id)
+			return false;
+		return true;
+	}
+
 	/**
 	 * 
 	 */

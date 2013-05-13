@@ -100,7 +100,7 @@ public class HCS_serializeSolutions {
 		fis.close();
 		
 		assertNotNull(toLoad);
-		assertEquals(toSave, toLoad);//TODO: Solution.equals - lol
+		assertEquals(toSave, toLoad);
 	}
 
 }
