@@ -1,9 +1,8 @@
 package util;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+
 import java.util.Date;
-import java.util.List;
+import util.DateUtils;
 import java.util.TreeMap;
 
 import struct.Exam;
@@ -125,21 +124,15 @@ public class CostCalculator {
 	public static int calculateTwoInADay(Solution s) {
 		int cost = 0;
 		for (int i = 0 ; i < s.getStudentList().size(); i++){
-			for (int j = 0; j < s.getStudentList().get(i).getExamRes().size(); j++){
-				Date currentDate = s.getStudentList().get(i).getExamRes().get(j).getPeriod().getDate_hour();
-				for (int k = 0; k < s.getStudentList().get(i).getExamRes().size() ;k++){
-					Date secondDate =  s.getStudentList().get(i).getExamRes().get(k).getPeriod().getDate_hour();
-					if (j != k){
-						if (currentDate.compareTo(secondDate) == 0){
+			if (s.getStudentList().get(i).getExamRes().size()>0){
+				for (int j = 0; j < s.getStudentList().get(i).getExamRes().size()-1; j++){
+					Date currentDate = s.getStudentList().get(i).getExamRes().get(j).getPeriod().getDate_hour();
+					for (int k = j+1; k < s.getStudentList().get(i).getExamRes().size() ;k++){
+						Date secondDate =  s.getStudentList().get(i).getExamRes().get(k).getPeriod().getDate_hour();
+						if (DateUtils.isSameDay(currentDate, secondDate)){
 							cost += s.getExamSession().getInstitutionalWeightings().getTwoInADay();
-						}
-						// TODO find how to compare dates 
-						/*
-						else if (){
-							
-						}*/
+						}					
 					}
-					
 				}
 			}
 		}
@@ -148,7 +141,8 @@ public class CostCalculator {
 
 	public static int calculateTwoInARow(Solution s) {
 		// TODO Auto-generated method stub
-		return 0;
+		int cost = 0;
+		return cost;
 	}
 	
 }
