@@ -115,20 +115,38 @@ public class CostCalculator {
 	}
 	
 	public static int calculatePeriodSpread(Solution s) {
-		//TODO
 		int cost = 0;
+		int gap = s.getExamSession().getInstitutionalWeightings().getPeriodSpread();
+		for (int i = 0 ; i < s.getStudentList().size();i++){
+			if (s.getStudentList().get(i).getExamRes().size()>1){
+				for (int j = 0; j < s.getStudentList().get(i).getExamRes().size()-1 ; j++){
+					int currentPeriodId = s.getStudentList().get(i).getExamRes().get(j).getPeriod().getId();
+					for (int k = j+i ; k < s.getStudentList().get(i).getExamRes().size();k++){
+						int secondPeriodId = s.getStudentList().get(i).getExamRes().get(k).getPeriod().getId();
+						int difference = currentPeriodId - secondPeriodId;
+						
+						if (difference < 0){
+							difference *= -1;
+						}
+						if (difference < gap){
+							cost++;
+						}
+					}
+				}
+			}
+		}
 		
 		return cost;
 	}
 
 	public static int calculateTwoInADay(Solution s) {
 		int cost = 0;
-		for (int i = 0 ; i < s.getStudentList().size(); i++){
-			if (s.getStudentList().get(i).getExamRes().size()>1){
-				for (int j = 0; j < s.getStudentList().get(i).getExamRes().size()-1; j++){
-					Date currentDate = s.getStudentList().get(i).getExamRes().get(j).getPeriod().getDate_hour();
-					for (int k = j+1; k < s.getStudentList().get(i).getExamRes().size() ;k++){
-						Date secondDate =  s.getStudentList().get(i).getExamRes().get(k).getPeriod().getDate_hour();
+		for (int i : s.getStudentTreeMap().navigableKeySet()){
+			if (s.getStudentTreeMap().get(i).getExamRes().size()>1){
+				for (int j = 0; j < s.getStudentTreeMap().get(i).getExamRes().size()-1; j++){
+					Date currentDate = s.getStudentTreeMap().get(i).getExamRes().get(j).getPeriod().getDate_hour();
+					for (int k = j+1; k < s.getStudentTreeMap().get(i).getExamRes().size() ;k++){
+						Date secondDate =  s.getStudentTreeMap().get(i).getExamRes().get(k).getPeriod().getDate_hour();
 						if (DateUtils.isSameDay(currentDate, secondDate)){
 							cost += s.getExamSession().getInstitutionalWeightings().getTwoInADay();
 						}					
@@ -141,14 +159,14 @@ public class CostCalculator {
 
 	public static int calculateTwoInARow(Solution s) {
 		int cost = 0;
-		for (int i = 0; i < s.getStudentList().size();i++){
-			if (s.getStudentList().get(i).getExamRes().size()>1){
-				for (int j = 0; j < s.getStudentList().get(i).getExamRes().size()-1; j++){
-					Date currentDate = s.getStudentList().get(i).getExamRes().get(j).getPeriod().getDate_hour();
-					int currentPeriodId = s.getStudentList().get(i).getExamRes().get(j).getPeriod().getId();
-					for (int k = j+1; k < s.getStudentList().get(i).getExamRes().size() ;k++){
-						Date secondDate =  s.getStudentList().get(i).getExamRes().get(k).getPeriod().getDate_hour();
-						int secondPeriodId = s.getStudentList().get(i).getExamRes().get(k).getPeriod().getId();
+		for (int i : s.getStudentTreeMap().navigableKeySet()){
+			if (s.getStudentTreeMap().get(i).getExamRes().size()>1){
+				for (int j = 0; j < s.getStudentTreeMap().get(i).getExamRes().size()-1; j++){
+					Date currentDate = s.getStudentTreeMap().get(i).getExamRes().get(j).getPeriod().getDate_hour();
+					int currentPeriodId = s.getStudentTreeMap().get(i).getExamRes().get(j).getPeriod().getId();
+					for (int k = j+1; k < s.getStudentTreeMap().get(i).getExamRes().size() ;k++){
+						Date secondDate =  s.getStudentTreeMap().get(i).getExamRes().get(k).getPeriod().getDate_hour();
+						int secondPeriodId = s.getStudentTreeMap().get(i).getExamRes().get(k).getPeriod().getId();
 						int difference = secondPeriodId - currentPeriodId;
 						if (DateUtils.isSameDay(currentDate, secondDate) && (difference == 1 || difference == -1) ){
 							cost += s.getExamSession().getInstitutionalWeightings().getTwoInARow();
