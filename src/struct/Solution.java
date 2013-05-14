@@ -42,7 +42,7 @@ public class Solution implements Serializable {
 		this.biggerExams = biggerExams;
 	}
 
-	public TreeMap<Integer,Student> getStudentList() {
+	public TreeMap<Integer,Student> getStudentTreeMap() {
 		return students;
 	}
 	

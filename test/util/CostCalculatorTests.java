@@ -32,9 +32,27 @@ public class CostCalculatorTests {
 		s_set4 = Serialization.loadSolution(HCS_serializeSolutions.set4SerializedName);
 	}
 
+	/**
+	 * Simply runs the various methods, to see if they crash. Using set4.
+	 */
 	@Test
-	public void test() {
-		fail("Not yet implemented");
+	public void test_checkForRuntimeErrors() {
+		Solution s = s_set3;
+		int frontLoad = CostCalculator.calculateFrontLoad(s);
+		int NMD = CostCalculator.calculateNonMixedDuration(s);
+		int periodCost = CostCalculator.calculatePeriodCost(s);
+		int periodSpread = CostCalculator.calculatePeriodSpread(s);
+		int roomCost = CostCalculator.calculateRoomCost(s);
+		int TID = CostCalculator.calculateTwoInADay(s);
+		int TIR = CostCalculator.calculateTwoInARow(s);
+		System.out.println("frontLoad=\t" + frontLoad);
+		System.out.println("NMD=\t\t" + NMD);
+		System.out.println("periodCost=\t" + periodCost);
+		System.out.println("periodSpread=\t" + periodSpread);
+		System.out.println("roomCost=\t" + roomCost);
+		System.out.println("TID=\t\t" + TID);
+		System.out.println("TIR=\t\t" + TIR);
 	}
+	
 
 }
