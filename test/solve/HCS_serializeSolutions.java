@@ -3,10 +3,8 @@ package solve;
 import static org.junit.Assert.*;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import org.junit.BeforeClass;
@@ -17,6 +15,7 @@ import parse.ExamParsingException;
 import parse.ExamSessionParser;
 import struct.ExamSession;
 import struct.Solution;
+import util.Serialization;
 
 /**
  * Tests the serialization/deserialization of the 4 main exam sets. The serialized (solved) Solution
@@ -34,7 +33,7 @@ public class HCS_serializeSolutions {
 	private ExamSession simpleExamSession;
 	private String simpleFileName = "res/simple_set.exam";
 	private HardConstraintsSolver simpleSolver;
-	private static final String simpleSerializedName = "res/solutions/simple_set.object";
+	public static final String simpleSerializedName = "res/solutions/simple_set.object";
 	
 	///////////////////////////////////////////////////////////////////
 	// res/exam_comp_set4.exam - res/solutions/exam_comp_set4.object //
@@ -44,7 +43,7 @@ public class HCS_serializeSolutions {
 	private ExamSession set4ExamSession;
 	private String set4FileName = "res/exam_comp_set4.exam";
 	private HardConstraintsSolver set4Solver;
-	private static final String set4SerializedName = "res/solutions/exam_comp_set4.object";
+	public static final String set4SerializedName = "res/solutions/exam_comp_set4.object";
 	
 	///////////////////////////////////////////////////////////////////
 	// res/exam_comp_set1.exam - res/solutions/exam_comp_set1.object //
@@ -54,7 +53,7 @@ public class HCS_serializeSolutions {
 	private ExamSession set1ExamSession;
 	private String set1FileName = "res/exam_comp_set1.exam";
 	private HardConstraintsSolver set1Solver;
-	private static final String set1SerializedName = "res/solutions/exam_comp_set1.object";
+	public static final String set1SerializedName = "res/solutions/exam_comp_set1.object";
 	
 	///////////////////////////////////////////////////////////////////
 	// res/exam_comp_set2.exam - res/solutions/exam_comp_set2.object //
@@ -64,7 +63,7 @@ public class HCS_serializeSolutions {
 	private ExamSession set2ExamSession;
 	private String set2FileName = "res/exam_comp_set2.exam";
 	private HardConstraintsSolver set2Solver;
-	private static final String set2SerializedName = "res/solutions/exam_comp_set2.object";
+	public static final String set2SerializedName = "res/solutions/exam_comp_set2.object";
 	
 	///////////////////////////////////////////////////////////////////
 	// res/exam_comp_set3.exam - res/solutions/exam_comp_set3.object //
@@ -74,7 +73,7 @@ public class HCS_serializeSolutions {
 	private ExamSession set3ExamSession;
 	private String set3FileName = "res/exam_comp_set3.exam";
 	private HardConstraintsSolver set3Solver;
-	private static final String set3SerializedName = "res/solutions/exam_comp_set3.object";
+	public static final String set3SerializedName = "res/solutions/exam_comp_set3.object";
 	
 	/**
 	 * Remove previously serialized objects.
@@ -125,23 +124,17 @@ public class HCS_serializeSolutions {
 		set4Solver = new HardConstraintsSolver(set4Solution);
 		Solution toSave = set4Solver.solve();
 		
-		FileOutputStream fos = new FileOutputStream(set4SerializedName);
-		ObjectOutputStream oos = new ObjectOutputStream(fos);
-		oos.writeObject(toSave);
-		oos.close();
-		fos.close();
+		Serialization.saveSolution(toSave, set4SerializedName);
 		
 		assertTrue(file.exists());
 		
-		FileInputStream fis = new FileInputStream(set4SerializedName);
-		ObjectInputStream ois = new ObjectInputStream(fis);
-		Solution toLoad = (Solution) ois.readObject();
-		ois.close();
-		fis.close();
+		Solution toLoad = Serialization.loadSolution(set4SerializedName);
 		
 		assertNotNull(toLoad);
 		assertEquals(toSave, toLoad);
 	}
+
+	
 	
 	@Test
 	public void set1() throws IOException, ExamParsingException, SolvingException, ClassNotFoundException {
@@ -156,19 +149,11 @@ public class HCS_serializeSolutions {
 		set1Solver = new HardConstraintsSolver(set1Solution);
 		Solution toSave = set1Solver.solve();
 		
-		FileOutputStream fos = new FileOutputStream(set1SerializedName);
-		ObjectOutputStream oos = new ObjectOutputStream(fos);
-		oos.writeObject(toSave);
-		oos.close();
-		fos.close();
+		Serialization.saveSolution(toSave, set1SerializedName);
 		
 		assertTrue(file.exists());
 		
-		FileInputStream fis = new FileInputStream(set1SerializedName);
-		ObjectInputStream ois = new ObjectInputStream(fis);
-		Solution toLoad = (Solution) ois.readObject();
-		ois.close();
-		fis.close();
+		Solution toLoad = Serialization.loadSolution(set1SerializedName);
 		
 		assertNotNull(toLoad);
 		assertEquals(toSave, toLoad);
@@ -187,19 +172,11 @@ public class HCS_serializeSolutions {
 		set2Solver = new HardConstraintsSolver(set2Solution);
 		Solution toSave = set2Solver.solve();
 		
-		FileOutputStream fos = new FileOutputStream(set2SerializedName);
-		ObjectOutputStream oos = new ObjectOutputStream(fos);
-		oos.writeObject(toSave);
-		oos.close();
-		fos.close();
+		Serialization.saveSolution(toSave, set2SerializedName);
 		
 		assertTrue(file.exists());
 		
-		FileInputStream fis = new FileInputStream(set2SerializedName);
-		ObjectInputStream ois = new ObjectInputStream(fis);
-		Solution toLoad = (Solution) ois.readObject();
-		ois.close();
-		fis.close();
+		Solution toLoad = Serialization.loadSolution(set2SerializedName);
 		
 		assertNotNull(toLoad);
 		assertEquals(toSave, toLoad);
@@ -218,19 +195,11 @@ public class HCS_serializeSolutions {
 		set3Solver = new HardConstraintsSolver(set3Solution);
 		Solution toSave = set3Solver.solve();
 		
-		FileOutputStream fos = new FileOutputStream(set3SerializedName);
-		ObjectOutputStream oos = new ObjectOutputStream(fos);
-		oos.writeObject(toSave);
-		oos.close();
-		fos.close();
+		Serialization.saveSolution(toSave, set3SerializedName);
 		
 		assertTrue(file.exists());
 		
-		FileInputStream fis = new FileInputStream(set3SerializedName);
-		ObjectInputStream ois = new ObjectInputStream(fis);
-		Solution toLoad = (Solution) ois.readObject();
-		ois.close();
-		fis.close();
+		Solution toLoad = Serialization.loadSolution(set3SerializedName);
 		
 		assertNotNull(toLoad);
 		assertEquals(toSave, toLoad);
