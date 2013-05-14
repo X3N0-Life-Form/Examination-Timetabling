@@ -19,10 +19,10 @@ import struct.ExamSession;
 import struct.Solution;
 
 /**
- * Tests the serialization/deserialization of the 4 main exam sets. The serialized Solution
+ * Tests the serialization/deserialization of the 4 main exam sets. The serialized (solved) Solution
  * files remain in res/solutions/ once the tests are done.
  * @author Adrien Droguet - Sara Tari
- *
+ * @see Solution
  */
 public class HCS_serializeSolutions {
 
