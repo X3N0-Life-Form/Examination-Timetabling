@@ -117,12 +117,12 @@ public class CostCalculator {
 	public static int calculatePeriodSpread(Solution s) {
 		int cost = 0;
 		int gap = s.getExamSession().getInstitutionalWeightings().getPeriodSpread();
-		for (int i = 0 ; i < s.getStudentList().size();i++){
-			if (s.getStudentList().get(i).getExamRes().size()>1){
-				for (int j = 0; j < s.getStudentList().get(i).getExamRes().size()-1 ; j++){
-					int currentPeriodId = s.getStudentList().get(i).getExamRes().get(j).getPeriod().getId();
-					for (int k = j+i ; k < s.getStudentList().get(i).getExamRes().size();k++){
-						int secondPeriodId = s.getStudentList().get(i).getExamRes().get(k).getPeriod().getId();
+		for (int i : s.getStudentTreeMap().navigableKeySet()){
+			if (s.getStudentTreeMap().get(i).getExamRes().size()>1){
+				for (int j = 0; j < s.getStudentTreeMap().get(i).getExamRes().size()-1 ; j++){
+					int currentPeriodId = s.getStudentTreeMap().get(i).getExamRes().get(j).getPeriod().getId();
+					for (int k = j+i ; k < s.getStudentTreeMap().get(i).getExamRes().size();k++){
+						int secondPeriodId = s.getStudentTreeMap().get(i).getExamRes().get(k).getPeriod().getId();
 						int difference = currentPeriodId - secondPeriodId;
 						
 						if (difference < 0){
