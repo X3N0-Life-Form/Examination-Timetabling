@@ -121,14 +121,14 @@ public class CostCalculator {
 			if (s.getStudentTreeMap().get(i).getExamRes().size()>1){
 				for (int j = 0; j < s.getStudentTreeMap().get(i).getExamRes().size()-1 ; j++){
 					int currentPeriodId = s.getStudentTreeMap().get(i).getExamRes().get(j).getPeriod().getId();
-					for (int k = j+i ; k < s.getStudentTreeMap().get(i).getExamRes().size();k++){
+					for (int k = j+1 ; k < s.getStudentTreeMap().get(i).getExamRes().size();k++){
 						int secondPeriodId = s.getStudentTreeMap().get(i).getExamRes().get(k).getPeriod().getId();
 						int difference = currentPeriodId - secondPeriodId;
 						
 						if (difference < 0){
 							difference *= -1;
 						}
-						if (difference < gap){
+						if (difference <= gap){
 							cost++;
 						}
 					}
@@ -175,7 +175,6 @@ public class CostCalculator {
 				}	
 			}
 		}	
-		
 		return cost;
 	}	
 }
