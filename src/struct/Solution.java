@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.TreeMap;
 
+import util.CostCalculator;
 import util.OurArrays;
 
 /**
@@ -15,7 +16,7 @@ import util.OurArrays;
  * @author Adrien Droguet - Sara Tari
  *
  */
-public class Solution implements Serializable {
+public class Solution implements Serializable, Comparable<Solution> {
 	
 	/**
 	 * 
@@ -279,6 +280,28 @@ public class Solution implements Serializable {
 		}
 	}
 
+	/**
+	 * Copy constructor.
+	 * @param originalSolution
+	 */
+	@SuppressWarnings("unchecked")
+	public Solution(Solution originalSolution) {
+		// fields that don't get modified
+		this.afterExams = originalSolution.afterExams;
+		this.biggerExams = originalSolution.biggerExams;
+		this.coincidingExams = originalSolution.coincidingExams;
+		this.examSession = originalSolution.examSession;
+		this.examPeriodBase = originalSolution.examPeriodBase;
+		// fields that can be modified
+		this.examCoincidence = originalSolution.examCoincidence.clone();
+		this.examPeriodModif = originalSolution.examPeriodModif.clone();
+		this.examRoom = originalSolution.examRoom.clone();
+		Collections.copy(this.nonPlacedExams, originalSolution.nonPlacedExams);
+		Collections.copy(this.result, originalSolution.result);
+		this.students = (TreeMap<Integer, Student>) originalSolution.students.clone();
+		//TODO: verify that everything is cloned/copied correctly
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -502,6 +525,14 @@ public class Solution implements Serializable {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Compares the Solutions' cost. Note: CostCalculator.calculateCost() is called twice.
+	 */
+	@Override
+	public int compareTo(Solution o) {//TODO: save the cost?
+		return CostCalculator.calculateCost(this) - CostCalculator.calculateCost(o);
 	}
 	
 }
