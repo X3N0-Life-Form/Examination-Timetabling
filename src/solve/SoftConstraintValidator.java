@@ -4,9 +4,10 @@ import struct.Solution;
 import util.CostCalculator;
 
 /**
- * Generic Soft Constraint Validator.
+ * Generic Soft Constraint Validator. Note that it doesn't check the hard constraints.
  * @author Adrien Droguet - Sara Tari
- *
+ * @see HardConstraintsValidator
+ * @see SoftConstraintSolver
  */
 public class SoftConstraintValidator implements Validator {
 
