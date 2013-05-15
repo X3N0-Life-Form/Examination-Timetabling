@@ -14,8 +14,14 @@ import struct.Solution;
  */
 public class Moving {
 
-// moving an exam without hardConstraints	
-	public void movingSingleExam(int examId, Solution s, int targetPeriodId, int targetRoomId){
+	/**
+	 * Moves an exam without hard constraints.
+	 * @param examId
+	 * @param s
+	 * @param targetPeriodId
+	 * @param targetRoomId
+	 */
+	public static void movingSingleExam(int examId, Solution s, int targetPeriodId, int targetRoomId){
 		//int firstPeriodId = -1;
 		//int firstRoomId = -1;
 		Exam exam = s.getExamSession().getExams().get(examId);
@@ -44,7 +50,13 @@ public class Moving {
 		s.updateStudentRCLists();
 	}
 	
-	public void swapExams(int firstExamId, int secondExamId, Solution s){
+	/**
+	 * Swaps two exams.
+	 * @param firstExamId
+	 * @param secondExamId
+	 * @param s
+	 */
+	public static void swapExams(int firstExamId, int secondExamId, Solution s){
 		ResultCouple resFirst = removeAndReturnRes(firstExamId, s);
 		ResultCouple resSecond = removeAndReturnRes(secondExamId, s);
 				
@@ -64,8 +76,13 @@ public class Moving {
 		s.updateStudentRCLists();
 	}
 	
-	
-	public ResultCouple removeAndReturnRes(int examId, Solution s){
+	/**
+	 * Removes an exam from the result list.
+	 * @param examId
+	 * @param s
+	 * @return The ResultCouple the exam was found in, or null.
+	 */
+	public static ResultCouple removeAndReturnRes(int examId, Solution s){
 		for (int i = 0; i < s.getResult().size();i++){
 			for (int j = 0; j < s.getResult().get(i).getExamList().size();j++){
 				if (s.getResult().get(i).getExamList().get(j).getId() == examId){
@@ -77,9 +94,13 @@ public class Moving {
 		return null;
 	}
 	
-
-	
-	public void refreshExamPeriod(int examId, int targetPeriodId, Solution s){		
+	/**
+	 * Updates the examPeriod matrix.
+	 * @param examId
+	 * @param targetPeriodId
+	 * @param s
+	 */
+	public static void refreshExamPeriod(int examId, int targetPeriodId, Solution s){ //TODO: move this in Solution?		
 		int firstPeriodId = -1;		
 		for (int i = 0; i < s.getResult().size();i++){
 			for (int j = 0; j < s.getResult().get(i).getExamList().size();j++){
@@ -95,15 +116,22 @@ public class Moving {
 			if (s.getExamCoincidence()[i][examId] == 0){
 				s.getExamCoincidence()[i][targetPeriodId] = 0;
 			}
-			if (zorg(examId, i, firstPeriodId, s) == true){
+			if (checkConstraints(examId, i, firstPeriodId, s) == true){
 				s.getExamPeriodModif()[i][firstPeriodId] = s.getExamPeriodBase()[i][firstPeriodId];
 			}
 		}
 	}
 	
 	
-	// check exclusion, coincidence exclusion, after, before. If true => EPM otherExamId periodId = baseValue
-	public boolean zorg(int currentExamId, int otherExamId, int periodId, Solution s){
+	/**
+	 * Check exclusion, coincidence exclusion, after, before. If true => EPM otherExamId periodId = baseValue
+	 * @param currentExamId
+	 * @param otherExamId
+	 * @param periodId
+	 * @param s
+	 * @return True if it's cool.
+	 */
+	public static boolean checkConstraints(int currentExamId, int otherExamId, int periodId, Solution s){
 		// if otherExam has exclusions on periodId
 		List<Integer> coincidingOther = Solving.checkCoincidence(s, otherExamId);
 		
