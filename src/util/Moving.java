@@ -4,6 +4,7 @@ import java.util.List;
 
 import struct.EPeriodHardConstraint;
 import struct.Exam;
+import struct.ResultCouple;
 import struct.Solution;
 
 /**
@@ -13,44 +14,24 @@ import struct.Solution;
  */
 public class Moving {
 
-// moving an exam without hardConstraints
-	
+// moving an exam without hardConstraints	
 	public void movingSingleExam(int examId, Solution s, int targetPeriodId, int targetRoomId){
-		int firstPeriodId = -1;
-		int firstRoomId = -1;
+		//int firstPeriodId = -1;
+		//int firstRoomId = -1;
+		Exam exam = s.getExamSession().getExams().get(examId);
 		
 		//remove the exam
 		for (int i = 0; i < s.getResult().size();i++){
 			for (int j = 0; j < s.getResult().get(i).getExamList().size();j++){
 				if (s.getResult().get(i).getExamList().get(j).getId() == examId){
-					firstPeriodId = s.getResult().get(i).getPeriod().getId();
-					firstRoomId = s.getResult().get(i).getRoom().getId();
+					//firstPeriodId = s.getResult().get(i).getPeriod().getId();
+					//firstRoomId = s.getResult().get(i).getRoom().getId();
 					s.getResult().get(i).getExamList().remove(j);
 				}
 			}
 		}
-
-		//get the exam
-		Exam exam = s.getExamSession().getExams().get(examId);
 		
-		//
-		
-		for (int i = 0; i < exam.getStudents().size();i++){
-			
-		}
-		
-		//refresh examPeriod
-		for (int i = 0 ; i < s.getExamCoincidence().length ; i++){
-			if (s.getExamCoincidence()[examId][i] == 0){
-				s.getExamPeriodModif()[i][targetPeriodId] = 0;
-			}
-			if (s.getExamCoincidence()[i][examId] == 0){
-				s.getExamCoincidence()[i][targetPeriodId] = 0;
-			}
-			if (zorg(examId, i, firstPeriodId, s) == true){
-				s.getExamPeriodModif()[i][firstPeriodId] = s.getExamPeriodBase()[i][firstPeriodId];
-			}
-		}
+		refreshExamPeriod(examId,targetPeriodId,s);
 		
 		//place the exam in another	period
 		for (int i = 0 ; i < s.getResult().size();i++){
@@ -62,6 +43,64 @@ public class Moving {
 		//refresh studentTreeMap
 		s.updateStudentRCLists();
 	}
+	
+	public void swapExams(int firstExamId, int secondExamId, Solution s){
+		ResultCouple resFirst = removeAndReturnRes(firstExamId, s);
+		ResultCouple resSecond = removeAndReturnRes(secondExamId, s);
+				
+		for (int i = 0; i < s.getResult().size(); i++){
+			if (s.getResult().get(i) == resFirst){
+				s.getResult().get(i).addExam(secondExamId);
+			}
+			if (s.getResult().get(i) == resSecond){
+				s.getResult().get(i).addExam(firstExamId);
+			}
+		}
+		
+		refreshExamPeriod(firstExamId,resSecond.getPeriod().getId(),s);
+		refreshExamPeriod(secondExamId,resFirst.getPeriod().getId(),s);
+		
+		//refresh studentTreeMap
+		s.updateStudentRCLists();
+	}
+	
+	
+	public ResultCouple removeAndReturnRes(int examId, Solution s){
+		for (int i = 0; i < s.getResult().size();i++){
+			for (int j = 0; j < s.getResult().get(i).getExamList().size();j++){
+				if (s.getResult().get(i).getExamList().get(j).getId() == examId){
+					s.getResult().get(i).getExamList().remove(j);
+					return s.getResult().get(i);
+				}
+			}
+		}
+		return null;
+	}
+	
+
+	
+	public void refreshExamPeriod(int examId, int targetPeriodId, Solution s){		
+		int firstPeriodId = -1;		
+		for (int i = 0; i < s.getResult().size();i++){
+			for (int j = 0; j < s.getResult().get(i).getExamList().size();j++){
+				if (s.getResult().get(i).getExamList().get(j).getId() == examId){
+					firstPeriodId = s.getResult().get(i).getPeriod().getId();
+				}
+			}
+		}		
+		for (int i = 0 ; i < s.getExamCoincidence().length ; i++){
+			if (s.getExamCoincidence()[examId][i] == 0){
+				s.getExamPeriodModif()[i][targetPeriodId] = 0;
+			}
+			if (s.getExamCoincidence()[i][examId] == 0){
+				s.getExamCoincidence()[i][targetPeriodId] = 0;
+			}
+			if (zorg(examId, i, firstPeriodId, s) == true){
+				s.getExamPeriodModif()[i][firstPeriodId] = s.getExamPeriodBase()[i][firstPeriodId];
+			}
+		}
+	}
+	
 	
 	// check exclusion, coincidence exclusion, after, before. If true => EPM otherExamId periodId = baseValue
 	public boolean zorg(int currentExamId, int otherExamId, int periodId, Solution s){
@@ -107,9 +146,5 @@ public class Moving {
 			}			
 		}
 		return true;
-	}
-	
-	
-	
-	
+	}	
 }
