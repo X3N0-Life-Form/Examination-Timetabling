@@ -14,14 +14,14 @@ public abstract class SoftConstraintSolver implements Solver {
 	/**
 	 * Looks for an available room/period for the specified exam.
 	 * @param examId
-	 * @return
+	 * @return An acceptable period/room.
 	 */
 	public abstract ResultCouple lookForMoveTarget(int examId);
 	
 	/**
 	 * Look for one or more room/period to move the specified exams in.
 	 * @param examIds
-	 * @return
+	 * @return A list of acceptable ResultCouples.
 	 */
 	public abstract List<ResultCouple> lookForMoveTargets(List<Integer> examIds);
 	

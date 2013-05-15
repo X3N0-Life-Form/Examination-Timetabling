@@ -33,7 +33,7 @@ public class HardConstraintsSolver {
 	 * 
 	 * @param boolArray
 	 * @param NPE list of non placed exams
-	 * @return
+	 * @return True if there is an exam with a coincidence constraint.
 	 * @throws SolvingException If boolArray & NPE have different size.
 	 */
 	public boolean hasCoincidingExams(boolean[] boolArray, List<Exam> NPE) throws SolvingException {

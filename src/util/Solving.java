@@ -231,8 +231,7 @@ public class Solving {
 	 * 
 	 * @param s
 	 * @param examId
-	 * @param periodId
-	 * @param res
+	 * @param resIn
 	 * @param returnCouple A list of examId returned by the method
 	 * @param returnList 
 	 * @return True if a swap operation can be done, as well as a
@@ -596,7 +595,7 @@ public class Solving {
 	 * @param s
 	 * @param examId
 	 * @param periodId
-	 * @param res Remains unchanged.
+	 * @param resIn Remains unchanged.
 	 * @return True if the exam can be placed into the period, false if it
 	 * must be before or after at least one other exam.
 	 */
