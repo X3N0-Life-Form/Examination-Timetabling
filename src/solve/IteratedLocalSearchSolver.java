@@ -47,8 +47,6 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 		Solution s = new Solution(originalSolution);
 		List<Solution> solutions = new LinkedList<Solution>();
 		startTime = Calendar.getInstance();
-		//TODO: underp
-		Moving derp = new Moving();
 		
 		System.out.println("--Beginning main loop: startTime=" + startTime);
 		System.out.println("--Stop conditions:");
@@ -69,14 +67,13 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 				if (target != null) {
 					System.out.println("------Found a move target: periodId=" + target.getPeriod().getId()
 							+ "; roomId=" + target.getRoom().getId());
-					//TODO:move
-					derp.movingSingleExam(examId, currentSolution, target.getPeriod().getId(), target.getRoom().getId());
+					Moving.movingSingleExam(examId, currentSolution, target.getPeriod().getId(), target.getRoom().getId());
 				} else if ((swapId  = lookForSwapTarget(examId, target)) != -1) {
 					System.out.println("------Found a swap target: " +
 							"examId=" + swapId
 							+ "; periodId=" + target.getPeriod().getId()
 							+ "; roomId=" + target.getRoom().getId());
-					//TODO: move
+					Moving.swapExams(examId, swapId, currentSolution);
 				} else {
 					System.out.println("------No target found - moving on");
 					continue;
