@@ -33,7 +33,11 @@ public class Moving {
 		//get the exam
 		Exam exam = s.getExamSession().getExams().get(examId);
 		
-		// check exclusion, coincidence exclusion, after, before
+		//
+		
+		for (int i = 0; i < exam.getStudents().size();i++){
+			
+		}
 		
 		//refresh examPeriod
 		for (int i = 0 ; i < s.getExamCoincidence().length ; i++){
@@ -48,13 +52,15 @@ public class Moving {
 			}
 		}
 		
-		//place the exam in another		
+		//place the exam in another	period
 		for (int i = 0 ; i < s.getResult().size();i++){
 			if (s.getResult().get(i).getPeriod().getId() == targetPeriodId
 					&& s.getResult().get(i).getRoom().getId() == targetRoomId ){
 				s.getResult().get(i).getExamList().add(exam);
 			}
 		}
+		//refresh studentTreeMap
+		s.updateStudentRCLists();
 	}
 	
 	// check exclusion, coincidence exclusion, after, before. If true => EPM otherExamId periodId = baseValue
@@ -107,5 +113,3 @@ public class Moving {
 	
 	
 }
-
-
