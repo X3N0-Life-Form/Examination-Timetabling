@@ -11,9 +11,17 @@ import struct.PeriodHardConstraint;
 import struct.ResultCouple;
 import struct.Solution;
 
+/**
+ * Contains various methods dedicated to solving hard constraints.
+ * @author Adrien Droguet - Sara Tari
+ *
+ */
 public class Solving {
 	
-	protected static int MAX_GET_AVAILABLE_PERIOD = 5;
+	/**
+	 * Number of available periods the getAvailablePeriod() method looks for.
+	 */
+	protected static int MAX_GET_AVAILABLE_PERIOD = 9;
 
 	/**
 	 * Manually clones a list and its contents.
