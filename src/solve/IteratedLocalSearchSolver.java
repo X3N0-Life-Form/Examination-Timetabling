@@ -13,6 +13,7 @@ import struct.ResultCouple;
 import struct.Solution;
 import util.CostCalculator;
 import util.Moving;
+import util.Solving;
 
 /**
  * Soft Constraint Solver using an iterated local search algorithm
@@ -44,6 +45,7 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 		this.originalSolution = originalSolution;
 	}
 
+	@SuppressWarnings("null")
 	@Override
 	public Solution solve() throws SolvingException {
 		System.out.println("Beginning iterated local search solving");
@@ -140,30 +142,37 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 		mainLoopCounter ++;
 		if (stopCounter > 0 && mainLoopCounter >= stopCounter)
 			return false;
-		if (stopTime > 0 && startTime.compareTo(Calendar.getInstance()) >= stopTime)//time
+		if (stopTime > 0 && startTime.compareTo(Calendar.getInstance()) >= stopTime)
 			return false;
 		return true;
 	}
 
 	/**
 	 * Determines whether a Move is valid or not within a Solution.
-	 * @param simulatedMove
+	 * @param move
 	 * @param s
 	 * @return True if it is.
 	 */
-	public boolean isMoveValid(Move simulatedMove, Solution s) {
-		switch (simulatedMove.getType()) {
+	public boolean isMoveValid(Move move, Solution s) {
+		ResultCouple target = null;
+		ResultCouple origin = null;
+		int examId = -1;
+		int examTargetId = -1;
+		switch (move.getType()) {
 		case SINGLE_MOVE:
-			
-			break;
+			target = move.getTargets().get(0);
+			examId = move.getExamIds().get(0);
+			return Solving.canHost(s, examId, target.getPeriod().getId(), s.getResult());
 		case SWAP:
-			
-			break;
+			target = move.getTargets().get(0);
+			origin = move.getOrigins().get(0);
+			examId = move.getExamIds().get(0);
+			examTargetId = move.getExamIds().get(1);
+			return Moving.canSwap(examId, examTargetId, target, origin, s);
 		case MULTIPLE_MOVES:
 			System.out.println("Not yet implemented"); //TODO:implement it
 			break;
 		}
-		// TODO Auto-generated method stub
 		return false;
 	}
 	

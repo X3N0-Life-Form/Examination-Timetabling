@@ -193,5 +193,29 @@ public class Moving {
 			}			
 		}
 		return true;
+	}
+
+	/**
+	 * See if these exams can be placed in each other's period/room.
+	 * @param examId
+	 * @param examTargetId
+	 * @param target
+	 * @param origin
+	 * @param solution
+	 * @return True if the specified exams can be swapped.
+	 */
+	public static boolean canSwap(int examId, int examTargetId,
+			ResultCouple target, ResultCouple origin, Solution solution) {
+		Solution s = new Solution(solution);
+		ResultCouple t = target.clone();
+		ResultCouple o = origin.clone();
+		Exam exam = s.getExamSession().getExams().get(examId);
+		Exam examTarget = s.getExamSession().getExams().get(examTargetId);
+		
+		o.removeExam(exam);
+		t.removeExam(examTarget);
+		
+		return (Solving.canHost(s, examId, t.getPeriod().getId(), s.getResult())
+				&& Solving.canHost(s, examTargetId, o.getPeriod().getId(), s.getResult()));
 	}	
 }
