@@ -33,8 +33,16 @@ public class Solution implements Serializable, Comparable<Solution> {
 	private List<Exam> afterExams;
 	private TreeMap<Integer, Student> students;
 	private List<Integer> biggerExams = null;
+	private int cost = -1;
 	
-	
+	public int getCost() {
+		return cost;
+	}
+
+	public void setCost(int cost) {
+		this.cost = cost;
+	}
+
 	public List<Integer> getBiggerExams() {
 		return biggerExams;
 	}
@@ -299,6 +307,7 @@ public class Solution implements Serializable, Comparable<Solution> {
 		Collections.copy(this.nonPlacedExams, originalSolution.nonPlacedExams);
 		Collections.copy(this.result, originalSolution.result);
 		this.students = (TreeMap<Integer, Student>) originalSolution.students.clone();
+		this.cost = originalSolution.cost;
 		//TODO: verify that everything is cloned/copied correctly
 	}
 
@@ -528,11 +537,29 @@ public class Solution implements Serializable, Comparable<Solution> {
 	}
 
 	/**
-	 * Compares the Solutions' cost. Note: CostCalculator.calculateCost() is called twice.
+	 * Compares the Solutions' cost. Calculates both costs if necessary.
 	 */
 	@Override
-	public int compareTo(Solution o) {//TODO: save the cost?
-		return CostCalculator.calculateCost(this) - CostCalculator.calculateCost(o);
+	public int compareTo(Solution o) {
+		if (this.cost < 0)
+			CostCalculator.calculateCost(this);
+		else if (o.cost < 0)
+			CostCalculator.calculateCost(o);
+		return this.cost - o.cost;
+	}
+
+	/**
+	 * Look for a ResultCouple containing the specified exam.
+	 * @param examId
+	 * @return null if the exam could not be found.
+	 */
+	public ResultCouple getResultForExam(int examId) {
+		for (ResultCouple rc : result) {
+			if (rc.getExamList().contains(examId)) {
+				return rc;
+			}
+		}
+		return null;
 	}
 	
 }

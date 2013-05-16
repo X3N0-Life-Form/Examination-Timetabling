@@ -1,9 +1,14 @@
 package solve;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import struct.EMoveType;
+import struct.Exam;
+import struct.Move;
 import struct.ResultCouple;
 import struct.Solution;
 import util.CostCalculator;
@@ -57,33 +62,37 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 		while (updateMainLoopStatus()) {
 			Solution currentSolution = new Solution(s);
 			int currentCost = CostCalculator.calculateCost(currentSolution);
+			List<Move> currentMoves = new ArrayList<Move>();
+			Move move = null;
 			System.out.println("--Current cost=" + currentCost);
 			//try to move each exam
 			for (Integer examId : currentSolution.getExamSession().getExams().navigableKeySet()) {
 				System.out.println("----Processing exam " + examId);
 				int swapId = -1;
 				
-				ResultCouple target = lookForMoveTarget(examId);
+				ResultCouple target = lookForMoveTarget(examId, s, currentMoves);
 				if (target != null) {
 					System.out.println("------Found a move target: periodId=" + target.getPeriod().getId()
 							+ "; roomId=" + target.getRoom().getId());
-					Moving.movingSingleExam(examId, currentSolution, target.getPeriod().getId(), target.getRoom().getId());
-				} else if ((swapId  = lookForSwapTarget(examId, target)) != -1) {
+					move = Moving.movingSingleExam(examId, currentSolution, target.getPeriod().getId(), target.getRoom().getId());
+				} else if ((swapId  = lookForSwapTarget(examId, target, s, currentMoves)) != -1) {
 					System.out.println("------Found a swap target: " +
 							"examId=" + swapId
 							+ "; periodId=" + target.getPeriod().getId()
 							+ "; roomId=" + target.getRoom().getId());
-					Moving.swapExams(examId, swapId, currentSolution);
+					move = Moving.swapExams(examId, swapId, currentSolution);
 				} else {
 					System.out.println("------No target found - moving on");
 					continue;
 				}
+				System.out.println("------Saving tested move");
+				currentMoves.add(move);
 				//exam moved --> save solution if lower cost
 				if (CostCalculator.calculateCost(currentSolution) < currentCost) {
-					System.out.println("Cost inferior to previous Solution - saving");
+					System.out.println("------Cost inferior to previous Solution - saving");
 					solutions.add(currentSolution);
 				} else {
-					System.out.println("Cost superior to previous Solution - ignoring");
+					System.out.println("------Cost superior to previous Solution - ignoring");
 				}
 			}
 			System.out.println("----Finished looping through the exam list - analyzing");
@@ -136,22 +145,67 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 		return true;
 	}
 
+	/**
+	 * Determines whether a Move is valid or not within a Solution.
+	 * @param simulatedMove
+	 * @param s
+	 * @return True if it is.
+	 */
+	public boolean isMoveValid(Move simulatedMove, Solution s) {
+		switch (simulatedMove.getType()) {
+		case SINGLE_MOVE:
+			
+			break;
+		case SWAP:
+			
+			break;
+		case MULTIPLE_MOVES:
+			System.out.println("Not yet implemented"); //TODO:implement it
+			break;
+		}
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
 	@Override
-	public ResultCouple lookForMoveTarget(int examId) {
+	public ResultCouple lookForMoveTarget(int examId, Solution s, List<Move> previousMoves) {
+		ResultCouple target = null;
+		for (ResultCouple rc : s.getResult()) {
+			Move simulatedMove = new Move(EMoveType.SINGLE_MOVE, examId, s.getResultForExam(examId), rc);
+			if (previousMoves.contains(simulatedMove)) {
+				continue;
+			}
+			if (isMoveValid(simulatedMove, s)) {
+				target = rc;
+			}
+		}
+		return target;
+	}
+	
+	@Override
+	public List<ResultCouple> lookForMoveTargets(List<Integer> examIds, Solution s, List<Move> previousMoves) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<ResultCouple> lookForMoveTargets(List<Integer> examIds) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int lookForSwapTarget(int examId, ResultCouple targetLocation) {
-		// TODO Auto-generated method stub
-		return 0;
+	public int lookForSwapTarget(int examId, ResultCouple targetLocation, Solution s, List<Move> previousMoves) {
+		List<Integer> examIds = new ArrayList<Integer>();
+		examIds.add(examId);
+		ResultCouple origin = s.getResultForExam(examId);
+		for (ResultCouple rc : s.getResult()) {
+			for (Exam currentExam : rc.getExamList()) {
+				examIds.add(currentExam.getId());
+				Move simulatedMove = new Move(EMoveType.SWAP, examIds, origin, rc);
+				if (isMoveValid(simulatedMove, s)) {
+					targetLocation = rc;
+					return currentExam.getId();
+				} else {
+					examIds.remove(1);
+				}
+			}
+		}
+		return -1;
 	}
 
 }

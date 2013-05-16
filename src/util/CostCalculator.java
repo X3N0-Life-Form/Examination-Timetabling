@@ -18,7 +18,7 @@ import struct.Solution;
 public class CostCalculator {
 	
 	/**
-	 * Calculates how much a Solution costs.
+	 * Calculates how much a Solution costs and updates the Solution's cost field.
 	 * @param s
 	 * @return The cost of the Solution according to its soft constraints.
 	 */
@@ -32,6 +32,8 @@ public class CostCalculator {
 		res += calculateRoomCost(s);
 		res += calculatePeriodCost(s);
 		res += calculateFrontLoad(s);
+		
+		s.setCost(res);
 		
 		return res;
 	}

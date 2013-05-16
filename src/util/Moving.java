@@ -1,9 +1,12 @@
 package util;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import struct.EMoveType;
 import struct.EPeriodHardConstraint;
 import struct.Exam;
+import struct.Move;
 import struct.ResultCouple;
 import struct.Solution;
 
@@ -21,10 +24,12 @@ public class Moving {
 	 * @param targetPeriodId
 	 * @param targetRoomId
 	 */
-	public static void movingSingleExam(int examId, Solution s, int targetPeriodId, int targetRoomId){
+	public static Move movingSingleExam(int examId, Solution s, int targetPeriodId, int targetRoomId){
 		//int firstPeriodId = -1;
 		//int firstRoomId = -1;
 		Exam exam = s.getExamSession().getExams().get(examId);
+		ResultCouple target = null;
+		ResultCouple origin = null;
 		
 		//remove the exam
 		for (int i = 0; i < s.getResult().size();i++){
@@ -33,7 +38,12 @@ public class Moving {
 					//firstPeriodId = s.getResult().get(i).getPeriod().getId();
 					//firstRoomId = s.getResult().get(i).getRoom().getId();
 					s.getResult().get(i).getExamList().remove(j);
+					origin = s.getResult().get(i);
+					break;
 				}
+			}
+			if (origin != null) {
+				break;
 			}
 		}
 		
@@ -44,10 +54,14 @@ public class Moving {
 			if (s.getResult().get(i).getPeriod().getId() == targetPeriodId
 					&& s.getResult().get(i).getRoom().getId() == targetRoomId ){
 				s.getResult().get(i).getExamList().add(exam);
+				target = s.getResult().get(i);
+				break;
 			}
 		}
 		//refresh studentTreeMap
 		s.updateStudentRCLists();
+		
+		return new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
 	}
 	
 	/**
@@ -56,7 +70,7 @@ public class Moving {
 	 * @param secondExamId
 	 * @param s
 	 */
-	public static void swapExams(int firstExamId, int secondExamId, Solution s){
+	public static Move swapExams(int firstExamId, int secondExamId, Solution s){
 		ResultCouple resFirst = removeAndReturnRes(firstExamId, s);
 		ResultCouple resSecond = removeAndReturnRes(secondExamId, s);
 				
@@ -74,6 +88,11 @@ public class Moving {
 		
 		//refresh studentTreeMap
 		s.updateStudentRCLists();
+		
+		List<Integer> idList = new ArrayList<Integer>();
+		idList.add(firstExamId);
+		idList.add(secondExamId);
+		return new Move(EMoveType.SWAP, idList, resFirst, resSecond);
 	}
 	
 	/**
