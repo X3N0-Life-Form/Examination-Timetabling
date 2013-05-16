@@ -153,7 +153,7 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 	 * @param s
 	 * @return True if it is.
 	 */
-	public boolean isMoveValid(Move move, Solution s) {
+	public boolean isMoveValid(Move move, Solution s) {//TODO:verify that constraints are properly taken into account
 		ResultCouple target = null;
 		ResultCouple origin = null;
 		int examId = -1;

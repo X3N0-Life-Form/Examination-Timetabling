@@ -43,7 +43,7 @@ public class HCS_serializeSolutions {
 	private ExamSession set4ExamSession;
 	private String set4FileName = "res/exam_comp_set4.exam";
 	private HardConstraintsSolver set4Solver;
-	public static final String set4SerializedName = "res/solutions/exam_comp_set4.object";
+	public static final String set4SerializedName = "res/solutions/exam_comp_set4.object";//TODO:move that in Serialization
 	
 	///////////////////////////////////////////////////////////////////
 	// res/exam_comp_set1.exam - res/solutions/exam_comp_set1.object //
