@@ -555,8 +555,10 @@ public class Solution implements Serializable, Comparable<Solution> {
 	 */
 	public ResultCouple getResultForExam(int examId) {
 		for (ResultCouple rc : result) {
-			if (rc.getExamList().contains(examId)) {
-				return rc;
+			for (int i = 0; i < rc.getExamList().size(); i++) {
+				if (rc.getExamList().get(i).getId() == examId) {
+					return rc;
+				}
 			}
 		}
 		return null;

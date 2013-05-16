@@ -47,8 +47,6 @@ public class Moving {
 			}
 		}
 		
-		refreshExamPeriod(examId,targetPeriodId,s);
-		
 		//place the exam in another	period
 		for (int i = 0 ; i < s.getResult().size();i++){
 			if (s.getResult().get(i).getPeriod().getId() == targetPeriodId
@@ -58,6 +56,10 @@ public class Moving {
 				break;
 			}
 		}
+		
+		refreshExamPeriod(examId,targetPeriodId,s);
+		
+
 		//refresh studentTreeMap
 		s.updateStudentRCLists();
 		
@@ -128,6 +130,7 @@ public class Moving {
 				}
 			}
 		}		
+		
 		for (int i = 0 ; i < s.getExamCoincidence().length ; i++){
 			if (s.getExamCoincidence()[examId][i] == 0){
 				s.getExamPeriodModif()[i][targetPeriodId] = 0;
