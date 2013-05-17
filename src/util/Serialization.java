@@ -51,4 +51,10 @@ public class Serialization {
 		oos.close();
 		fos.close();
 	}
+
+	public static final String simpleSerializedName = "res/solutions/simple_set.object";
+	public static final String set4SerializedName = "res/solutions/exam_comp_set4.object";
+	public static final String set1SerializedName = "res/solutions/exam_comp_set1.object";
+	public static final String set2SerializedName = "res/solutions/exam_comp_set2.object";
+	public static final String set3SerializedName = "res/solutions/exam_comp_set3.object";
 }

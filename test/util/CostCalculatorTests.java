@@ -8,7 +8,6 @@ import java.io.IOException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import solve.HCS_serializeSolutions;
 import struct.Solution;
 
 public class CostCalculatorTests {
@@ -26,10 +25,10 @@ public class CostCalculatorTests {
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws FileNotFoundException, ClassNotFoundException, IOException {
-		s_set1 = Serialization.loadSolution(HCS_serializeSolutions.set1SerializedName);
-		s_set2 = Serialization.loadSolution(HCS_serializeSolutions.set2SerializedName);
-		s_set3 = Serialization.loadSolution(HCS_serializeSolutions.set3SerializedName);
-		s_set4 = Serialization.loadSolution(HCS_serializeSolutions.set4SerializedName);
+		s_set1 = Serialization.loadSolution(Serialization.set1SerializedName);
+		s_set2 = Serialization.loadSolution(Serialization.set2SerializedName);
+		s_set3 = Serialization.loadSolution(Serialization.set3SerializedName);
+		s_set4 = Serialization.loadSolution(Serialization.set4SerializedName);
 	}
 
 	/**

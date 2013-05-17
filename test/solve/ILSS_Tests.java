@@ -3,6 +3,7 @@ package solve;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import struct.EMoveType;
@@ -19,7 +20,7 @@ public class ILSS_Tests {
 
 	@Before
 	public void setUp() throws Exception {
-		s = Serialization.loadSolution(HCS_serializeSolutions.set4SerializedName);
+		s = Serialization.loadSolution(Serialization.set4SerializedName);
 		solver = new IteratedLocalSearchSolver(s);
 	}
 
@@ -70,21 +71,21 @@ public class ILSS_Tests {
 	}
 	//TODO:the rest
 	/**
-	 * SingleMove - room size
+	 * SingleMove not OK - room size
 	 */
 	@Test
 	public void testIsMoveValid_no() {
-		int examId = 272; //size=3
+		int examId = 0; //size=3
 		ResultCouple origin = s.getResultForExam(examId);
 		ResultCouple target = s.getResult().get(0);
 		Move move = new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
-		assertTrue(solver.isMoveValid(move, s));
+		assertFalse(solver.isMoveValid(move, s));
 	}
 	
 	/**
 	 * Swap OK
 	 */
-	@Test
+	@Test @Ignore
 	public void testIsMoveValid_maybe() {
 		int examId = 272; //size=3
 		ResultCouple origin = s.getResultForExam(examId);
@@ -96,7 +97,7 @@ public class ILSS_Tests {
 	/**
 	 * Swap not OK - room size
 	 */
-	@Test
+	@Test @Ignore
 	public void testIsMoveValid_I() {
 		int examId = 272; //size=3
 		ResultCouple origin = s.getResultForExam(examId);
@@ -108,7 +109,7 @@ public class ILSS_Tests {
 	/**
 	 * singleMove not OK - EXAM_COINCIDENCE
 	 */
-	@Test
+	@Test @Ignore
 	public void testIsMoveValid_dont() {
 		int examId = 272; //size=3
 		ResultCouple origin = s.getResultForExam(examId);
@@ -120,7 +121,7 @@ public class ILSS_Tests {
 	/**
 	 * swap not - EXAM_COINCIDENCE
 	 */
-	@Test
+	@Test @Ignore
 	public void testIsMoveValid_know() {
 		int examId = 272; //size=3
 		ResultCouple origin = s.getResultForExam(examId);
@@ -132,7 +133,7 @@ public class ILSS_Tests {
 	/**
 	 * single not - EXCLUSION
 	 */
-	@Test
+	@Test @Ignore
 	public void testIsMoveValid_can() {
 		int examId = 272; //size=3
 		ResultCouple origin = s.getResultForExam(examId);
@@ -144,7 +145,7 @@ public class ILSS_Tests {
 	/**
 	 * swap - EXCLUSION
 	 */
-	@Test
+	@Test @Ignore
 	public void testIsMoveValid_you() {
 		int examId = 272; //size=3
 		ResultCouple origin = s.getResultForExam(examId);
@@ -156,7 +157,7 @@ public class ILSS_Tests {
 	/**
 	 * single - AFTER
 	 */
-	@Test
+	@Test @Ignore
 	public void testIsMoveValid_repeat() {
 		int examId = 272; //size=3
 		ResultCouple origin = s.getResultForExam(examId);
@@ -168,7 +169,7 @@ public class ILSS_Tests {
 	/**
 	 * swap - AFTER
 	 */
-	@Test
+	@Test @Ignore
 	public void testIsMoveValid_the() {
 		int examId = 272; //size=3
 		ResultCouple origin = s.getResultForExam(examId);
@@ -180,7 +181,7 @@ public class ILSS_Tests {
 	/**
 	 * single - ROOM_EXCLUSIVE
 	 */
-	@Test
+	@Test @Ignore
 	public void testIsMoveValid_question() {
 		int examId = 272; //size=3
 		ResultCouple origin = s.getResultForExam(examId);
@@ -192,7 +193,7 @@ public class ILSS_Tests {
 	/**
 	 * swap - ROOM_EXCLUSIVE
 	 */
-	@Test
+	@Test @Ignore
 	public void testIsMoveValid_urNotTheBossOfMeNow() {
 		int examId = 272; //size=3
 		ResultCouple origin = s.getResultForExam(examId);
@@ -205,7 +206,7 @@ public class ILSS_Tests {
 	// lookForMoveTarget //
 	///////////////////////
 	
-	@Test
+	@Test @Ignore
 	public void testLookForMoveTarget() {
 		
 	}
@@ -214,7 +215,7 @@ public class ILSS_Tests {
 	// lookForSwapTarget //
 	///////////////////////
 	
-	@Test
+	@Test @Ignore
 	public void testLookForSwapTarget() {
 		
 	}
@@ -229,7 +230,7 @@ public class ILSS_Tests {
 	// the big one //
 	/////////////////
 	
-	@Test
+	@Test @Ignore
 	public void testSolve() {
 		
 	}

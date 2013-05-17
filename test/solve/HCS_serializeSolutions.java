@@ -33,8 +33,6 @@ public class HCS_serializeSolutions {
 	private ExamSession simpleExamSession;
 	private String simpleFileName = "res/simple_set.exam";
 	private HardConstraintsSolver simpleSolver;
-	public static final String simpleSerializedName = "res/solutions/simple_set.object";
-	
 	///////////////////////////////////////////////////////////////////
 	// res/exam_comp_set4.exam - res/solutions/exam_comp_set4.object //
 	///////////////////////////////////////////////////////////////////
@@ -43,8 +41,6 @@ public class HCS_serializeSolutions {
 	private ExamSession set4ExamSession;
 	private String set4FileName = "res/exam_comp_set4.exam";
 	private HardConstraintsSolver set4Solver;
-	public static final String set4SerializedName = "res/solutions/exam_comp_set4.object";//TODO:move that in Serialization
-	
 	///////////////////////////////////////////////////////////////////
 	// res/exam_comp_set1.exam - res/solutions/exam_comp_set1.object //
 	///////////////////////////////////////////////////////////////////
@@ -53,8 +49,6 @@ public class HCS_serializeSolutions {
 	private ExamSession set1ExamSession;
 	private String set1FileName = "res/exam_comp_set1.exam";
 	private HardConstraintsSolver set1Solver;
-	public static final String set1SerializedName = "res/solutions/exam_comp_set1.object";
-	
 	///////////////////////////////////////////////////////////////////
 	// res/exam_comp_set2.exam - res/solutions/exam_comp_set2.object //
 	///////////////////////////////////////////////////////////////////
@@ -63,8 +57,6 @@ public class HCS_serializeSolutions {
 	private ExamSession set2ExamSession;
 	private String set2FileName = "res/exam_comp_set2.exam";
 	private HardConstraintsSolver set2Solver;
-	public static final String set2SerializedName = "res/solutions/exam_comp_set2.object";
-	
 	///////////////////////////////////////////////////////////////////
 	// res/exam_comp_set3.exam - res/solutions/exam_comp_set3.object //
 	///////////////////////////////////////////////////////////////////
@@ -73,27 +65,25 @@ public class HCS_serializeSolutions {
 	private ExamSession set3ExamSession;
 	private String set3FileName = "res/exam_comp_set3.exam";
 	private HardConstraintsSolver set3Solver;
-	public static final String set3SerializedName = "res/solutions/exam_comp_set3.object";
-	
 	/**
 	 * Remove previously serialized objects.
 	 */
 	@BeforeClass
 	public static void tearDownBeforeClass() {
-		new File(simpleSerializedName).delete();
-		new File(set4SerializedName).delete();
-		new File(set1SerializedName).delete();
-		new File(set2SerializedName).delete();
-		new File(set3SerializedName).delete();
+		new File(Serialization.simpleSerializedName).delete();
+		new File(Serialization.set4SerializedName).delete();
+		new File(Serialization.set1SerializedName).delete();
+		new File(Serialization.set2SerializedName).delete();
+		new File(Serialization.set3SerializedName).delete();
 	}
 	//TODO: time stamp the files
 	
 	@Test @Ignore
 	public void simpleSet() throws ExamParsingException, IOException, SolvingException {
-		File file = new File(simpleSerializedName);
+		File file = new File(Serialization.simpleSerializedName);
 		//safety
 		if (file.exists())
-			fail(simpleSerializedName + " exists");
+			fail(Serialization.simpleSerializedName + " exists");
 		
 		simpleParser = new ExamSessionParser(simpleFileName);
 		simpleExamSession = simpleParser.parse();
@@ -101,7 +91,7 @@ public class HCS_serializeSolutions {
 		simpleSolver = new HardConstraintsSolver(simpleSolution);
 		Solution toSave = simpleSolver.solve();
 		
-		FileOutputStream fos = new FileOutputStream(simpleSerializedName);
+		FileOutputStream fos = new FileOutputStream(Serialization.simpleSerializedName);
 		ObjectOutputStream oos = new ObjectOutputStream(fos);
 		oos.writeObject(toSave);
 		oos.close();
@@ -113,10 +103,10 @@ public class HCS_serializeSolutions {
 	
 	@Test
 	public void set4() throws IOException, ExamParsingException, SolvingException, ClassNotFoundException {
-		File file = new File(set4SerializedName);
+		File file = new File(Serialization.set4SerializedName);
 		//safety
 		if (file.exists())
-			fail(set4SerializedName + " exists");
+			fail(Serialization.set4SerializedName + " exists");
 		
 		set4Parser = new ExamSessionParser(set4FileName);
 		set4ExamSession = set4Parser.parse();
@@ -124,11 +114,11 @@ public class HCS_serializeSolutions {
 		set4Solver = new HardConstraintsSolver(set4Solution);
 		Solution toSave = set4Solver.solve();
 		
-		Serialization.saveSolution(toSave, set4SerializedName);
+		Serialization.saveSolution(toSave, Serialization.set4SerializedName);
 		
 		assertTrue(file.exists());
 		
-		Solution toLoad = Serialization.loadSolution(set4SerializedName);
+		Solution toLoad = Serialization.loadSolution(Serialization.set4SerializedName);
 		
 		assertNotNull(toLoad);
 		assertEquals(toSave, toLoad);
@@ -138,10 +128,10 @@ public class HCS_serializeSolutions {
 	
 	@Test
 	public void set1() throws IOException, ExamParsingException, SolvingException, ClassNotFoundException {
-		File file = new File(set1SerializedName);
+		File file = new File(Serialization.set1SerializedName);
 		//safety
 		if (file.exists())
-			fail(set1SerializedName + " exists");
+			fail(Serialization.set1SerializedName + " exists");
 		
 		set1Parser = new ExamSessionParser(set1FileName);
 		set1ExamSession = set1Parser.parse();
@@ -149,11 +139,11 @@ public class HCS_serializeSolutions {
 		set1Solver = new HardConstraintsSolver(set1Solution);
 		Solution toSave = set1Solver.solve();
 		
-		Serialization.saveSolution(toSave, set1SerializedName);
+		Serialization.saveSolution(toSave, Serialization.set1SerializedName);
 		
 		assertTrue(file.exists());
 		
-		Solution toLoad = Serialization.loadSolution(set1SerializedName);
+		Solution toLoad = Serialization.loadSolution(Serialization.set1SerializedName);
 		
 		assertNotNull(toLoad);
 		assertEquals(toSave, toLoad);
@@ -161,10 +151,10 @@ public class HCS_serializeSolutions {
 	
 	@Test
 	public void set2() throws IOException, ExamParsingException, SolvingException, ClassNotFoundException {
-		File file = new File(set2SerializedName);
+		File file = new File(Serialization.set2SerializedName);
 		//safety
 		if (file.exists())
-			fail(set2SerializedName + " exists");
+			fail(Serialization.set2SerializedName + " exists");
 		
 		set2Parser = new ExamSessionParser(set2FileName);
 		set2ExamSession = set2Parser.parse();
@@ -172,11 +162,11 @@ public class HCS_serializeSolutions {
 		set2Solver = new HardConstraintsSolver(set2Solution);
 		Solution toSave = set2Solver.solve();
 		
-		Serialization.saveSolution(toSave, set2SerializedName);
+		Serialization.saveSolution(toSave, Serialization.set2SerializedName);
 		
 		assertTrue(file.exists());
 		
-		Solution toLoad = Serialization.loadSolution(set2SerializedName);
+		Solution toLoad = Serialization.loadSolution(Serialization.set2SerializedName);
 		
 		assertNotNull(toLoad);
 		assertEquals(toSave, toLoad);
@@ -184,10 +174,10 @@ public class HCS_serializeSolutions {
 	
 	@Test
 	public void set3() throws IOException, ExamParsingException, SolvingException, ClassNotFoundException {
-		File file = new File(set3SerializedName);
+		File file = new File(Serialization.set3SerializedName);
 		//safety
 		if (file.exists())
-			fail(set3SerializedName + " exists");
+			fail(Serialization.set3SerializedName + " exists");
 		
 		set3Parser = new ExamSessionParser(set3FileName);
 		set3ExamSession = set3Parser.parse();
@@ -195,11 +185,11 @@ public class HCS_serializeSolutions {
 		set3Solver = new HardConstraintsSolver(set3Solution);
 		Solution toSave = set3Solver.solve();
 		
-		Serialization.saveSolution(toSave, set3SerializedName);
+		Serialization.saveSolution(toSave, Serialization.set3SerializedName);
 		
 		assertTrue(file.exists());
 		
-		Solution toLoad = Serialization.loadSolution(set3SerializedName);
+		Solution toLoad = Serialization.loadSolution(Serialization.set3SerializedName);
 		
 		assertNotNull(toLoad);
 		assertEquals(toSave, toLoad);

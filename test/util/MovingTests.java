@@ -8,7 +8,6 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 
-import solve.HCS_serializeSolutions;
 import struct.ResultCouple;
 import struct.Solution;
 
@@ -18,7 +17,7 @@ public class MovingTests {
 	
 	@Before
 	public void setup() throws FileNotFoundException, ClassNotFoundException, IOException {
-		s = Serialization.loadSolution(HCS_serializeSolutions.set4SerializedName);
+		s = Serialization.loadSolution(Serialization.set4SerializedName);
 	}
 
 	@Test
