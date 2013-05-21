@@ -5,20 +5,15 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import parse.ExamSessionParser;
+import util.Serialization;
 
 public class ResultCoupleTests {
 
-	private String fileName = "res/exam_comp_set2.exam";
-	private ExamSessionParser esp;
-	private ExamSession es;
 	private Solution s;
 	
 	@Before
 	public void setUp() throws Exception {
-		esp = new ExamSessionParser(fileName);
-		es = esp.parse();
-		s = new Solution(es);
+		s = Serialization.loadSolution(Serialization.set2SerializedName);
 	}
 
 	/**
@@ -27,11 +22,18 @@ public class ResultCoupleTests {
 	@Test
 	public void addExam() {
 		ResultCouple rc = s.getResult().get(0);
-		Exam exam = es.getExams().get(856);
+		Exam exam = s.getExamSession().getExams().get(856);
 		rc.addExam(exam);
 		int eId = 246;
 		int pId = rc.getPeriod().getId();
 		assertTrue(s.getExamPeriodModif()[eId][pId] == 0);
 	}
 
+	@Test
+	public void removeExam() {
+		ResultCouple rc = s.getResultForExam(0);
+		Exam e = rc.getExam(0);
+		rc.removeExam(e);
+		assertFalse(rc.getExamList().contains(e));
+	}
 }

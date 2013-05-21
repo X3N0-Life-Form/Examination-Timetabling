@@ -46,8 +46,8 @@ public class Solving {
 	
 	public static boolean canHost(Solution s, int examId, int periodId, List<ResultCouple> resIn) {
 		ArrayList<ResultCouple> res = manualClone(resIn);
-		boolean tmp = false;
-		boolean exclusive;
+		boolean canHost = false;
+		boolean isExclusive;
 		
 		for (int i = 0; i< res.size();i++){
 			// where the result period id = periodId
@@ -55,46 +55,57 @@ public class Solving {
 				
 				// if there's no other exams
 				if (res.get(i).getExamList().size() == 0){
-					int sizeE = 0;
+					int sizeExam = 0;
 					for (int k = 0; k < s.getExamSession().getExams().size(); k++){
 						if (s.getExamSession().getExams().get(k).getId() == examId){
-							sizeE = s.getExamSession().getExams().get(k).getSize();
+							sizeExam = s.getExamSession().getExams().get(k).getSize();
 							break;
 						}
 					}
-					if ( sizeE <= res.get(i).getRoom().getSize()){
-						tmp = true;
+					//exam size < room size --> good to go
+					if (sizeExam <= res.get(i).getRoom().getSize()){
+						canHost = true;
 						break;
 					}
 				}
 				// if there's 1 or more exams
 				else {
-					exclusive = false;
+					isExclusive = false;
 					// get the sum of all the exams size for this room & this period
 					int examSizeSum = 0;
 					for (int j = 0; j< res.get(i).getExamList().size(); j++){
 						examSizeSum += res.get(i).getExamList().get(j).getSize();
 					}
 					//get the capacity of the room
-					int sizeE = 0;
+					int sizeExam = 0;
 					for (int k = 0; k < s.getExamSession().getExams().size(); k++){
 						if (s.getExamSession().getExams().get(k).getId() == examId){
-							sizeE = s.getExamSession().getExams().get(k).getSize();
+							sizeExam = s.getExamSession().getExams().get(k).getSize();
 							break;
 						}
 					}
 					//check if room exclusive or not 
 					for (int l = 0; l< s.getExamSession().getRoomHardConstraints().size(); l++){
 						if (s.getExamSession().getRoomHardConstraints().get(l).getId() == examId)
-							exclusive = true;
+							isExclusive = true;
 					}
-					//if the size of all the exams + size of our exam <= room capacity => true
-					if (examSizeSum + sizeE <= res.get(i).getRoom().getSize() && !exclusive )
-						tmp = true;
+					//if the size of all the exams + size of our exam <= room capacity --=> good to go
+					if (examSizeSum + sizeExam <= res.get(i).getRoom().getSize() && !isExclusive ) {
+						canHost = true;						
+					}
+					///////////////////////////////
+					if (examId == 258) {
+						System.out.println(examSizeSum);
+						System.out.println(sizeExam);
+						System.out.println(res.get(i).getRoom().getSize());
+						System.out.println(canHost);
+						
+					}
+					///////////////////////////////
 				}
 			}
 		}
-		return tmp;
+		return canHost;
 	}
 	
 	/**
@@ -255,7 +266,7 @@ public class Solving {
 	 * Finds a suitable room for the specified exam in the specified period.
 	 * @param examId
 	 * @param periodId
-	 * @return A suitable room id or -1.
+	 * @return A List of suitable room id.
 	 */
 	public static List<Integer> findSuitable(Solution s, int examId, int periodId, List<ResultCouple> res) {
 		//note: prioritize rooms that are already in use.
@@ -476,6 +487,27 @@ public class Solving {
 	}
 	
 	/**
+	 * 
+	 * @param s
+	 * @param examId
+	 * @param res
+	 * @param periodId
+	 * @return True if the period is deemed available for the specified exam.
+	 */
+	public static boolean isPeriodAvailable(Solution s, int examId, List<ResultCouple> res, int periodId) {
+		//copied from getAvailablePeriod
+		int[][] eP = s.getExamPeriodModif();
+		if (hasConstraint(s, examId, EPeriodHardConstraint.AFTER) && !checkBeforeAfter(s, examId, periodId, res)) {
+			return false;
+		}
+		
+		if (canHost(s, examId, periodId, res) && (eP[examId][periodId] != 0)){
+				return true;
+		}
+		return false;
+	}
+	
+	/**
 	 * Finds periods capable of hosting the specified exam.
 	 * @param s
 	 * @param examId
@@ -486,7 +518,7 @@ public class Solving {
 		ArrayList<Integer> availablePeriods = new ArrayList<Integer>();
 		int[][] eP = s.getExamPeriodModif();
 		boolean hasAfter = hasConstraint(s, examId, EPeriodHardConstraint.AFTER);
-				
+		
 		for (int i = 0; i < s.getExamSession().getPeriods().size(); i++){
 			int periodId = s.getExamSession().getPeriods().get(i).getId();
 	
@@ -502,8 +534,6 @@ public class Solving {
 				break;
 			}
 		}
-		
-		
 		
 		return availablePeriods;
 	}

@@ -115,20 +115,24 @@ public class Moving {
 		return null;
 	}
 	
+	 //TODO: move this in Solution?
 	/**
 	 * Updates the examPeriod matrix.
 	 * @param examId
 	 * @param targetPeriodId
 	 * @param s
 	 */
-	public static void refreshExamPeriod(int examId, int targetPeriodId, Solution s){ //TODO: move this in Solution?		
-		int firstPeriodId = -1;		
+	public static void refreshExamPeriod(int examId, int targetPeriodId, Solution s){		
+		int firstPeriodId = -1;
 		for (int i = 0; i < s.getResult().size();i++){
 			for (int j = 0; j < s.getResult().get(i).getExamList().size();j++){
 				if (s.getResult().get(i).getExamList().get(j).getId() == examId){
 					firstPeriodId = s.getResult().get(i).getPeriod().getId();
+					break;
 				}
 			}
+			if (firstPeriodId > 0)
+				break;
 		}		
 		
 		for (int i = 0 ; i < s.getExamCoincidence().length ; i++){
@@ -138,7 +142,7 @@ public class Moving {
 			if (s.getExamCoincidence()[i][examId] == 0){
 				s.getExamCoincidence()[i][targetPeriodId] = 0;
 			}
-			if (checkConstraints(examId, i, firstPeriodId, s) == true){
+			if (firstPeriodId > 0 && checkConstraints(examId, i, firstPeriodId, s) == true){
 				s.getExamPeriodModif()[i][firstPeriodId] = s.getExamPeriodBase()[i][firstPeriodId];
 			}
 		}
@@ -202,23 +206,41 @@ public class Moving {
 	 * See if these exams can be placed in each other's period/room.
 	 * @param examId
 	 * @param examTargetId
-	 * @param target
-	 * @param origin
 	 * @param solution
 	 * @return True if the specified exams can be swapped.
 	 */
-	public static boolean canSwap(int examId, int examTargetId,
-			ResultCouple target, ResultCouple origin, Solution solution) {
+	public static boolean canSwap(int examId, int examTargetId, Solution solution) {
 		Solution s = new Solution(solution);
-		ResultCouple t = target.clone();
-		ResultCouple o = origin.clone();
-		Exam exam = s.getExamSession().getExams().get(examId);
-		Exam examTarget = s.getExamSession().getExams().get(examTargetId);
+		ResultCouple targetClone = s.getResultForExam(examId);
+		ResultCouple originClone = s.getResultForExam(examTargetId);
 		
-		o.removeExam(exam);
-		t.removeExam(examTarget);
+		originClone.removeExam(examId);
+		targetClone.removeExam(examTargetId);
+		//derp fuck that shit
+		originClone.removeExam(examTargetId);
+		targetClone.removeExam(examId);
+		Moving.refreshExamPeriod(examId, originClone.getPeriod().getId(), s);
+		Moving.refreshExamPeriod(examTargetId, targetClone.getPeriod().getId(), s);
 		
-		return (Solving.canHost(s, examId, t.getPeriod().getId(), s.getResult())
-				&& Solving.canHost(s, examTargetId, o.getPeriod().getId(), s.getResult()));
+		//copied from ILSS.isMoveValid
+		if (!Solving.canHost(s, examId, targetClone.getPeriod().getId(), s.getResult())
+				|| !Solving.canHost(s, examTargetId, originClone.getPeriod().getId(), s.getResult())) {
+			//period can't host
+			return false;
+		} else if (!Solving.isPeriodAvailable(s, examId, s.getResult(), targetClone.getPeriod().getId())
+				|| !Solving.isPeriodAvailable(s, examTargetId, s.getResult(), originClone.getPeriod().getId())
+				) {
+			//target period is not an available period
+			return false;
+		} else if (!Solving.findSuitable(s, examId, targetClone.getPeriod().getId(), s.getResult())
+				.contains(targetClone.getRoom().getId())
+				|| !Solving.findSuitable(s, examTargetId, originClone.getPeriod().getId(), s.getResult())
+				.contains(originClone.getRoom().getId())) { 
+			//target room isn't suitable
+			return false;
+		} else {
+			//everything OK
+			return true;
+		}
 	}	
 }

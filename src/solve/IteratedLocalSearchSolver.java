@@ -153,7 +153,7 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 	 * @param s
 	 * @return True if it is.
 	 */
-	public boolean isMoveValid(Move move, Solution s) {//TODO:verify that constraints are properly taken into account
+	public boolean isMoveValid(Move move, Solution s) {
 		ResultCouple target = null;
 		ResultCouple origin = null;
 		int examId = -1;
@@ -162,15 +162,27 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 		case SINGLE_MOVE:
 			target = move.getTargets().get(0);
 			examId = move.getExamIds().get(0);
-			return Solving.canHost(s, examId, target.getPeriod().getId(), s.getResult());
+			if (!Solving.canHost(s, examId, target.getPeriod().getId(), s.getResult())) {
+				//period can't host
+				return false;
+			} else if (!Solving.getAvailablePeriod(s, examId, s.getResult())
+					.contains(target.getPeriod().getId())) {
+				//target period is not an available period
+				return false;
+			} else if (!Solving.findSuitable(s, examId, target.getPeriod().getId(), s.getResult())
+					.contains(target.getRoom().getId())) { 
+				//target room isn't suitable
+				return false;
+			} else {
+				//everything OK
+				return true;
+			}
 		case SWAP:
-			target = move.getTargets().get(0);
-			origin = move.getOrigins().get(0);
 			examId = move.getExamIds().get(0);
 			examTargetId = move.getExamIds().get(1);
-			return Moving.canSwap(examId, examTargetId, target, origin, s);
+			return Moving.canSwap(examId, examTargetId, s);
 		case MULTIPLE_MOVES:
-			System.out.println("Not yet implemented"); //TODO:implement it
+			System.err.println("Not yet implemented");
 			break;
 		}
 		return false;

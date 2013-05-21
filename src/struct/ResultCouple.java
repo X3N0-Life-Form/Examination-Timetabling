@@ -47,9 +47,25 @@ public class ResultCouple implements Serializable {
 		this.addExam(e);
 	}
 	
+	/**
+	 * Removes the specified Exam from the exam list.
+	 * @param e {@link Exam} to remove.
+	 */
 	public void removeExam(Exam e){
-		//TODO: update matrixes
 		examList.remove(e);
+	}
+	
+	/**
+	 * Removes the specified Exam from the exam list.
+	 * @param examId Id of the Exam to remove.
+	 */
+	public void removeExam(int examId) {
+		for (Exam e : examList) {
+			if (e.getId() == examId) {
+				examList.remove(e);
+				break;
+			}
+		}
 	}
 	
 	public ArrayList<Exam> getExamList() {
@@ -135,4 +151,24 @@ public class ResultCouple implements Serializable {
 		return true;
 	}
 	
+	/**
+	 * 
+	 * @return The sum of every exam in the ResultCouple
+	 */
+	public int getTotalSize() {
+		int res = 0;
+		for (Exam e : examList) {
+			res += e.getSize();
+		}
+		return res;
+	}
+	
+	public Exam getExam(int examId) {
+		for (Exam e : examList) {
+			if (e.getId() == examId) {
+				return e;
+			}
+		}
+		return null;
+	}
 }

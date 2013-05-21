@@ -304,7 +304,9 @@ public class Solution implements Serializable, Comparable<Solution> {
 		this.examCoincidence = originalSolution.examCoincidence.clone();
 		this.examPeriodModif = originalSolution.examPeriodModif.clone();
 		this.examRoom = originalSolution.examRoom.clone();
+		this.nonPlacedExams = new ArrayList<Exam>(originalSolution.nonPlacedExams);
 		Collections.copy(this.nonPlacedExams, originalSolution.nonPlacedExams);
+		this.result = new ArrayList<ResultCouple>(originalSolution.result);
 		Collections.copy(this.result, originalSolution.result);
 		this.students = (TreeMap<Integer, Student>) originalSolution.students.clone();
 		this.cost = originalSolution.cost;

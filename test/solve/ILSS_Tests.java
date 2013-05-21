@@ -2,6 +2,9 @@ package solve;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -11,6 +14,7 @@ import struct.Exam;
 import struct.Move;
 import struct.ResultCouple;
 import struct.Solution;
+import util.Moving;
 import util.Serialization;
 
 public class ILSS_Tests {
@@ -22,6 +26,13 @@ public class ILSS_Tests {
 	public void setUp() throws Exception {
 		s = Serialization.loadSolution(Serialization.set4SerializedName);
 		solver = new IteratedLocalSearchSolver(s);
+	}
+	
+	@SuppressWarnings("unused")
+	private void printSolutionExams() {
+		for (Exam exam : s.getExamSession().getExamsAsList()) {
+			System.out.println("id=" + exam.getId() + "; size=" + exam.getSize());
+		}
 	}
 
 	//////////////////////
@@ -69,41 +80,54 @@ public class ILSS_Tests {
 		Move move = new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
 		assertTrue(solver.isMoveValid(move, s));
 	}
-	//TODO:the rest
+	
 	/**
 	 * SingleMove not OK - room size
 	 */
 	@Test
 	public void testIsMoveValid_no() {
-		int examId = 0; //size=3
+		int examId = 261; //size=1042
 		ResultCouple origin = s.getResultForExam(examId);
-		ResultCouple target = s.getResult().get(0);
+		ResultCouple target = s.getResultForExam(223);//size=455
 		Move move = new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
 		assertFalse(solver.isMoveValid(move, s));
 	}
-	
+
 	/**
 	 * Swap OK
 	 */
-	@Test @Ignore
+	@Test
 	public void testIsMoveValid_maybe() {
-		int examId = 272; //size=3
+		int examId = 257; //size=1
+		int targetId = 258; //size=1
 		ResultCouple origin = s.getResultForExam(examId);
-		ResultCouple target = s.getResult().get(0);
-		Move move = new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
+		ResultCouple target = s.getResultForExam(targetId);
+		List<Integer> examIds = new ArrayList<Integer>();
+		examIds.add(examId);
+		examIds.add(targetId);
+		Move move = new Move(EMoveType.SWAP, examIds, origin, target);
+		Moving.swapExams(examId, targetId, s);
+		assertTrue(new HardConstraintsValidator().isSolutionValid(s, new Feedback()));
 		assertTrue(solver.isMoveValid(move, s));
 	}
 	
 	/**
 	 * Swap not OK - room size
 	 */
-	@Test @Ignore
+	@Test
 	public void testIsMoveValid_I() {
-		int examId = 272; //size=3
+		int examId = 257; //size=1
+		int targetId = 258; //size=
+		printSolutionExams();
 		ResultCouple origin = s.getResultForExam(examId);
-		ResultCouple target = s.getResult().get(0);
-		Move move = new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
-		assertTrue(solver.isMoveValid(move, s));
+		ResultCouple target = s.getResultForExam(targetId);
+		List<Integer> examIds = new ArrayList<Integer>();
+		examIds.add(examId);
+		examIds.add(targetId);
+		Move move = new Move(EMoveType.SWAP, examIds, origin, target);
+		//Moving.swapExams(examId, targetId, s);
+		//assertTrue(new HardConstraintsValidator().isSolutionValid(s, new Feedback()));
+		//assertTrue(solver.isMoveValid(move, s));
 	}
 	
 	/**
@@ -111,11 +135,11 @@ public class ILSS_Tests {
 	 */
 	@Test @Ignore
 	public void testIsMoveValid_dont() {
-		int examId = 272; //size=3
+		int examId = 3;
 		ResultCouple origin = s.getResultForExam(examId);
-		ResultCouple target = s.getResult().get(0);
+		ResultCouple target = s.getResultForExam(0);
 		Move move = new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
-		assertTrue(solver.isMoveValid(move, s));
+		assertFalse(solver.isMoveValid(move, s));
 	}
 	
 	/**
@@ -125,21 +149,21 @@ public class ILSS_Tests {
 	public void testIsMoveValid_know() {
 		int examId = 272; //size=3
 		ResultCouple origin = s.getResultForExam(examId);
-		ResultCouple target = s.getResult().get(0);
+		ResultCouple target = s.getResultForExam(0);
 		Move move = new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
 		assertTrue(solver.isMoveValid(move, s));
 	}
 	
 	/**
-	 * single not - EXCLUSION
+	 * single not OK - EXCLUSION
 	 */
-	@Test @Ignore
+	@Test
 	public void testIsMoveValid_can() {
-		int examId = 272; //size=3
+		int examId = 6;
 		ResultCouple origin = s.getResultForExam(examId);
-		ResultCouple target = s.getResult().get(0);
+		ResultCouple target = s.getResultForExam(69);
 		Move move = new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
-		assertTrue(solver.isMoveValid(move, s));
+		assertFalse(solver.isMoveValid(move, s));
 	}
 	
 	/**
@@ -149,7 +173,7 @@ public class ILSS_Tests {
 	public void testIsMoveValid_you() {
 		int examId = 272; //size=3
 		ResultCouple origin = s.getResultForExam(examId);
-		ResultCouple target = s.getResult().get(0);
+		ResultCouple target = s.getResultForExam(0);
 		Move move = new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
 		assertTrue(solver.isMoveValid(move, s));
 	}
@@ -161,7 +185,7 @@ public class ILSS_Tests {
 	public void testIsMoveValid_repeat() {
 		int examId = 272; //size=3
 		ResultCouple origin = s.getResultForExam(examId);
-		ResultCouple target = s.getResult().get(0);
+		ResultCouple target = s.getResultForExam(0);
 		Move move = new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
 		assertTrue(solver.isMoveValid(move, s));
 	}
@@ -173,7 +197,7 @@ public class ILSS_Tests {
 	public void testIsMoveValid_the() {
 		int examId = 272; //size=3
 		ResultCouple origin = s.getResultForExam(examId);
-		ResultCouple target = s.getResult().get(0);
+		ResultCouple target = s.getResultForExam(0);
 		Move move = new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
 		assertTrue(solver.isMoveValid(move, s));
 	}
@@ -185,7 +209,7 @@ public class ILSS_Tests {
 	public void testIsMoveValid_question() {
 		int examId = 272; //size=3
 		ResultCouple origin = s.getResultForExam(examId);
-		ResultCouple target = s.getResult().get(0);
+		ResultCouple target = s.getResultForExam(0);
 		Move move = new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
 		assertTrue(solver.isMoveValid(move, s));
 	}
@@ -197,7 +221,7 @@ public class ILSS_Tests {
 	public void testIsMoveValid_urNotTheBossOfMeNow() {
 		int examId = 272; //size=3
 		ResultCouple origin = s.getResultForExam(examId);
-		ResultCouple target = s.getResult().get(0);
+		ResultCouple target = s.getResultForExam(0);
 		Move move = new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
 		assertTrue(solver.isMoveValid(move, s));
 	}
