@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import struct.EMoveType;
+import struct.EPeriodHardConstraint;
 import struct.Exam;
 import struct.Move;
 import struct.ResultCouple;
@@ -162,7 +163,11 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 		case SINGLE_MOVE:
 			target = move.getTargets().get(0);
 			examId = move.getExamIds().get(0);
-			if (!Solving.canHost(s, examId, target.getPeriod().getId(), s.getResult())) {
+			Exam exam = s.getExamSession().getExams().get(examId);
+			if (/*target.getPeriod().getId() != origin.getPeriod().getId()//TODO:this
+					&& */exam.hasPeriodHardConstraint(EPeriodHardConstraint.EXAM_COINCIDENCE)) {
+				return false;
+			} else if (!Solving.canHost(s, examId, target.getPeriod().getId(), s.getResult())) {
 				//period can't host
 				return false;
 			} else if (!Solving.getAvailablePeriod(s, examId, s.getResult())

@@ -2,6 +2,8 @@ package solve;
 
 import static org.junit.Assert.*;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,8 +31,8 @@ public class ILSS_Tests {
 	}
 	
 	@SuppressWarnings("unused")
-	private void printSolutionExams() {
-		for (Exam exam : s.getExamSession().getExamsAsList()) {
+	private void printSolutionExams(Solution solution) {
+		for (Exam exam : solution.getExamSession().getExamsAsList()) {
 			System.out.println("id=" + exam.getId() + "; size=" + exam.getSize());
 		}
 	}
@@ -116,42 +118,49 @@ public class ILSS_Tests {
 	 */
 	@Test
 	public void testIsMoveValid_I() {
-		int examId = 257; //size=1
-		int targetId = 258; //size=
-		printSolutionExams();
+		int examId = 209; //size=5
+		int targetId = 185; //size=631
 		ResultCouple origin = s.getResultForExam(examId);
 		ResultCouple target = s.getResultForExam(targetId);
 		List<Integer> examIds = new ArrayList<Integer>();
 		examIds.add(examId);
 		examIds.add(targetId);
 		Move move = new Move(EMoveType.SWAP, examIds, origin, target);
-		//Moving.swapExams(examId, targetId, s);
-		//assertTrue(new HardConstraintsValidator().isSolutionValid(s, new Feedback()));
-		//assertTrue(solver.isMoveValid(move, s));
+		Moving.swapExams(examId, targetId, s);
+		assertFalse(new HardConstraintsValidator().isSolutionValid(s, new Feedback()));
+		assertFalse(solver.isMoveValid(move, s));
 	}
 	
 	/**
 	 * singleMove not OK - EXAM_COINCIDENCE
 	 */
-	@Test @Ignore
+	@Test
 	public void testIsMoveValid_dont() {
-		int examId = 3;
+		int examId = 108;
 		ResultCouple origin = s.getResultForExam(examId);
 		ResultCouple target = s.getResultForExam(0);
 		Move move = new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
+		Moving.movingSingleExam(examId, s, target.getPeriod().getId(), target.getRoom().getId());
+		assertFalse(new HardConstraintsValidator().isSolutionValid(s, new Feedback()));
 		assertFalse(solver.isMoveValid(move, s));
 	}
 	
 	/**
-	 * swap not - EXAM_COINCIDENCE
+	 * swap not OK - EXAM_COINCIDENCE
 	 */
-	@Test @Ignore
+	@Test
 	public void testIsMoveValid_know() {
-		int examId = 272; //size=3
+		int examId = 108; //size=50 + examCoincidence
+		int targetId = 26; //size=49
 		ResultCouple origin = s.getResultForExam(examId);
-		ResultCouple target = s.getResultForExam(0);
-		Move move = new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
-		assertTrue(solver.isMoveValid(move, s));
+		ResultCouple target = s.getResultForExam(targetId);
+		List<Integer> examIds = new ArrayList<Integer>();
+		examIds.add(examId);
+		examIds.add(targetId);
+		Move move = new Move(EMoveType.SWAP, examIds, origin, target);
+		Moving.swapExams(examId, targetId, s);
+		assertFalse(new HardConstraintsValidator().isSolutionValid(s, new Feedback()));
+		assertFalse(solver.isMoveValid(move, s));
 	}
 	
 	/**
@@ -167,63 +176,98 @@ public class ILSS_Tests {
 	}
 	
 	/**
-	 * swap - EXCLUSION
+	 * swap not OK - EXCLUSION
 	 */
-	@Test @Ignore
+	@Test
 	public void testIsMoveValid_you() {
-		int examId = 272; //size=3
+		int examId = 6; //size=34 --> exclude 122
+		int targetId = 98; //size=34 --> with 122
 		ResultCouple origin = s.getResultForExam(examId);
-		ResultCouple target = s.getResultForExam(0);
-		Move move = new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
-		assertTrue(solver.isMoveValid(move, s));
+		ResultCouple target = s.getResultForExam(targetId);
+		List<Integer> examIds = new ArrayList<Integer>();
+		examIds.add(examId);
+		examIds.add(targetId);
+		Move move = new Move(EMoveType.SWAP, examIds, origin, target);
+		Moving.swapExams(examId, targetId, s);
+		assertFalse(new HardConstraintsValidator().isSolutionValid(s, new Feedback()));
+		assertFalse(solver.isMoveValid(move, s));
 	}
 	
 	/**
 	 * single - AFTER
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
+	 * @throws FileNotFoundException 
 	 */
-	@Test @Ignore
-	public void testIsMoveValid_repeat() {
-		int examId = 272; //size=3
-		ResultCouple origin = s.getResultForExam(examId);
-		ResultCouple target = s.getResultForExam(0);
+	@Test
+	public void testIsMoveValid_repeat() throws FileNotFoundException, ClassNotFoundException, IOException {
+		Solution s1 = Serialization.loadSolution(Serialization.set1SerializedName);
+		int examId = 11; //size=? AFTER 10
+		int targetId = 10;
+		ResultCouple origin = s1.getResultForExam(examId);
+		ResultCouple target = s1.getResultForExam(targetId);
 		Move move = new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
-		assertTrue(solver.isMoveValid(move, s));
+		assertFalse(solver.isMoveValid(move, s1));
 	}
 	
 	/**
 	 * swap - AFTER
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
+	 * @throws FileNotFoundException 
 	 */
-	@Test @Ignore
-	public void testIsMoveValid_the() {
-		int examId = 272; //size=3
-		ResultCouple origin = s.getResultForExam(examId);
-		ResultCouple target = s.getResultForExam(0);
-		Move move = new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
-		assertTrue(solver.isMoveValid(move, s));
+	@Test
+	public void testIsMoveValid_the() throws FileNotFoundException, ClassNotFoundException, IOException {
+		Solution s1 = Serialization.loadSolution(Serialization.set1SerializedName);
+		int examId = 11; //size=? AFTER 10
+		int targetId = 10;
+		ResultCouple origin = s1.getResultForExam(examId);
+		ResultCouple target = s1.getResultForExam(targetId);
+		
+		List<Integer> examIds = new ArrayList<Integer>();
+		examIds.add(examId);
+		examIds.add(targetId);
+		Move move = new Move(EMoveType.SWAP, examIds, origin, target);
+		assertFalse(solver.isMoveValid(move, s1));
 	}
 	
 	/**
 	 * single - ROOM_EXCLUSIVE
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
+	 * @throws FileNotFoundException 
 	 */
-	@Test @Ignore
-	public void testIsMoveValid_question() {
-		int examId = 272; //size=3
-		ResultCouple origin = s.getResultForExam(examId);
-		ResultCouple target = s.getResultForExam(0);
+	@Test
+	public void testIsMoveValid_question() throws FileNotFoundException, ClassNotFoundException, IOException {
+		Solution s2 = Serialization.loadSolution(Serialization.set2SerializedName);
+		int examId = 239; //size=1
+		int targetId = 78;//size=31 --> Room exclusive
+		ResultCouple origin = s2.getResultForExam(examId);
+		ResultCouple target = s2.getResultForExam(targetId);
+		
 		Move move = new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
-		assertTrue(solver.isMoveValid(move, s));
+		assertFalse(solver.isMoveValid(move, s));
 	}
 	
 	/**
 	 * swap - ROOM_EXCLUSIVE
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
+	 * @throws FileNotFoundException 
 	 */
-	@Test @Ignore
-	public void testIsMoveValid_urNotTheBossOfMeNow() {
-		int examId = 272; //size=3
-		ResultCouple origin = s.getResultForExam(examId);
-		ResultCouple target = s.getResultForExam(0);
-		Move move = new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
-		assertTrue(solver.isMoveValid(move, s));
+	@Test
+	public void testIsMoveValid_urNotTheBossOfMeNow() throws FileNotFoundException, ClassNotFoundException, IOException {
+		Solution s2 = Serialization.loadSolution(Serialization.set2SerializedName);
+		int examId = 78; //size=31 --> Room exclusive
+		int targetId = 241;//size=31
+		ResultCouple origin = s2.getResultForExam(examId);
+		ResultCouple target = s2.getResultForExam(targetId);
+		
+		List<Integer> examIds = new ArrayList<Integer>();
+		examIds.add(examId);
+		examIds.add(targetId);
+		Move move = new Move(EMoveType.SWAP, examIds, origin, target);
+		assertFalse(solver.isMoveValid(move, s2));
 	}
 	
 	///////////////////////

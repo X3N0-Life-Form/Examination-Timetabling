@@ -214,6 +214,17 @@ public class Moving {
 		ResultCouple targetClone = s.getResultForExam(examId);
 		ResultCouple originClone = s.getResultForExam(examTargetId);
 		
+		Exam e1 = s.getExamSession().getExams().get(examId);
+		Exam e2 = s.getExamSession().getExams().get(examTargetId);
+		if (targetClone.getPeriod().getId() != originClone.getPeriod().getId()
+				&& (e1.hasPeriodHardConstraint(EPeriodHardConstraint.EXAM_COINCIDENCE)
+						|| e2.hasPeriodHardConstraint(EPeriodHardConstraint.EXAM_COINCIDENCE))) {
+			return false;
+		} else if (e1.getRoomHardConstraint() != null
+				|| e2.getRoomHardConstraint() != null) {
+			return false;
+		}
+		
 		originClone.removeExam(examId);
 		targetClone.removeExam(examTargetId);
 		//derp fuck that shit
