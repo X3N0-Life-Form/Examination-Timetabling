@@ -25,8 +25,6 @@ public class Moving {
 	 * @param targetRoomId
 	 */
 	public static Move movingSingleExam(int examId, Solution s, int targetPeriodId, int targetRoomId){
-		//int firstPeriodId = -1;
-		//int firstRoomId = -1;
 		Exam exam = s.getExamSession().getExams().get(examId);
 		ResultCouple target = null;
 		ResultCouple origin = null;
@@ -35,8 +33,6 @@ public class Moving {
 		for (int i = 0; i < s.getResult().size();i++){
 			for (int j = 0; j < s.getResult().get(i).getExamList().size();j++){
 				if (s.getResult().get(i).getExamList().get(j).getId() == examId){
-					//firstPeriodId = s.getResult().get(i).getPeriod().getId();
-					//firstRoomId = s.getResult().get(i).getRoom().getId();
 					s.getResult().get(i).getExamList().remove(j);
 					origin = s.getResult().get(i);
 					break;
@@ -64,6 +60,50 @@ public class Moving {
 		s.updateStudentRCLists();
 		
 		return new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
+	}
+	
+	public static Move moveExamList(ArrayList<Integer> examList, int targetPeriodId, Solution s, ArrayList<Integer> suitableRooms){
+		
+		ArrayList<ResultCouple> origin = new ArrayList<ResultCouple>();
+		ArrayList<ResultCouple> target = new ArrayList<ResultCouple>();
+		
+		//remove the exam && fills origin
+		for (int i = 0; i < s.getResult().size();i++){
+			for (int j = 0; j < s.getResult().get(i).getExamList().size();j++){
+				for (int examId : examList){
+					if (s.getResult().get(i).getExamList().get(j).getId() == examId){
+						origin.add(s.getResultForExam(examId));
+						s.getResult().get(i).getExamList().remove(j);
+						break;
+					}
+				}
+			}
+			if (origin.size() == examList.size()){
+				break;
+			}
+		}
+		
+		// fills target && place exams
+		for (int i = 0; i < suitableRooms.size(); i++){
+			int roomId = suitableRooms.get(i);
+			for (int j = 0; j< s.getResult().size(); j++){
+				if (s.getResult().get(j).getPeriod().getId() == targetPeriodId 
+					&& roomId == s.getResult().get(j).getRoom().getId()){
+					
+					for (int k = 0 ; k < examList.size(); k++) {
+						if (i == k){
+							Exam exam = s.getExamSession().getExams().get(examList.get(k));
+							s.getResult().get(j).addExam(exam);
+							target.add(s.getResult().get(j));
+							refreshExamPeriod(examList.get(k), targetPeriodId, s);
+						}
+					}					
+				}
+			}
+		}		
+		
+		s.updateStudentRCLists();		
+		return new Move(EMoveType.MULTIPLE_MOVES, examList, origin, target);
 	}
 	
 	/**
