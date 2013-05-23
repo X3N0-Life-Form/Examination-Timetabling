@@ -3,6 +3,9 @@ package util;
 import java.util.ArrayList;
 import java.util.List;
 
+import solve.Feedback;
+import solve.HardConstraintsValidator;
+import solve.SolvingException;
 import struct.EMoveType;
 import struct.EPeriodHardConstraint;
 import struct.Exam;
@@ -23,11 +26,22 @@ public class Moving {
 	 * @param s
 	 * @param targetPeriodId
 	 * @param targetRoomId
+	 * @throws SolvingException 
 	 */
-	public static Move movingSingleExam(int examId, Solution s, int targetPeriodId, int targetRoomId){
+	public static Move movingSingleExam(int examId, Solution s, int targetPeriodId, int targetRoomId) throws SolvingException{
 		Exam exam = s.getExamSession().getExams().get(examId);
 		ResultCouple target = null;
 		ResultCouple origin = null;
+		/////
+		Feedback f = new Feedback();
+		HardConstraintsValidator HCV = new HardConstraintsValidator();
+		if (!HCV .isSolutionValid(s, f)) {
+			System.out.println(f);
+			//System.out.println(s.getResultForExam(17));
+			//System.out.println(s.getResultForExam(4));
+			throw new SolvingException("fuck you move");
+		}
+		/////
 		
 		//remove the exam
 		for (int i = 0; i < s.getResult().size();i++){
@@ -58,6 +72,19 @@ public class Moving {
 
 		//refresh studentTreeMap
 		s.updateStudentRCLists();
+		
+		//////
+		//System.out.println((s.getExamCoincidence()[8][2]));
+		if (!HCV.isSolutionValid(s, f)) {
+			System.out.println(f);
+			//System.out.println(s.getResultForExam(8));
+			//System.out.println(s.getResultForExam(2));
+			System.out.println(examId);
+			System.out.println(origin);
+			System.out.println(target);
+			throw new SolvingException("fuck you move");
+		}
+		//////
 		
 		return new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
 	}
@@ -125,8 +152,10 @@ public class Moving {
 			}
 		}
 		
+		//System.out.println(" first exam "+firstExamId+" seconExamId "+secondExamId);
 		refreshExamPeriod(firstExamId,resSecond.getPeriod().getId(),s);
 		refreshExamPeriod(secondExamId,resFirst.getPeriod().getId(),s);
+		
 		
 		//refresh studentTreeMap
 		s.updateStudentRCLists();
@@ -180,7 +209,7 @@ public class Moving {
 				s.getExamPeriodModif()[i][targetPeriodId] = 0;
 			}
 			if (s.getExamCoincidence()[i][examId] == 0){
-				s.getExamCoincidence()[i][targetPeriodId] = 0;
+				s.getExamPeriodModif()[i][targetPeriodId] = 0;
 			}
 			if (firstPeriodId > 0 && checkConstraints(examId, i, firstPeriodId, s) == true){
 				s.getExamPeriodModif()[i][firstPeriodId] = s.getExamPeriodBase()[i][firstPeriodId];
@@ -244,50 +273,51 @@ public class Moving {
 
 	/**
 	 * See if these exams can be placed in each other's period/room.
-	 * @param examId
-	 * @param examTargetId
+	 * @param firstExamId
+	 * @param secondExamId
 	 * @param solution
 	 * @return True if the specified exams can be swapped.
 	 */
-	public static boolean canSwap(int examId, int examTargetId, Solution solution) {
+	public static boolean canSwap(int firstExamId, int secondExamId, Solution solution) {
 		Solution s = new Solution(solution);
-		ResultCouple targetClone = s.getResultForExam(examId);
-		ResultCouple originClone = s.getResultForExam(examTargetId);
+		ResultCouple firstExamOrigin = s.getResultForExam(firstExamId);
+		ResultCouple secondExamOrigin = s.getResultForExam(secondExamId);
 		
-		Exam e1 = s.getExamSession().getExams().get(examId);
-		Exam e2 = s.getExamSession().getExams().get(examTargetId);
-		if (targetClone.getPeriod().getId() != originClone.getPeriod().getId()
-				&& (e1.hasPeriodHardConstraint(EPeriodHardConstraint.EXAM_COINCIDENCE)
-						|| e2.hasPeriodHardConstraint(EPeriodHardConstraint.EXAM_COINCIDENCE))) {
+		Exam firstExam = s.getExamSession().getExams().get(firstExamId);
+		Exam secondExam = s.getExamSession().getExams().get(secondExamId);
+		if (firstExamOrigin.getPeriod().getId() != secondExamOrigin.getPeriod().getId()
+				&& (firstExam.hasPeriodHardConstraint(EPeriodHardConstraint.EXAM_COINCIDENCE)
+						|| secondExam.hasPeriodHardConstraint(EPeriodHardConstraint.EXAM_COINCIDENCE))) {
 			return false;
-		} else if (e1.getRoomHardConstraint() != null
-				|| e2.getRoomHardConstraint() != null) {
+		} else if (firstExam.getRoomHardConstraint() != null
+				|| secondExam.getRoomHardConstraint() != null) {
 			return false;
 		}
 		
-		originClone.removeExam(examId);
-		targetClone.removeExam(examTargetId);
-		//derp fuck that shit
-		originClone.removeExam(examTargetId);
-		targetClone.removeExam(examId);
-		Moving.refreshExamPeriod(examId, originClone.getPeriod().getId(), s);
-		Moving.refreshExamPeriod(examTargetId, targetClone.getPeriod().getId(), s);
+		secondExamOrigin.removeExam(secondExamId);
+		firstExamOrigin.removeExam(firstExamId);
+		//refresh the targeted examPeriod
+		Moving.refreshExamPeriod(firstExamId, secondExamOrigin.getPeriod().getId(), s);
+		Moving.refreshExamPeriod(secondExamId, firstExamOrigin.getPeriod().getId(), s);
 		
 		//copied from ILSS.isMoveValid
-		if (!Solving.canHost(s, examId, targetClone.getPeriod().getId(), s.getResult())
-				|| !Solving.canHost(s, examTargetId, originClone.getPeriod().getId(), s.getResult())) {
+		if (!Solving.canHost(s, firstExamId, firstExamOrigin.getPeriod().getId(), s.getResult())
+				|| !Solving.canHost(s, secondExamId, secondExamOrigin.getPeriod().getId(), s.getResult())) {
 			//period can't host
 			return false;
-		} else if (!Solving.isPeriodAvailable(s, examId, s.getResult(), targetClone.getPeriod().getId())
-				|| !Solving.isPeriodAvailable(s, examTargetId, s.getResult(), originClone.getPeriod().getId())
+		} else if (!Solving.isPeriodAvailable(s, firstExamId, s.getResult(), firstExamOrigin.getPeriod().getId())
+				|| !Solving.isPeriodAvailable(s, secondExamId, s.getResult(), secondExamOrigin.getPeriod().getId())
 				) {
 			//target period is not an available period
 			return false;
-		} else if (!Solving.findSuitable(s, examId, targetClone.getPeriod().getId(), s.getResult())
-				.contains(targetClone.getRoom().getId())
-				|| !Solving.findSuitable(s, examTargetId, originClone.getPeriod().getId(), s.getResult())
-				.contains(originClone.getRoom().getId())) { 
+		} else if (!Solving.findSuitable(s, firstExamId, firstExamOrigin.getPeriod().getId(), s.getResult())
+				.contains(firstExamOrigin.getRoom().getId())
+				|| !Solving.findSuitable(s, secondExamId, secondExamOrigin.getPeriod().getId(), s.getResult())
+				.contains(secondExamOrigin.getRoom().getId())) { 
 			//target room isn't suitable
+			return false;
+		} else if ((firstExamOrigin.getTotalSize() + s.getExamSession().getExams().get(firstExamId).getSize()) > firstExamOrigin.getRoom().getSize()
+				 || (secondExamOrigin.getTotalSize() + s.getExamSession().getExams().get(secondExamId).getSize()) > secondExamOrigin.getRoom().getSize()) {
 			return false;
 		} else {
 			//everything OK

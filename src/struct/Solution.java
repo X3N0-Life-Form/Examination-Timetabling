@@ -10,6 +10,7 @@ import java.util.TreeMap;
 
 import util.CostCalculator;
 import util.OurArrays;
+import util.OurCollections;
 
 /**
  * 
@@ -121,6 +122,7 @@ public class Solution implements Serializable, Comparable<Solution> {
 		}
 		return res;
 	}
+	
 	/**
 	 * 
 	 * @param periodId
@@ -185,7 +187,6 @@ public class Solution implements Serializable, Comparable<Solution> {
 		/**
 		 * if a student takes exam i & exam j then examCoincidence = 0
 		 */
-		//TODO:something about that loop fest
 		System.out.print("--Finding mutually exclusive exams based on student presence");
 		int loopCounter = 0;
 		for (int i = 0; i < numberOfExams; i++) {
@@ -304,10 +305,8 @@ public class Solution implements Serializable, Comparable<Solution> {
 		this.examCoincidence = originalSolution.examCoincidence.clone();
 		this.examPeriodModif = originalSolution.examPeriodModif.clone();
 		this.examRoom = originalSolution.examRoom.clone();
-		this.nonPlacedExams = new ArrayList<Exam>(originalSolution.nonPlacedExams);
-		Collections.copy(this.nonPlacedExams, originalSolution.nonPlacedExams);
-		this.result = new ArrayList<ResultCouple>(originalSolution.result);
-		Collections.copy(this.result, originalSolution.result);
+		this.nonPlacedExams = OurCollections.manualCloneExam(originalSolution.nonPlacedExams);
+		this.result = OurCollections.manualClone(originalSolution.result);
 		this.students = (TreeMap<Integer, Student>) originalSolution.students.clone();
 		this.cost = originalSolution.cost;
 		//TODO: verify that everything is cloned/copied correctly

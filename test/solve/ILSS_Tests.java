@@ -81,6 +81,8 @@ public class ILSS_Tests {
 		ResultCouple target = s.getResult().get(0);
 		Move move = new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
 		assertTrue(solver.isMoveValid(move, s));
+		//bug hunt
+		assertNotNull(s.getResultForExam(examId));
 	}
 	
 	/**
@@ -111,6 +113,9 @@ public class ILSS_Tests {
 		Moving.swapExams(examId, targetId, s);
 		assertTrue(new HardConstraintsValidator().isSolutionValid(s, new Feedback()));
 		assertTrue(solver.isMoveValid(move, s));
+		//bug hunt
+		assertNotNull(s.getResultForExam(examId));
+		assertNotNull(s.getResultForExam(targetId));
 	}
 	
 	/**
@@ -133,9 +138,10 @@ public class ILSS_Tests {
 	
 	/**
 	 * singleMove not OK - EXAM_COINCIDENCE
+	 * @throws SolvingException 
 	 */
 	@Test
-	public void testIsMoveValid_dont() {
+	public void testIsMoveValid_dont() throws SolvingException {
 		int examId = 108;
 		ResultCouple origin = s.getResultForExam(examId);
 		ResultCouple target = s.getResultForExam(0);
@@ -274,29 +280,150 @@ public class ILSS_Tests {
 	// lookForMoveTarget //
 	///////////////////////
 	
-	@Test @Ignore
-	public void testLookForMoveTarget() {
-		
+	/**
+	 * Normal case.
+	 * @throws MovingException 
+	 */
+	@Test
+	public void testLookForMoveTarget_regular() throws MovingException {
+		List<Move> previousMoves = new ArrayList<Move>();
+		int examId = 0;
+		ResultCouple origin = s.getResultForExam(examId);
+		ResultCouple target = solver.lookForMoveTarget(examId, s, previousMoves);
+		Move move = new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
+		assertTrue(solver.isMoveValid(move, s));
+	}
+	
+	/**
+	 * Giving it a null previousMoves list.
+	 * @throws MovingException 
+	 */
+	@Test
+	public void testLookForMoveTarget_previousMovesNull() throws MovingException {
+		List<Move> previousMoves = null;
+		int examId = 0;
+		ResultCouple origin = s.getResultForExam(examId);
+		ResultCouple target = solver.lookForMoveTarget(examId, s, previousMoves);
+		Move move = new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
+		assertTrue(solver.isMoveValid(move, s));
+	}
+	
+	/**
+	 * Giving it an invalid exam id.
+	 * @throws MovingException 
+	 */
+	@Test(expected=MovingException.class)
+	public void testLookForMoveTarget_invalidExam() throws MovingException {
+		List<Move> previousMoves = new ArrayList<Move>();
+		int examId = 1000;
+		ResultCouple origin = s.getResultForExam(examId);
+		ResultCouple target = solver.lookForMoveTarget(examId, s, previousMoves);
+		Move move = new Move(EMoveType.SINGLE_MOVE, examId, origin, target);
+		solver.isMoveValid(move, s);
 	}
 
 	///////////////////////
 	// lookForSwapTarget //
 	///////////////////////
 	
-	@Test @Ignore
-	public void testLookForSwapTarget() {
+	/**
+	 * Regular
+	 * @throws MovingException 
+	 */
+	@Test
+	public void testLookForSwapTarget_regular() throws MovingException {
+		List<Move> previousMoves = new ArrayList<Move>();
+		int examId = 239; //size=1
+		ResultCouple origin = s.getResultForExam(examId);
+		ResultCouple targetLocation = null;
 		
+		int targetId = solver.lookForSwapTarget(examId, s, previousMoves);
+		
+		List<Integer> examIds = new ArrayList<Integer>();
+		examIds.add(examId);
+		examIds.add(targetId);
+		targetLocation = s.getResultForExam(targetId);
+		
+		Move move = new Move(EMoveType.SWAP, examIds, origin, targetLocation);
+		assertTrue(targetId != -1);
+		System.out.println(targetId);
+		System.out.println(s.getResultForExam(206));
+		System.out.println(examIds);
+		assertNotNull(targetLocation);
+		assertTrue(solver.isMoveValid(move, s));
 	}
 
+	/**
+	 * Null previousMoves
+	 * @throws MovingException 
+	 */
+	@Test
+	public void testLookForSwapTarget_previousMovesNull() throws MovingException {
+		List<Move> previousMoves = null;
+		int examId = 239; //size=1
+		ResultCouple origin = s.getResultForExam(examId);
+		ResultCouple targetLocation = null;
+		
+		int targetId = solver.lookForSwapTarget(examId, s, previousMoves);
+		
+		List<Integer> examIds = new ArrayList<Integer>();
+		examIds.add(examId);
+		examIds.add(targetId);
+		targetLocation = s.getResultForExam(targetId);
+		
+		Move move = new Move(EMoveType.SWAP, examIds, origin, targetLocation);
+		assertTrue(targetId != -1);
+		assertNotNull(targetLocation);
+		assertTrue(solver.isMoveValid(move, s));
+	}
 
-
-	
-
-
+	/**
+	 * Invalid examId
+	 * @throws MovingException 
+	 */
+	@Test(expected=MovingException.class)
+	public void testLookForSwapTarget_invalidExam() throws MovingException {
+		List<Move> previousMoves = new ArrayList<Move>();
+		int examId = 1000;
+		ResultCouple origin = s.getResultForExam(examId);
+		ResultCouple targetLocation = null;
+		
+		int targetId = solver.lookForSwapTarget(examId, s, previousMoves);
+		
+		List<Integer> examIds = new ArrayList<Integer>();
+		examIds.add(examId);
+		examIds.add(targetId);
+		targetLocation = s.getResultForExam(targetId);
+		
+		Move move = new Move(EMoveType.SWAP, examIds, origin, targetLocation);
+		solver.isMoveValid(move, s);
+	}
 
 	/////////////////
 	// the big one //
 	/////////////////
+	
+	/**
+	 * Play with stop conditions - stopCounter
+	 * @throws SolvingException Something fucked up.
+	 */
+	@Test
+	public void testSolve_stopAfterTwoLoops() throws SolvingException {
+		solver.setStopConditions(2, -1);
+		solver.solve();
+		//assert ends really fast
+	}
+	
+	/**
+	 * Play with stop conditions - stopTime
+	 * @throws SolvingException Idem.
+	 */
+	@Test @Ignore
+	public void testSolve_stopAfterFiveSeconds() throws SolvingException {
+		solver.setStopConditions(-1, 5000);
+		solver.solve();
+		//assert ends after twenty seconds
+	}
 	
 	@Test @Ignore
 	public void testSolve() {

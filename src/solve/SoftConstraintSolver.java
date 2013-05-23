@@ -19,8 +19,9 @@ public abstract class SoftConstraintSolver implements Solver {
 	 * @param s
 	 * @param previousMoves
 	 * @return An acceptable period/room.
+	 * @throws MovingException 
 	 */
-	public abstract ResultCouple lookForMoveTarget(int examId, Solution s, List<Move> previousMoves);
+	public abstract ResultCouple lookForMoveTarget(int examId, Solution s, List<Move> previousMoves) throws MovingException;
 	
 	/**
 	 * Look for one or more room/period to move the specified exams in.
@@ -34,11 +35,11 @@ public abstract class SoftConstraintSolver implements Solver {
 	/**
 	 * Look for an exam the can safely be swapped with the specified exam 
 	 * @param examId
-	 * @param targetLocation The location of the target exam, or null.
 	 * @param s
 	 * @param previousMoves
 	 * @return The target exam id, or -1.
+	 * @throws MovingException 
 	 */
-	public abstract int lookForSwapTarget(int examId, ResultCouple targetLocation, Solution s, List<Move> previousMoves);
+	public abstract int lookForSwapTarget(int examId, Solution s, List<Move> previousMoves) throws MovingException;
 	
 }

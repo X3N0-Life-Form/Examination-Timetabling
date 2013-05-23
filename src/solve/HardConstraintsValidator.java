@@ -9,7 +9,7 @@ import struct.ResultCouple;
 import struct.Solution;
 
 public class HardConstraintsValidator implements Validator {
-
+	
 	@Override
 	public boolean isSolutionValid(Solution s, Feedback feedback) {
 		boolean res = true;
@@ -59,11 +59,6 @@ public class HardConstraintsValidator implements Validator {
 						}
 						if(periodAfter <= periodBefore) {
 							notAfter = true;
-							System.out.println("exam after " +afterId);
-							System.out.println("period after " +periodAfter);
-							System.out.println("exam before " +beforeId);
-							System.out.println("period before " + periodBefore);
-							
 						}
 					}
 					
@@ -137,26 +132,21 @@ public class HardConstraintsValidator implements Validator {
 				for (int j =0; j < s.getExamSession().getExams().size();j++ ){
 					boolean present = false;
 					// if exam i & j cannot take place at the same time
-					if (coincidence[currentRC.getExamList().get(i).getId()][j] == 0) 
+					if (coincidence[currentRC.getExamList().get(i).getId()][j] == 0) {
 						// check if exam j is present 
 						for(int k = 0; k < currentRC.getExamList().size();k++){
 							// if id is found : present = true
 							if (currentRC.getExamList().get(k).getId() == j) {
 								present = true;
-								/*
-								System.out.println("present! --> id=" + j +" " + current.getExamList().get(i).getId());
-								for (Integer kStudent: current.getExamList().get(k).getStudents()) {
-									if (s.getExamSession().getExams().get(j).getStudents().contains(kStudent)) {
-										System.out.println("  Found one! --> " + kStudent);
-									}
-								}
-								 */
+								break;
 							}
 						}
+					}
 					// if present, id's found => false because of the exclusion
 					if (present) {
 						res = false;
-						feedback.addItem(currentRC, Feedback.EXCLUSION_VIOLATION);
+						feedback.addItem(currentRC, Feedback.EXCLUSION_VIOLATION
+								+ "exam " + i + " and exam " + j);
 					}
 				}
 			}

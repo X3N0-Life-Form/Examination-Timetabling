@@ -9,6 +9,7 @@ import struct.Exam;
 import struct.ExamSession;
 import struct.ResultCouple;
 import struct.Solution;
+import util.OurCollections;
 import util.Solving;
 
 /**
@@ -63,7 +64,7 @@ public class HardConstraintsSolver {
 
 	public Solution solve() throws SolvingException {
 		System.out.println("Solving hard constraints:");
-		List <ResultCouple> res = Solving.manualClone(s.getResult());
+		List <ResultCouple> res = OurCollections.manualClone(s.getResult());
 		List <Exam> NPE = s.getNonPlacedExams();
 		System.out.println("--Found " + NPE.size() + " non placed exams");
 

@@ -32,10 +32,13 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 	 * In milliseconds. Default is two hours
 	 */
 	private int stopTime = 7200000;//now that's badass
+	
+	private HardConstraintsValidator HCV;
 
 	public IteratedLocalSearchSolver(Solution originalSolution) {
 		super();
 		this.originalSolution = originalSolution;
+		HCV = new HardConstraintsValidator();
 	}
 
 	public Solution getOriginalSolution() {
@@ -46,65 +49,139 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 		this.originalSolution = originalSolution;
 	}
 
-	@SuppressWarnings("null")
+	
 	@Override
 	public Solution solve() throws SolvingException {
 		System.out.println("Beginning iterated local search solving");
-		if (areStopConditionsSet())
+		if (!areStopConditionsSet())
 			throw new SolvingException("Stop conditions were not set");
 		Solution s = new Solution(originalSolution);
+		CostCalculator.calculateCost(originalSolution);
 		List<Solution> solutions = new LinkedList<Solution>();
 		startTime = Calendar.getInstance();
+		int adds = 0;
+		Feedback feedback = new Feedback();
+		if (!HCV.isSolutionValid(s, feedback)) {
+			System.out.println(feedback);
+			throw new SolvingException("The provided Solution is invalid.");
+		}
 		
 		System.out.println("--Beginning main loop: startTime=" + startTime);
 		System.out.println("--Stop conditions:");
 		if (stopCounter > 0)
-			System.out.println("----stopCounter=" + stopCounter);;
+			System.out.println("----stopCounter=" + stopCounter);
 		if (stopTime > 0)
-			System.out.println("----stopTime=" + stopTime);;
+			System.out.println("----stopTime=" + stopTime);
+		
 		while (updateMainLoopStatus()) {
 			Solution currentSolution = new Solution(s);
 			int currentCost = CostCalculator.calculateCost(currentSolution);
 			List<Move> currentMoves = new ArrayList<Move>();
 			Move move = null;
 			System.out.println("--Current cost=" + currentCost);
+			
 			//try to move each exam
 			for (Integer examId : currentSolution.getExamSession().getExams().navigableKeySet()) {
+				////////////////////////
+				if (examId == 0)
+					continue;
+				////////////////////////
 				System.out.println("----Processing exam " + examId);
 				int swapId = -1;
 				
-				ResultCouple target = lookForMoveTarget(examId, s, currentMoves);
+				ResultCouple target = null;
+				move = null;
+				/////////////////
+				// single move //
+				/////////////////
+				try {
+					target = lookForMoveTarget(examId, currentSolution, currentMoves);
+				} catch (MovingException e) {
+					throw new SolvingException("Invalid examId provided to IteratedLocalSearchSolver.lookForMoveTarget:" + examId);
+				}
 				if (target != null) {
 					System.out.println("------Found a move target: periodId=" + target.getPeriod().getId()
 							+ "; roomId=" + target.getRoom().getId());
+					System.out.println("avant:"+target);
 					move = Moving.movingSingleExam(examId, currentSolution, target.getPeriod().getId(), target.getRoom().getId());
-				} else if ((swapId  = lookForSwapTarget(examId, target, s, currentMoves)) != -1) {
-					System.out.println("------Found a swap target: " +
-							"examId=" + swapId
-							+ "; periodId=" + target.getPeriod().getId()
-							+ "; roomId=" + target.getRoom().getId());
-					move = Moving.swapExams(examId, swapId, currentSolution);
-				} else {
+					System.out.println("après:"+target);
+					////////
+					Feedback f = new Feedback();
+					if (!HCV.isSolutionValid(currentSolution, f)) {
+						System.out.println(f);
+						System.out.println(currentSolution.getResultForExam(17));
+						System.out.println(currentSolution.getResultForExam(4));
+						throw new SolvingException("fuck you move");
+					}
+					///////
+				}
+				//////////
+				// swap //
+				//////////
+				if (target == null) {
+					try {
+						swapId = lookForSwapTarget(examId, currentSolution, currentMoves);
+						target = s.getResultForExam(swapId);
+					} catch (MovingException e) {
+						throw new SolvingException("Invalid examId provided to IteratedLocalSearchSolver.lookForSwapTarget:" + examId);
+					}
+					if (swapId != -1) {
+						System.out.println("------Found a swap target: " +
+								"examId=" + swapId
+								+ "; periodId=" + target.getPeriod().getId()
+								+ "; roomId=" + target.getRoom().getId());
+						move = Moving.swapExams(examId, swapId, currentSolution);
+						////////
+						Feedback f = new Feedback();
+						if (!HCV.isSolutionValid(currentSolution, f)) {
+							System.out.println(f);
+							throw new SolvingException("fuck you swap");
+						}
+						///////
+					}
+				}
+				//still null --> found nothing
+				if (target == null) {
 					System.out.println("------No target found - moving on");
 					continue;
 				}
+				
 				System.out.println("------Saving tested move");
 				currentMoves.add(move);
 				//exam moved --> save solution if lower cost
 				if (CostCalculator.calculateCost(currentSolution) < currentCost) {
-					System.out.println("------Cost inferior to previous Solution - saving");
-					solutions.add(currentSolution);
+					System.out.println("------Cost inferior to previous Solution");
+					feedback = new Feedback();
+					if (HCV.isSolutionValid(currentSolution, feedback)) {
+						System.out.println("------Solution is valid - saving");
+						adds++;
+						solutions.add(currentSolution);
+					} else {
+						System.out.println("------Solution is invalid - ignoring");
+						System.err.println("------" + feedback);
+					}
 				} else {
 					System.out.println("------Cost superior to previous Solution - ignoring");
 				}
 			}
+			
 			System.out.println("----Finished looping through the exam list - analyzing");
+			
 			if (solutions.isEmpty()) {
 				System.out.println("----Solution list is empty - exiting loop");
 				break;
 				//TODO: look for another path?
 			} else {
+				System.out.println("----Sorting the Solutions");
 				Collections.sort(solutions);
+				
+				System.out.println("----Verifying the validity of each Solution");
+				for (Solution cs : solutions) {
+					if (!new HardConstraintsValidator().isSolutionValid(cs, new Feedback())) {
+						throw new SolvingException("Found an invalid Solution.");
+					}
+				}
+				
 				s = solutions.get(0);
 				System.out.println("----Found the least costly Solution - moving to next iteration");
 			}
@@ -113,6 +190,9 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 		
 		if (s.equals(originalSolution))
 			System.err.println("--Warning: result Solution is identical to original Solution");
+		System.out.println("--Added " + adds + " Solutions");
+		System.out.println("--Original Solution cost=\t" + originalSolution.getCost());
+		System.out.println("--Final Solution cost=\t\t" + CostCalculator.calculateCost(s));
 		return s;
 	}
 
@@ -127,8 +207,8 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 
 	/**
 	 * Sets the stop conditions.
-	 * @param stopCounter negative value to disable
-	 * @param stopTime negative value to disable
+	 * @param stopCounter Number of loop. Negative value to disable.
+	 * @param stopTime Run time, in milliseconds. Negative value to disable.
 	 */
 	public void setStopConditions(int stopCounter, int stopTime) {
 		this.stopCounter = stopCounter;
@@ -178,6 +258,8 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 					.contains(target.getRoom().getId())) { 
 				//target room isn't suitable
 				return false;
+			} else if ((target.getTotalSize() + s.getExamSession().getExams().get(examId).getSize()) > target.getRoom().getSize()) {
+				return false;
 			} else {
 				//everything OK
 				return true;
@@ -194,10 +276,16 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 	}
 	
 	@Override
-	public ResultCouple lookForMoveTarget(int examId, Solution s, List<Move> previousMoves) {
+	public ResultCouple lookForMoveTarget(int examId, Solution s, List<Move> previousMoves) throws MovingException {
 		ResultCouple target = null;
+		ResultCouple origin = s.getResultForExam(examId);
+		if (previousMoves == null) {
+			previousMoves = new ArrayList<Move>();
+		} else if (origin == null) {
+			throw new MovingException("Invalid examId:" + examId);
+		}
 		for (ResultCouple rc : s.getResult()) {
-			Move simulatedMove = new Move(EMoveType.SINGLE_MOVE, examId, s.getResultForExam(examId), rc);
+			Move simulatedMove = new Move(EMoveType.SINGLE_MOVE, examId, origin, rc);
 			if (previousMoves.contains(simulatedMove)) {
 				continue;
 			}
@@ -215,17 +303,29 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 	}
 
 	@Override
-	public int lookForSwapTarget(int examId, ResultCouple targetLocation, Solution s, List<Move> previousMoves) {
+	public int lookForSwapTarget(int examId, Solution s, List<Move> previousMoves) throws MovingException {
 		List<Integer> examIds = new ArrayList<Integer>();
 		examIds.add(examId);
+		if (previousMoves == null) {
+			previousMoves = new ArrayList<Move>();
+		}
 		ResultCouple origin = s.getResultForExam(examId);
+		if (origin == null) {
+			throw new MovingException("Invalid examId:" + examId);
+		}
+		
 		for (ResultCouple rc : s.getResult()) {
 			for (Exam currentExam : rc.getExamList()) {
-				examIds.add(currentExam.getId());
+				int targetId = currentExam.getId();
+				if (targetId != examId) {
+					examIds.add(targetId);
+				} else {
+					continue;
+				}
+				
 				Move simulatedMove = new Move(EMoveType.SWAP, examIds, origin, rc);
 				if (isMoveValid(simulatedMove, s)) {
-					targetLocation = rc;
-					return currentExam.getId();
+					return targetId;
 				} else {
 					examIds.remove(1);
 				}

@@ -23,29 +23,8 @@ public class Solving {
 	 */
 	protected static int MAX_GET_AVAILABLE_PERIOD = 9;
 
-	/**
-	 * Manually clones a list and its contents.
-	 * @param resIn
-	 * @return A list containing clones of resIn's elements.
-	 */
-	public static ArrayList<ResultCouple> manualClone(List<ResultCouple> resIn) {
-		ArrayList<ResultCouple> res = new ArrayList<ResultCouple>();
-		for (ResultCouple toClone : resIn) {
-			res.add(toClone.clone());
-		}//manual cloning - lol
-		return res;
-	}
-	
-	public static ArrayList<Exam> manualCloneExam(List<Exam> resIn) {
-		ArrayList<Exam> res = new ArrayList<Exam>();
-		for (Exam toClone : resIn) {
-			res.add(toClone.clone());
-		}//manual cloning - lol
-		return res;
-	}
-	
 	public static boolean canHost(Solution s, int examId, int periodId, List<ResultCouple> resIn) {
-		ArrayList<ResultCouple> res = manualClone(resIn);
+		ArrayList<ResultCouple> res = OurCollections.manualClone(resIn);
 		boolean canHost = false;
 		boolean isExclusive;
 		
@@ -93,15 +72,6 @@ public class Solving {
 					if (examSizeSum + sizeExam <= res.get(i).getRoom().getSize() && !isExclusive ) {
 						canHost = true;						
 					}
-					///////////////////////////////
-					if (examId == 258) {
-						System.out.println(examSizeSum);
-						System.out.println(sizeExam);
-						System.out.println(res.get(i).getRoom().getSize());
-						System.out.println(canHost);
-						
-					}
-					///////////////////////////////
 				}
 			}
 		}
@@ -118,7 +88,7 @@ public class Solving {
 		boolean tmp = false;
 		@SuppressWarnings("unchecked")
 		ArrayList<Integer> e = (ArrayList<Integer>) ((ArrayList<Integer>) exams).clone();
-		ArrayList<ResultCouple> res = manualClone(resIn);
+		ArrayList<ResultCouple> res = OurCollections.manualClone(resIn);
 		
 		int numberOfExams = exams.size();
 		int index;
@@ -209,7 +179,7 @@ public class Solving {
 	 *  List of exams satisfying the swap prerequisites.
 	 */
 	public static boolean canSwap(Solution s, int examId, List<ResultCouple> resIn, ResultCouple returnCouple, List<Integer> returnList){
-		List<ResultCouple> res = manualClone(resIn);
+		List<ResultCouple> res = OurCollections.manualClone(resIn);
 		int sizeExam = -1;
 		List<Exam> listExams = new ArrayList<Exam>(); 
 		List<Integer> currentList = new ArrayList<Integer>();
@@ -236,7 +206,7 @@ public class Solving {
 			System.out.println("period : " + periodId + "roomSize :" +roomSize);
 			// if period is OK & size is OK
 			if (sizeExam <= roomSize && s.getExamPeriodModif()[examId][periodId]!=0){
-				listExams = manualCloneExam(res.get(i).getExamList());
+				listExams = OurCollections.manualCloneExam(res.get(i).getExamList());
 				int currentSum = 0;
 				currentList = new ArrayList<Integer>();
 				for (int j = 0; j< listExams.size() ; j++){
@@ -351,7 +321,7 @@ public class Solving {
 		List<Integer> list = new ArrayList<Integer>();
 		@SuppressWarnings("unchecked")
 		ArrayList<Integer> examsClone = (ArrayList<Integer>) ((ArrayList<Integer>) exams).clone();
-		ArrayList<ResultCouple> res = manualClone(resIn);
+		ArrayList<ResultCouple> res = OurCollections.manualClone(resIn);
 		
 		ArrayList<Integer> isAdd = new ArrayList<Integer>();
 		

@@ -8,6 +8,7 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 
+import solve.SolvingException;
 import struct.ResultCouple;
 import struct.Solution;
 
@@ -21,7 +22,7 @@ public class MovingTests {
 	}
 
 	@Test
-	public void movingSingleExam() {
+	public void movingSingleExam() throws SolvingException {
 		int examId = 0;
 		ResultCouple rc = s.getResultForExam(examId);
 		int targetPeriodId = 5;
