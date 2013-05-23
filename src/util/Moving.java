@@ -43,19 +43,7 @@ public class Moving {
 		}
 		/////
 		
-		//remove the exam
-		for (int i = 0; i < s.getResult().size();i++){
-			for (int j = 0; j < s.getResult().get(i).getExamList().size();j++){
-				if (s.getResult().get(i).getExamList().get(j).getId() == examId){
-					s.getResult().get(i).getExamList().remove(j);
-					origin = s.getResult().get(i);
-					break;
-				}
-			}
-			if (origin != null) {
-				break;
-			}
-		}
+		origin = removeAndReturnRes(examId, s);
 		
 		//place the exam in another	period
 		for (int i = 0 ; i < s.getResult().size();i++){

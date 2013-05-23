@@ -178,6 +178,7 @@ public class HardConstraintsSolver {
 
 		//place exams (for real)	
 		System.out.println("--Final res:" + res);
+	
 		s.setResult((ArrayList<ResultCouple>) res);
 		s.updateStudentRCLists();
 		return s;
