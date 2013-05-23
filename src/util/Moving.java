@@ -304,8 +304,8 @@ public class Moving {
 				.contains(secondExamOrigin.getRoom().getId())) { 
 			//target room isn't suitable
 			return false;
-		} else if ((firstExamOrigin.getTotalSize() + s.getExamSession().getExams().get(firstExamId).getSize()) > firstExamOrigin.getRoom().getSize()
-				 || (secondExamOrigin.getTotalSize() + s.getExamSession().getExams().get(secondExamId).getSize()) > secondExamOrigin.getRoom().getSize()) {
+		} else if ((firstExamOrigin.getTotalSize() + s.getExamSession().getExams().get(secondExamId).getSize()) > firstExamOrigin.getRoom().getSize()
+				 || (secondExamOrigin.getTotalSize() + s.getExamSession().getExams().get(firstExamId).getSize()) > secondExamOrigin.getRoom().getSize()) {
 			return false;
 		} else {
 			//everything OK
