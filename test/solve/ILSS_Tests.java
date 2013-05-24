@@ -406,11 +406,16 @@ public class ILSS_Tests {
 	/**
 	 * Play with stop conditions - stopCounter
 	 * @throws SolvingException Something fucked up.
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
+	 * @throws FileNotFoundException 
 	 */
 	@Test
-	public void testSolve_stopAfterTwoLoops() throws SolvingException {
-		solver.setStopConditions(2, -1);
-		solver.solve();
+	public void testSolve_stopAfterTwoLoops() throws SolvingException, FileNotFoundException, ClassNotFoundException, IOException {
+		Solution s1 = Serialization.loadSolution(Serialization.set1SerializedName);
+		IteratedLocalSearchSolver solver1 = new IteratedLocalSearchSolver(s1);
+		solver1.setStopConditions(2, -1);
+		solver1.solve();
 		//assert ends really fast
 	}
 	

@@ -179,6 +179,8 @@ public class Moving {
 				s.getExamPeriodModif()[i][firstPeriodId] = s.getExamPeriodBase()[i][firstPeriodId];
 			}
 		}
+		
+		Updater.updateValidPeriods(examId, targetPeriodId, s);
 	}
 	
 	

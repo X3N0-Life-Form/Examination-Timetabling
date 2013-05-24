@@ -13,6 +13,7 @@ import struct.Move;
 import struct.ResultCouple;
 import struct.Solution;
 import util.CostCalculator;
+import util.Debugging;
 import util.Moving;
 import util.Solving;
 
@@ -103,16 +104,16 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 				if (target != null) {
 					System.out.println("------Found a move target: periodId=" + target.getPeriod().getId()
 							+ "; roomId=" + target.getRoom().getId());
-					System.out.println("avant:"+target);
 					move = Moving.movingSingleExam(examId, currentSolution, target.getPeriod().getId(), target.getRoom().getId());
-					System.out.println("après:"+target);
 					////////
 					Feedback f = new Feedback();
-					if (!HCV.isSolutionValid(currentSolution, f)) {
+					if (Debugging.debug && !HCV.isSolutionValid(currentSolution, f)) {
 						System.out.println(f);
-						System.out.println(currentSolution.getResultForExam(17));
-						System.out.println(currentSolution.getResultForExam(4));
-						throw new SolvingException("fuck you move");
+						System.out.println(currentSolution.getExamPeriodModif()[417][31]);
+						System.out.println(currentSolution.getExamPeriodModif()[417][17]);
+						System.out.println(currentSolution.getExamPeriodModif()[418][31]);
+						System.out.println(currentSolution.getExamPeriodModif()[418][17]);
+						throw new SolvingException("Move error");
 					}
 					///////
 				}
@@ -135,9 +136,9 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 						move = Moving.swapExams(examId, swapId, currentSolution);
 						////////
 						Feedback f = new Feedback();
-						if (!HCV.isSolutionValid(currentSolution, f)) {
+						if (Debugging.debug && !HCV.isSolutionValid(currentSolution, f)) {
 							System.out.println(f);
-							throw new SolvingException("fuck you swap");
+							throw new SolvingException("Swap error");
 						}
 						///////
 					}
