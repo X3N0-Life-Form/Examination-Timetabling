@@ -10,6 +10,7 @@ import struct.EMoveType;
 import struct.EPeriodHardConstraint;
 import struct.Exam;
 import struct.Move;
+import struct.PeriodHardConstraint;
 import struct.ResultCouple;
 import struct.Solution;
 import util.CostCalculator;
@@ -251,6 +252,8 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 			if (/*target.getPeriod().getId() != origin.getPeriod().getId()//TODO:this
 					&& */exam.hasPeriodHardConstraint(EPeriodHardConstraint.EXAM_COINCIDENCE)) {
 				return false;
+			} else if (exam.hasPeriodHardConstraint(EPeriodHardConstraint.AFTER) && !checkAfter(examId, target, s)) {
+				return false;
 			} else if (!Solving.canHost(s, examId, target.getPeriod().getId(), s.getResult())) {
 				//period can't host
 				return false;
@@ -279,6 +282,35 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 		return false;
 	}
 	
+	/**
+	 * Check an exam's AFTER constraints regarding a specified target ResultCouple.
+	 * @param examId
+	 * @param target
+	 * @param s
+	 * @return True if the exam can be put in the RC.
+	 */
+	public boolean checkAfter(int examId, ResultCouple target, Solution s) {
+		Exam exam = s.getExamSession().getExams().get(examId);
+		for (PeriodHardConstraint phc : exam.getConstraints()) {
+			if (phc.getConstraint() == EPeriodHardConstraint.AFTER) {
+				int beforeId = phc.getE2Id();
+				int afterId = phc.getE1Id();
+				for (Exam et : target.getExamList()) {
+					if (et.getId() == beforeId || et.getId() == afterId) {
+						return false;
+					} else if (beforeId != examId
+							&& s.getResultForExam(beforeId).getPeriod().getId() >= target.getPeriod().getId()) {
+						return false;
+					} else if (afterId != examId
+							&& s.getResultForExam(afterId).getPeriod().getId() <= target.getPeriod().getId()) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
+
 	@Override
 	public ResultCouple lookForMoveTarget(int examId, Solution s, List<Move> previousMoves) throws MovingException {
 		ResultCouple target = null;
