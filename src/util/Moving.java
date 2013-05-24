@@ -10,6 +10,7 @@ import struct.EMoveType;
 import struct.EPeriodHardConstraint;
 import struct.Exam;
 import struct.Move;
+import struct.PeriodHardConstraint;
 import struct.ResultCouple;
 import struct.Solution;
 
@@ -128,6 +129,19 @@ public class Moving {
 	 * @param s
 	 */
 	public static Move swapExams(int firstExamId, int secondExamId, Solution s){
+		////////
+		HardConstraintsValidator HCV = new HardConstraintsValidator();
+		Feedback f = new Feedback();
+		if (firstExamId == 15 || secondExamId == 197 || firstExamId == 197 || secondExamId == 15
+				|| firstExamId == 158 || secondExamId == 158) {
+			//System.out.println("vlix " + s.getExamCoincidence()[60][197] + " ; " + s.getExamCoincidence()[60][158]);
+			//System.out.println("EP " + s.getExamPeriodModif()[60][13]);
+			//System.out.println("ER " + s.getExamRoom()[60][0]);
+			System.out.println("just entered:" + HCV.isSolutionValid(s, f));
+			System.out.println(f);
+		}
+		////////
+		
 		ResultCouple resFirst = removeAndReturnRes(firstExamId, s);
 		ResultCouple resSecond = removeAndReturnRes(secondExamId, s);
 				
@@ -140,17 +154,26 @@ public class Moving {
 			}
 		}
 		
-		//System.out.println(" first exam "+firstExamId+" seconExamId "+secondExamId);
 		refreshExamPeriod(firstExamId,resSecond.getPeriod().getId(),s);
 		refreshExamPeriod(secondExamId,resFirst.getPeriod().getId(),s);
-		
 		
 		//refresh studentTreeMap
 		s.updateStudentRCLists();
 		
+		//preparing to save the move
 		List<Integer> idList = new ArrayList<Integer>();
 		idList.add(firstExamId);
 		idList.add(secondExamId);
+		////////
+		if (firstExamId == 15 || secondExamId == 197 || firstExamId == 197 || secondExamId == 15
+				|| firstExamId == 158 || secondExamId == 158) {
+			//System.out.println("vlix " + s.getExamCoincidence()[60][197] + " ; " + s.getExamCoincidence()[60][158]);
+			//System.out.println("EP " + s.getExamPeriodModif()[60][13]);
+			//System.out.println("ER " + s.getExamRoom()[60][0]);
+			System.out.println("before exiting:" + HCV.isSolutionValid(s, f));
+			System.out.println(f);
+		}
+		////////
 		return new Move(EMoveType.SWAP, idList, resFirst, resSecond);
 	}
 	
@@ -307,9 +330,47 @@ public class Moving {
 		} else if ((firstExamOrigin.getTotalSize() + s.getExamSession().getExams().get(secondExamId).getSize()) > firstExamOrigin.getRoom().getSize()
 				 || (secondExamOrigin.getTotalSize() + s.getExamSession().getExams().get(firstExamId).getSize()) > secondExamOrigin.getRoom().getSize()) {
 			return false;
-		} else {
+		}/* else if (!checkSwapExclusion(firstExam, secondExam, firstExamOrigin, secondExamOrigin, s)) { 
+			return false;
+		}*/ else {
 			//everything OK
 			return true;
 		}
+	}
+
+	/**
+	 * 
+	 * @param firstExam
+	 * @param secondExam
+	 * @return True if the exams aren't mutually exclusive.
+	 */
+	private static boolean checkSwapExclusion(Exam firstExam, Exam secondExam,
+			ResultCouple firstExamOrigin, ResultCouple secondExamOrigin, Solution s) {
+		
+		//first exam's RC can't host the second
+		for (Exam exam : firstExamOrigin.getExamList()) {
+			//check constraints
+			for (PeriodHardConstraint phc : exam.getConstraints()) {
+				if (phc.getConstraint() == EPeriodHardConstraint.EXCLUSION
+						&& (phc.getE1Id() == secondExam.getId() || phc.getE2Id() == secondExam.getId())) {
+					return false;
+				}
+			}
+			//check matrix
+		}
+		
+		//second exam's RC can't host the first
+		for (Exam exam : secondExamOrigin.getExamList()) {
+			//check constraints
+			for (PeriodHardConstraint phc : exam.getConstraints()) {
+				if (phc.getConstraint() == EPeriodHardConstraint.EXCLUSION
+						&& (phc.getE1Id() == firstExam.getId() || phc.getE2Id() == firstExam.getId())) {
+					return false;
+				}
+			}
+			//check matrix
+		}
+		
+		return true;
 	}	
 }

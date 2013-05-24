@@ -126,6 +126,7 @@ public class HardConstraintsValidator implements Validator {
 			//check EXCLUSION
 			// coincidence matrix
 			int [][] coincidence = s.getExamCoincidence();
+			int evilExamId = -1;
 
 			for (int i = 0; i< currentRC.getExamList().size(); i++){
 				// matrix
@@ -137,6 +138,7 @@ public class HardConstraintsValidator implements Validator {
 						for(int k = 0; k < currentRC.getExamList().size();k++){
 							// if id is found : present = true
 							if (currentRC.getExamList().get(k).getId() == j) {
+								evilExamId = currentRC.getExamList().get(i).getId();
 								present = true;
 								break;
 							}
@@ -146,7 +148,7 @@ public class HardConstraintsValidator implements Validator {
 					if (present) {
 						res = false;
 						feedback.addItem(currentRC, Feedback.EXCLUSION_VIOLATION
-								+ "exam " + i + " and exam " + j);
+								+ "exam " + evilExamId + " and exam " + j);
 					}
 				}
 			}

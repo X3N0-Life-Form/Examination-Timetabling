@@ -67,6 +67,14 @@ public class Solution implements Serializable, Comparable<Solution> {
 		this.examPeriodBase = examPeriod;
 	}
 	
+	public int[][] getExamRoom() {
+		return examRoom;
+	}
+
+	public void setExamRoom(int[][] examRoom) {
+		this.examRoom = examRoom;
+	}
+
 	public int[][] getExamPeriodModif() {
 		return examPeriodModif;
 	}
