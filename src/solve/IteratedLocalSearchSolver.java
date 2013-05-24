@@ -131,20 +131,12 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 								"examId=" + swapId
 								+ "; periodId=" + target.getPeriod().getId()
 								+ "; roomId=" + target.getRoom().getId());
-						/////////////////
-						Feedback f = new Feedback();
-						if (examId == 158) {
-							System.out.println(currentSolution.getResultForExam(15));
-							System.out.println(currentSolution.getResultForExam(197));
-							System.out.println(HCV.isSolutionValid(currentSolution, f));
-						}
-						////////////////
+						
 						move = Moving.swapExams(examId, swapId, currentSolution);
 						////////
+						Feedback f = new Feedback();
 						if (!HCV.isSolutionValid(currentSolution, f)) {
 							System.out.println(f);
-							System.out.println(currentSolution.getResultForExam(15));
-							System.out.println(currentSolution.getResultForExam(197));
 							throw new SolvingException("fuck you swap");
 						}
 						///////

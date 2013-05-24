@@ -194,9 +194,9 @@ public class ILSS_Tests {
 		examIds.add(examId);
 		examIds.add(targetId);
 		Move move = new Move(EMoveType.SWAP, examIds, origin, target);
+		assertFalse(solver.isMoveValid(move, s));
 		Moving.swapExams(examId, targetId, s);
 		assertFalse(new HardConstraintsValidator().isSolutionValid(s, new Feedback()));
-		assertFalse(solver.isMoveValid(move, s));
 	}
 	
 	/**
