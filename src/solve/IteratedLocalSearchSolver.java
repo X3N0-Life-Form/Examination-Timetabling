@@ -109,12 +109,8 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 					////////
 					Feedback f = new Feedback();
 					if (Debugging.debug && !HCV.isSolutionValid(currentSolution, f)) {
-						System.out.println(f);
-						System.out.println(currentSolution.getExamPeriodModif()[417][31]);
-						System.out.println(currentSolution.getExamPeriodModif()[417][17]);
-						System.out.println(currentSolution.getExamPeriodModif()[418][31]);
-						System.out.println(currentSolution.getExamPeriodModif()[418][17]);
-						throw new SolvingException("Move error");
+						System.err.println("------" + f);
+						throw new SolvingException("Move error.");
 					}
 					///////
 				}
@@ -138,8 +134,8 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 						////////
 						Feedback f = new Feedback();
 						if (Debugging.debug && !HCV.isSolutionValid(currentSolution, f)) {
-							System.out.println(f);
-							throw new SolvingException("Swap error");
+							System.err.println("------" + f);
+							throw new SolvingException("Swap error.");
 						}
 						///////
 					}
@@ -156,8 +152,12 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 				if (CostCalculator.calculateCost(currentSolution) < currentCost) {
 					System.out.println("------Cost inferior to previous Solution");
 					feedback = new Feedback();
-					if (HCV.isSolutionValid(currentSolution, feedback)) {
+					if (Debugging.debug && HCV.isSolutionValid(currentSolution, feedback)) {
 						System.out.println("------Solution is valid - saving");
+						adds++;
+						solutions.add(currentSolution);
+					} else if (!Debugging.debug) {
+						System.out.println("------Saving");
 						adds++;
 						solutions.add(currentSolution);
 					} else {
@@ -202,7 +202,7 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 	}
 
 	/**
-	 * 
+	 * Test whether the stop conditions are set or not.
 	 * @return True if at least one of the stop conditions is set.
 	 */
 	public boolean areStopConditionsSet() {
@@ -241,7 +241,7 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 	 */
 	public boolean isMoveValid(Move move, Solution s) {
 		ResultCouple target = null;
-		ResultCouple origin = null;
+		//ResultCouple origin = null;
 		int examId = -1;
 		int examTargetId = -1;
 		switch (move.getType()) {
@@ -249,6 +249,7 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 			target = move.getTargets().get(0);
 			examId = move.getExamIds().get(0);
 			Exam exam = s.getExamSession().getExams().get(examId);
+			
 			if (/*target.getPeriod().getId() != origin.getPeriod().getId()//TODO:this
 					&& */exam.hasPeriodHardConstraint(EPeriodHardConstraint.EXAM_COINCIDENCE)) {
 				return false;
@@ -298,15 +299,19 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 				for (Exam et : target.getExamList()) {
 					if (et.getId() == beforeId || et.getId() == afterId) {
 						return false;
-					} else if (beforeId != examId
-							&& s.getResultForExam(beforeId).getPeriod().getId() >= target.getPeriod().getId()) {
-						return false;
-					} else if (afterId != examId
-							&& s.getResultForExam(afterId).getPeriod().getId() <= target.getPeriod().getId()) {
-						return false;
 					}
 				}
+				if (beforeId != examId
+						&& s.getResultForExam(beforeId).getPeriod().getId() >= target.getPeriod().getId()) {
+					return false;
+				} else if (afterId != examId
+						&& s.getResultForExam(afterId).getPeriod().getId() <= target.getPeriod().getId()) {
+					return false;
+				}
 			}
+		}
+		if (examId == 494) {
+			System.out.println("hjvo");
 		}
 		return true;
 	}

@@ -3,14 +3,11 @@ package util;
 import java.util.ArrayList;
 import java.util.List;
 
-import solve.Feedback;
-import solve.HardConstraintsValidator;
 import solve.SolvingException;
 import struct.EMoveType;
 import struct.EPeriodHardConstraint;
 import struct.Exam;
 import struct.Move;
-import struct.PeriodHardConstraint;
 import struct.ResultCouple;
 import struct.Solution;
 
