@@ -581,5 +581,20 @@ public class Solution implements Serializable, Comparable<Solution> {
 		}
 		return null;
 	}
+
+	/**
+	 * Look for a specific ResultCouple.
+	 * @param periodId
+	 * @param roomId
+	 * @return The specified ResultCouple, or null.
+	 */
+	public ResultCouple getSpecificResult(int periodId, int roomId) {
+		for (ResultCouple currentRC : result) {
+			if (currentRC.getPeriod().getId() == periodId && currentRC.getRoom().getId() == roomId) {
+				return currentRC;
+			}
+		}
+		return null;
+	}
 	
 }

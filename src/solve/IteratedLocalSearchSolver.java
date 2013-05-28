@@ -1,11 +1,12 @@
 package solve;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
+import java.util.TreeMap;
 
 import struct.EMoveType;
 import struct.EPeriodHardConstraint;
@@ -38,11 +39,16 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 	
 	private HardConstraintsValidator HCV;
 	private int lowestCost;
+	/**
+	 * Contains applied Moves & the Solution they've been applied to.
+	 */
+	private TreeMap<Move, Solution> appliedMoves;
 
 	public IteratedLocalSearchSolver(Solution originalSolution) {
 		super();
 		this.originalSolution = originalSolution;
 		HCV = new HardConstraintsValidator();
+		appliedMoves = new TreeMap<Move, Solution>();
 	}
 
 	public Solution getOriginalSolution() {
@@ -53,6 +59,26 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 		this.originalSolution = originalSolution;
 	}
 
+	static class OurThreadInfo {
+		static List<Solution> solutions;
+		static Solution currentSolution;
+		static int currentCost;
+		static List<Move> currentMoves;
+		static EMoveType moveType;
+	}
+
+	@Override
+	public void run() {
+		try {
+			doMoves(OurThreadInfo.solutions,
+					OurThreadInfo.currentSolution,
+					OurThreadInfo.currentMoves,
+					OurThreadInfo.moveType);
+		} catch (SolvingException e) {
+			e.printStackTrace();
+		}
+		
+	}
 	
 	@Override
 	public Solution solve() throws SolvingException {
@@ -94,6 +120,7 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 			
 			//TODO: some randomness, skip exams or hjvo
 			//try to move each exam
+			int sSize = solutions.size();
 			doMoves(solutions, currentSolution, currentMoves, EMoveType.SINGLE_MOVE);
 			doMoves(solutions, currentSolution, currentMoves, EMoveType.SWAP);
 			
@@ -106,10 +133,10 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 			
 			System.out.println("----Finished looping through the exam list - analyzing");
 			
-			if (solutions.isEmpty()) {
-				System.out.println("----Solution list is empty - exiting loop");
-				break;
-				//TODO: look for another path?
+			if (sSize == solutions.size()) {
+				System.out.println("----No valid Solution was added - making a random move");
+				previousSolution = doRandomMove(solutions, currentSolution, currentMoves);
+				//TODO: failsafe if no other move can be done
 			} else {
 				System.out.println("----Sorting the Solutions");
 				Collections.sort(solutions);
@@ -144,6 +171,44 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 	}
 
 	/**
+	 * Does a random move operation.
+	 * @param solutions
+	 * @param currentSolution
+	 * @param currentMoves
+	 * @return A new Solution, or null.
+	 * @throws SolvingException
+	 */
+	public Solution doRandomMove(List<Solution> solutions,
+			Solution currentSolution, List<Move> currentMoves) throws SolvingException {
+		Move move;
+		for (int i = 0; i < currentSolution.getExamSession().getExams().size(); i++) {
+			Random rand = new Random();
+			int examId = rand.nextInt(currentSolution.getExamSession().getExams().size());
+			System.out.println("----Processing exam " + examId
+					+ " (loop " + (mainLoopCounter + 1) + "/" + stopCounter + " - random move)");
+			
+			move = null;
+			Solution currentCopy = new Solution(currentSolution);
+
+			if (rand.nextBoolean()) {
+				move = doSingleMove(examId, currentCopy, currentMoves, true);
+			} else {
+				move = doSwap(examId, currentCopy, currentMoves, true);
+			}
+			
+			if (move == null) {
+				System.out.println("------No valid move found - moving on");
+				continue;
+			}
+			
+			//force save the move
+			saveMoveAndSolution(solutions, currentCopy, currentMoves, move, currentSolution, true);
+			return currentCopy;
+		}
+		return null;
+	}
+
+	/**
 	 * Loop through the exams & do the specified move type.
 	 * @param solutions
 	 * @param currentSolution
@@ -162,19 +227,18 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 			
 			move = null;
 			Solution currentCopy = new Solution(currentSolution);
-			//Solution currentCopy = currentSolution; //lol
 			/////////////////
 			// single move //
 			/////////////////
 			if (moveType == EMoveType.SINGLE_MOVE) {
-				move = doSingleMove(examId, currentCopy, currentMoves);
+				move = doSingleMove(examId, currentCopy, currentMoves, false);
 			}
 			
 			//////////
 			// swap //
 			//////////
 			if (moveType == EMoveType.SWAP) {
-				move = doSwap(examId, currentCopy, currentMoves);
+				move = doSwap(examId, currentCopy, currentMoves, false);
 			}
 			
 			//////////////////////////////////
@@ -185,25 +249,30 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 				continue;
 			}
 			
-			saveMoveAndSolution(solutions, currentCopy, currentMoves, move);
+			saveMoveAndSolution(solutions, currentCopy, currentMoves, move, currentSolution, false);
 		}
 	}
 
 	/**
-	 * 
+	 * Does a swap movement operation.
 	 * @param examId
 	 * @param currentSolution
 	 * @param currentMoves
+	 * @param randomSwap If set to true, makes a random valid swap.
 	 * @return A valid Move, or null.
 	 * @throws SolvingException 
 	 */
 	public Move doSwap(Integer examId, Solution currentSolution,
-			List<Move> currentMoves) throws SolvingException {
+			List<Move> currentMoves, boolean randomSwap) throws SolvingException {
 		ResultCouple swapTarget = null;
 		Move move = null;
 		int swapId = -1;
 		try {
-			swapId = lookForSwapTarget(examId, currentSolution, currentMoves);
+			if (!randomSwap) {
+				swapId = lookForSwapTarget(examId, currentSolution, currentMoves);
+			} else {
+				swapId = lookForRandomSwapTarget(examId, currentSolution, currentMoves);
+			}
 			swapTarget = currentSolution.getResultForExam(swapId);
 		} catch (MovingException e) {
 			throw new SolvingException("Invalid examId provided to IteratedLocalSearchSolver.lookForSwapTarget:" + examId);
@@ -227,18 +296,23 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 	}
 
 	/**
-	 * 
+	 * Does a single move operation.
 	 * @param examId
 	 * @param currentSolution
 	 * @param currentMoves
+	 * @param randomMove If true, makes a random valid Move.
 	 * @return A valid Move, or null.
 	 * @throws SolvingException
 	 */
-	public Move doSingleMove(int examId, Solution currentSolution, List<Move> currentMoves) throws SolvingException {
+	public Move doSingleMove(int examId, Solution currentSolution, List<Move> currentMoves, boolean randomMove) throws SolvingException {
 		ResultCouple moveTarget = null;
 		Move move = null;
 		try {
-			moveTarget = lookForMoveTarget(examId, currentSolution, currentMoves);
+			if (!randomMove) {
+				moveTarget = lookForMoveTarget(examId, currentSolution, currentMoves);
+			} else {
+				moveTarget = lookForRandomMoveTarget(examId, currentSolution, currentMoves);
+			}
 		} catch (MovingException e) {
 			throw new SolvingException("Invalid examId provided to IteratedLocalSearchSolver.lookForMoveTarget:" + examId);
 		}
@@ -261,34 +335,35 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 	/**
 	 * Saves the provided move, and potentially the resulting Solution.
 	 * @param solutions List to add the Solution into.
-	 * @param currentSolution
+	 * @param newSolution
 	 * @param lowestCost
 	 * @param currentMoves List to add the move into.
 	 * @param move
+	 * @param previousSolution
+	 * @param forceSave Forcibly save the move, even if it's inefficient.
 	 * @return True if the Solution was saved.
 	 */
 	public synchronized boolean saveMoveAndSolution(List<Solution> solutions,
-			Solution currentSolution, List<Move> currentMoves,
-			Move move) {
+			Solution newSolution, List<Move> currentMoves,
+			Move move, Solution previousSolution, boolean forceSave) {
 		boolean added = false;
 		Feedback feedback;
 		System.out.println("------Saving tested move");
-		currentMoves.add(move);
+		//if the move has never been applied, no chance of a duplicate in move lists
+		if (!appliedMoves.containsKey(move)) {
+			currentMoves.add(move);
+		}
 		//exam moved --> save solution if lower cost
-		if (CostCalculator.calculateCost(currentSolution) < lowestCost) {
+		if (CostCalculator.calculateCost(newSolution) < lowestCost) {
 			System.out.println("------Cost inferior to lowest Solution ("
-					+ currentSolution.getCost() + " - " + lowestCost + ")");
+					+ newSolution.getCost() + " - " + lowestCost + ")");
 			feedback = new Feedback();
-			if (Debugging.debug && HCV.isSolutionValid(currentSolution, feedback)) {
+			if (Debugging.debug && HCV.isSolutionValid(newSolution, feedback)) {
 				System.out.println("------Solution is valid - saving");
 				added = true;
-				solutions.add(currentSolution);
-				lowestCost = currentSolution.getCost();
 			} else if (!Debugging.debug) {
 				System.out.println("------Saving");
 				added = true;
-				solutions.add(currentSolution);
-				lowestCost = currentSolution.getCost();
 			} else {
 				System.out.println("------Solution is invalid - ignoring");
 				System.err.println("------" + feedback);
@@ -296,7 +371,14 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 		} else {
 			System.out.println("------Cost superior to previous Solution - ignoring");
 		}
-		return added;
+		
+		if (added || forceSave) {
+			solutions.add(newSolution);
+			appliedMoves.put(move, previousSolution);
+			lowestCost = newSolution.getCost();
+		}
+		
+		return added || forceSave;
 	}
 
 	/**
@@ -427,8 +509,40 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 			}
 			if (isMoveValid(simulatedMove, s)) {
 				target = rc;
+				break;
 			}
 		}
+		return target;
+	}
+	
+	public ResultCouple lookForRandomMoveTarget(int examId,
+			Solution currentSolution, List<Move> previousMoves) throws MovingException {
+		ResultCouple target = null;
+		ResultCouple origin = currentSolution.getResultForExam(examId);
+		
+		if (previousMoves == null) {
+			previousMoves = new ArrayList<Move>();
+		} else if (origin == null) {
+			throw new MovingException("Invalid examId:" + examId);
+		}
+		
+		Random rand = new Random();
+		//don't loop forever
+		for (int i = 0; i < currentSolution.getResult().size(); i++) {
+			int periodId = rand.nextInt(currentSolution.getExamSession().getPeriods().size());
+			int roomId = rand.nextInt(currentSolution.getExamSession().getRooms().size());
+			ResultCouple rc = currentSolution.getSpecificResult(periodId, roomId);
+			//copied from regular move method
+			Move simulatedMove = new Move(EMoveType.SINGLE_MOVE, examId, origin, rc);
+			if (appliedMoves.containsKey(simulatedMove)) {
+				continue;
+			}
+			if (isMoveValid(simulatedMove, currentSolution)) {
+				target = rc;
+				break;
+			}
+		}
+		
 		return target;
 	}
 	
@@ -472,25 +586,46 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 		return -1;
 	}
 	
-	static class OurThreadInfo {
-		static List<Solution> solutions;
-		static Solution currentSolution;
-		static int currentCost;
-		static List<Move> currentMoves;
-		static EMoveType moveType;
-	}
-
-	@Override
-	public void run() {
-		try {
-			doMoves(OurThreadInfo.solutions,
-					OurThreadInfo.currentSolution,
-					OurThreadInfo.currentMoves,
-					OurThreadInfo.moveType);
-		} catch (SolvingException e) {
-			e.printStackTrace();
+	public int lookForRandomSwapTarget(Integer examId,
+			Solution currentSolution, List<Move> previousMoves) throws MovingException {
+		List<Integer> examIds = new ArrayList<Integer>();
+		examIds.add(examId);
+		if (previousMoves == null) {
+			previousMoves = new ArrayList<Move>();
+		}
+		ResultCouple origin = currentSolution.getResultForExam(examId);
+		if (origin == null) {
+			throw new MovingException("Invalid examId:" + examId);
 		}
 		
+		
+		Random rand = new Random();
+		//don't loop forever
+		for (int i = 0; i < currentSolution.getResult().size(); i++) {
+			int targetId = rand.nextInt(currentSolution.getExamSession().getExams().size());
+			if (targetId != examId) {
+				examIds.add(targetId);
+			} else {
+				continue;
+			}
+			ResultCouple rc = currentSolution.getResultForExam(targetId);
+			
+			Move simulatedMove = new Move(EMoveType.SWAP, examIds, origin, rc);
+			
+			if (appliedMoves.containsKey(simulatedMove)) {
+				continue;
+			}
+			if (isMoveValid(simulatedMove, currentSolution)) {
+				return targetId;
+			} else {
+				examIds.remove(1);
+			}
+		}
+		
+		return -1;
+		
 	}
+	
+
 
 }
