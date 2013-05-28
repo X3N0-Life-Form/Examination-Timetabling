@@ -3,10 +3,11 @@ package solve;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
-import java.util.TreeMap;
 
 import struct.EMoveType;
 import struct.EPeriodHardConstraint;
@@ -42,13 +43,13 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 	/**
 	 * Contains applied Moves & the Solution they've been applied to.
 	 */
-	private TreeMap<Move, Solution> appliedMoves;
+	private Map<Move, Solution> appliedMoves;
 
 	public IteratedLocalSearchSolver(Solution originalSolution) {
 		super();
 		this.originalSolution = originalSolution;
 		HCV = new HardConstraintsValidator();
-		appliedMoves = new TreeMap<Move, Solution>();
+		appliedMoves = new HashMap<Move, Solution>();
 	}
 
 	public Solution getOriginalSolution() {

@@ -19,7 +19,7 @@ import struct.Solution;
 import util.Moving;
 import util.Serialization;
 
-public class ILSS_Tests {
+public class ILSS_Tests_Base {
 	
 	private Solution s;
 	private IteratedLocalSearchSolver solver;
