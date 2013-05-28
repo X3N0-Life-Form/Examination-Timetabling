@@ -412,7 +412,7 @@ public class ILSS_Tests {
 	 */
 	@Test
 	public void testSolve_stopAfterTwoLoops() throws SolvingException, FileNotFoundException, ClassNotFoundException, IOException {
-		Solution s1 = Serialization.loadSolution(Serialization.set1SerializedName);
+		Solution s1 = Serialization.loadSolution(Serialization.set4SerializedName);
 		IteratedLocalSearchSolver solver1 = new IteratedLocalSearchSolver(s1);
 		solver1.setStopConditions(2, -1);
 		solver1.solve();

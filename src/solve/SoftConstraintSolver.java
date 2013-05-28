@@ -29,8 +29,9 @@ public abstract class SoftConstraintSolver implements Solver {
 	 * @param s
 	 * @param previousMoves
 	 * @return A list of acceptable ResultCouples.
+	 * @throws MovingException 
 	 */
-	public abstract List<ResultCouple> lookForMoveTargets(List<Integer> examIds, Solution s, List<Move> previousMoves);
+	public abstract List<ResultCouple> lookForMoveTargets(List<Integer> examIds, Solution s, List<Move> previousMoves) throws MovingException;
 	
 	/**
 	 * Look for an exam the can safely be swapped with the specified exam 

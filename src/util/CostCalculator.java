@@ -9,6 +9,7 @@ import struct.Exam;
 import struct.Period;
 import struct.Room;
 import struct.Solution;
+import struct.Student;
 
 /**
  * Contains various cost-calculation-related methods.
@@ -162,18 +163,19 @@ public class CostCalculator {
 	public static int calculateTwoInARow(Solution s) {
 		int cost = 0;
 		for (int i : s.getStudentTreeMap().navigableKeySet()){
-			if (s.getStudentTreeMap().get(i).getExamRes().size()>1){
-				for (int j = 0; j < s.getStudentTreeMap().get(i).getExamRes().size()-1; j++){
-					Date currentDate = s.getStudentTreeMap().get(i).getExamRes().get(j).getPeriod().getDate_hour();
-					int currentPeriodId = s.getStudentTreeMap().get(i).getExamRes().get(j).getPeriod().getId();
-					for (int k = j+1; k < s.getStudentTreeMap().get(i).getExamRes().size() ;k++){
-						Date secondDate =  s.getStudentTreeMap().get(i).getExamRes().get(k).getPeriod().getDate_hour();
-						int secondPeriodId = s.getStudentTreeMap().get(i).getExamRes().get(k).getPeriod().getId();
+			Student currentStudent = s.getStudentTreeMap().get(i);
+			if (currentStudent .getExamRes().size()>1){
+				for (int j = 0; j < currentStudent.getExamRes().size()-1; j++){
+					Date currentDate = currentStudent.getExamRes().get(j).getPeriod().getDate_hour();
+					int currentPeriodId = currentStudent.getExamRes().get(j).getPeriod().getId();
+					for (int k = j+1; k < currentStudent.getExamRes().size() ;k++){
+						Date secondDate =  currentStudent.getExamRes().get(k).getPeriod().getDate_hour();
+						int secondPeriodId = currentStudent.getExamRes().get(k).getPeriod().getId();
 						int difference = secondPeriodId - currentPeriodId;
 						if (DateUtils.isSameDay(currentDate, secondDate) && (difference == 1 || difference == -1) ){
 							cost += s.getExamSession().getInstitutionalWeightings().getTwoInARow();
 						}		
-					}
+					}	
 				}	
 			}
 		}	

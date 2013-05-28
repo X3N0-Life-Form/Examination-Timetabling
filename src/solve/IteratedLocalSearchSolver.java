@@ -1,6 +1,7 @@
 package solve;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -23,7 +24,7 @@ import util.Solving;
  * @author Adrien Droguet - Sara Tari
  *
  */
-public class IteratedLocalSearchSolver extends SoftConstraintSolver {
+public class IteratedLocalSearchSolver extends SoftConstraintSolver implements Runnable {
 	
 	private Solution originalSolution;
 	private int mainLoopCounter = -1;
@@ -36,6 +37,7 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 	private int stopTime = 7200000;//now that's badass
 	
 	private HardConstraintsValidator HCV;
+	private int lowestCost;
 
 	public IteratedLocalSearchSolver(Solution originalSolution) {
 		super();
@@ -58,10 +60,9 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 		if (!areStopConditionsSet())
 			throw new SolvingException("Stop conditions were not set");
 		Solution previousSolution = new Solution(originalSolution);
-		CostCalculator.calculateCost(originalSolution);
+		lowestCost = CostCalculator.calculateCost(originalSolution);
 		List<Solution> solutions = new LinkedList<Solution>();
 		startTime = Calendar.getInstance();
-		int adds = 0;
 		Feedback feedback = new Feedback();
 		if (!HCV.isSolutionValid(previousSolution, feedback)) {
 			System.out.println(feedback);
@@ -75,99 +76,33 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 		if (stopTime > 0)
 			System.out.println("----stopTime=" + stopTime);
 		
+		//Thread fred = new Thread(this);
+		
 		while (updateMainLoopStatus()) {
 			Solution currentSolution = new Solution(previousSolution);
-			int currentCost = CostCalculator.calculateCost(currentSolution);
+			CostCalculator.calculateCost(currentSolution);
 			List<Move> currentMoves = new ArrayList<Move>();
-			Move move = null;
-			System.out.println("--Current cost=" + currentCost);
+			System.out.println("--Lowest cost=" + lowestCost);
 			
+			//prepare for thread execution
+			OurThreadInfo.solutions = solutions;
+			OurThreadInfo.currentCost = lowestCost;
+			OurThreadInfo.currentSolution = currentSolution;
+			OurThreadInfo.currentMoves = currentMoves;
+			OurThreadInfo.moveType = EMoveType.SWAP;
+			//fred.start();//TODO:thread stuff
+			
+			//TODO: some randomness, skip exams or hjvo
 			//try to move each exam
-			for (Integer examId : currentSolution.getExamSession().getExams().navigableKeySet()) {
-				////////////////////////
-				if (examId == 0)
-					continue;
-				////////////////////////
-				System.out.println("----Processing exam " + examId
-						+ " (loop " + (mainLoopCounter + 1) + "/" + stopCounter + ")");
-				int swapId = -1;
-				
-				ResultCouple target = null;
-				move = null;
-				/////////////////
-				// single move //
-				/////////////////
-				try {
-					target = lookForMoveTarget(examId, currentSolution, currentMoves);
-				} catch (MovingException e) {
-					throw new SolvingException("Invalid examId provided to IteratedLocalSearchSolver.lookForMoveTarget:" + examId);
-				}
-				if (target != null) {
-					System.out.println("------Found a move target: periodId=" + target.getPeriod().getId()
-							+ "; roomId=" + target.getRoom().getId());
-					move = Moving.movingSingleExam(examId, currentSolution, target.getPeriod().getId(), target.getRoom().getId());
-					////////
-					Feedback f = new Feedback();
-					if (Debugging.debug && !HCV.isSolutionValid(currentSolution, f)) {
-						System.err.println("------" + f);
-						throw new SolvingException("Move error.");
-					}
-					///////
-				}
-				//////////
-				// swap //
-				//////////
-				if (target == null) {
-					try {
-						swapId = lookForSwapTarget(examId, currentSolution, currentMoves);
-						target = currentSolution.getResultForExam(swapId);
-					} catch (MovingException e) {
-						throw new SolvingException("Invalid examId provided to IteratedLocalSearchSolver.lookForSwapTarget:" + examId);
-					}
-					if (swapId != -1) {
-						System.out.println("------Found a swap target: " +
-								"examId=" + swapId
-								+ "; periodId=" + target.getPeriod().getId()
-								+ "; roomId=" + target.getRoom().getId());
-						
-						move = Moving.swapExams(examId, swapId, currentSolution);
-						////////
-						Feedback f = new Feedback();
-						if (Debugging.debug && !HCV.isSolutionValid(currentSolution, f)) {
-							System.err.println("------" + f);
-							throw new SolvingException("Swap error.");
-						}
-						///////
-					}
-				}
-				//still null --> found nothing
-				if (target == null) {
-					System.out.println("------No target found - moving on");
-					continue;
-				}
-				
-				System.out.println("------Saving tested move");
-				currentMoves.add(move);
-				//exam moved --> save solution if lower cost
-				if (CostCalculator.calculateCost(currentSolution) < currentCost) {
-					System.out.println("------Cost inferior to previous Solution");
-					feedback = new Feedback();
-					if (Debugging.debug && HCV.isSolutionValid(currentSolution, feedback)) {
-						System.out.println("------Solution is valid - saving");
-						adds++;
-						solutions.add(currentSolution);
-					} else if (!Debugging.debug) {
-						System.out.println("------Saving");
-						adds++;
-						solutions.add(currentSolution);
-					} else {
-						System.out.println("------Solution is invalid - ignoring");
-						System.err.println("------" + feedback);
-					}
-				} else {
-					System.out.println("------Cost superior to previous Solution - ignoring");
-				}
-			}
+			doMoves(solutions, currentSolution, currentMoves, EMoveType.SWAP);
+			doMoves(solutions, currentSolution, currentMoves, EMoveType.SINGLE_MOVE);
+			
+			/*
+			try {
+				fred.join();
+			} catch (InterruptedException e) {
+				throw new SolvingException("Thread interrupted: " + e.getMessage());
+			}*/
 			
 			System.out.println("----Finished looping through the exam list - analyzing");
 			
@@ -181,24 +116,187 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 				
 				System.out.println("----Verifying the validity of each Solution");
 				for (Solution cs : solutions) {
-					if (!new HardConstraintsValidator().isSolutionValid(cs, new Feedback())) {
+					Feedback f = new Feedback();
+					if (!HCV.isSolutionValid(cs, f)) {
+						System.err.println(f);
 						throw new SolvingException("Found an invalid Solution.");
 					}
 				}
 				
-				previousSolution = solutions.get(0);
+				previousSolution = solutions.get(0); //TODO:lol bug
 				System.out.println("----Found the least costly Solution - moving to next iteration");
 			}
 		}
 		System.out.println("--Exiting main loop");
 		
-		if (previousSolution.equals(originalSolution))
+		Solution cheapestSolution = solutions.get(0);//idem
+		
+		if (cheapestSolution.equals(originalSolution))
 			System.err.println("--Warning: result Solution is identical to original Solution");
-		System.out.println("--Added " + adds + " Solutions");
 		System.out.println("--Original Solution cost=\t" + originalSolution.getCost());
-		System.out.println("--Final Solution cost=\t\t" + CostCalculator.calculateCost(previousSolution));
-		System.out.println("--TODO:%");
+		System.out.println("--Final Solution cost=\t\t" + CostCalculator.calculateCost(cheapestSolution));
+		//System.out.println("--Improved cost by " + ((cheapestSolution.getCost() / originalSolution.getCost()) * 100) + "%");
+		System.out.println("--Other solutions:");
+		for (Solution solution : solutions) {
+			System.out.println(solution.getCost());
+		}
 		return previousSolution;
+	}
+
+	/**
+	 * Loop through the exams & do the specified move type.
+	 * @param solutions
+	 * @param currentSolution
+	 * @param currentCost
+	 * @param currentMoves
+	 * @param moveType
+	 * @throws SolvingException
+	 */
+	public void doMoves(List<Solution> solutions,
+			Solution currentSolution, List<Move> currentMoves,
+			EMoveType moveType) throws SolvingException {
+		Move move;
+		for (Integer examId : currentSolution.getExamSession().getExams().navigableKeySet()) {
+			System.out.println("----Processing exam " + examId
+					+ " (loop " + (mainLoopCounter + 1) + "/" + stopCounter + " - " + moveType + ")");
+			
+			move = null;
+			Solution currentCopy = new Solution(currentSolution);
+			//Solution currentCopy = currentSolution; //lol
+			/////////////////
+			// single move //
+			/////////////////
+			if (moveType == EMoveType.SINGLE_MOVE) {
+				move = doSingleMove(examId, currentCopy, currentMoves);
+			}
+			
+			//////////
+			// swap //
+			//////////
+			if (moveType == EMoveType.SWAP) {
+				move = doSwap(examId, currentCopy, currentMoves);
+			}
+			
+			//////////////////////////////////
+			// still null --> found nothing //
+			//////////////////////////////////
+			if (move == null) {
+				System.out.println("------No valid move found - moving on");
+				continue;
+			}
+			
+			saveMoveAndSolution(solutions, currentCopy, currentMoves, move);
+		}
+	}
+
+	/**
+	 * 
+	 * @param examId
+	 * @param currentSolution
+	 * @param currentMoves
+	 * @return A valid Move, or null.
+	 * @throws SolvingException 
+	 */
+	public Move doSwap(Integer examId, Solution currentSolution,
+			List<Move> currentMoves) throws SolvingException {
+		ResultCouple swapTarget = null;
+		Move move = null;
+		int swapId = -1;
+		try {
+			swapId = lookForSwapTarget(examId, currentSolution, currentMoves);
+			swapTarget = currentSolution.getResultForExam(swapId);
+		} catch (MovingException e) {
+			throw new SolvingException("Invalid examId provided to IteratedLocalSearchSolver.lookForSwapTarget:" + examId);
+		}
+		if (swapId != -1) {
+			System.out.println("------Found a swap target: " +
+					"examId=" + swapId
+					+ "; periodId=" + swapTarget.getPeriod().getId()
+					+ "; roomId=" + swapTarget.getRoom().getId());
+			
+			move = Moving.swapExams(examId, swapId, currentSolution);
+			// DEBUG //
+			Feedback f = new Feedback();
+			if (Debugging.debug && !HCV.isSolutionValid(currentSolution, f)) {
+				System.err.println("------" + f);
+				throw new SolvingException("Swap error.");
+			}
+			// END DEBUG //
+		}
+		return move;
+	}
+
+	/**
+	 * 
+	 * @param examId
+	 * @param currentSolution
+	 * @param currentMoves
+	 * @return A valid Move, or null.
+	 * @throws SolvingException
+	 */
+	public Move doSingleMove(int examId, Solution currentSolution, List<Move> currentMoves) throws SolvingException {
+		ResultCouple moveTarget = null;
+		Move move = null;
+		try {
+			moveTarget = lookForMoveTarget(examId, currentSolution, currentMoves);
+		} catch (MovingException e) {
+			throw new SolvingException("Invalid examId provided to IteratedLocalSearchSolver.lookForMoveTarget:" + examId);
+		}
+		if (moveTarget != null) {
+			System.out.println("------Found a move target: periodId="
+					+ moveTarget.getPeriod().getId()
+					+ "; roomId=" + moveTarget.getRoom().getId());
+			move = Moving.movingSingleExam(examId, currentSolution, moveTarget.getPeriod().getId(), moveTarget.getRoom().getId());
+			// DEBUG //
+			Feedback f = new Feedback();
+			if (Debugging.debug && !HCV.isSolutionValid(currentSolution, f)) {
+				System.err.println("------" + f);
+				throw new SolvingException("Move error.");
+			}
+			// END DEBUG //
+		}
+		return move;
+	}
+
+	/**
+	 * Saves the provided move, and potentially the resulting Solution.
+	 * @param solutions List to add the Solution into.
+	 * @param currentSolution
+	 * @param lowestCost
+	 * @param currentMoves List to add the move into.
+	 * @param move
+	 * @return True if the Solution was saved.
+	 */
+	public synchronized boolean saveMoveAndSolution(List<Solution> solutions,
+			Solution currentSolution, List<Move> currentMoves,
+			Move move) {
+		boolean added = false;
+		Feedback feedback;
+		System.out.println("------Saving tested move");
+		currentMoves.add(move);
+		//exam moved --> save solution if lower cost
+		if (CostCalculator.calculateCost(currentSolution) < lowestCost) {
+			System.out.println("------Cost inferior to lowest Solution ("
+					+ currentSolution.getCost() + " - " + lowestCost + ")");
+			feedback = new Feedback();
+			if (Debugging.debug && HCV.isSolutionValid(currentSolution, feedback)) {
+				System.out.println("------Solution is valid - saving");
+				added = true;
+				solutions.add(currentSolution);
+				lowestCost = currentSolution.getCost();
+			} else if (!Debugging.debug) {
+				System.out.println("------Saving");
+				added = true;
+				solutions.add(currentSolution);
+				lowestCost = currentSolution.getCost();
+			} else {
+				System.out.println("------Solution is invalid - ignoring");
+				System.err.println("------" + feedback);
+			}
+		} else {
+			System.out.println("------Cost superior to previous Solution - ignoring");
+		}
+		return added;
 	}
 
 	/**
@@ -225,7 +323,7 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 	 * @return True if the loop may continue.
 	 */
 	protected boolean updateMainLoopStatus() {
-		mainLoopCounter ++;
+		mainLoopCounter++;
 		if (stopCounter > 0 && mainLoopCounter >= stopCounter)
 			return false;
 		if (stopTime > 0 && startTime.compareTo(Calendar.getInstance()) >= stopTime)
@@ -310,9 +408,6 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 				}
 			}
 		}
-		if (examId == 494) {
-			System.out.println("hjvo");
-		}
 		return true;
 	}
 
@@ -337,9 +432,11 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 		return target;
 	}
 	
+	@SuppressWarnings("unused")
 	@Override
-	public List<ResultCouple> lookForMoveTargets(List<Integer> examIds, Solution s, List<Move> previousMoves) {
-		// TODO Auto-generated method stub
+	public List<ResultCouple> lookForMoveTargets(List<Integer> examIds, Solution s, List<Move> previousMoves) throws MovingException {
+		if (true)
+			throw new MovingException("Not yet implemented.");
 		return null;
 	}
 
@@ -373,6 +470,27 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver {
 			}
 		}
 		return -1;
+	}
+	
+	static class OurThreadInfo {
+		static List<Solution> solutions;
+		static Solution currentSolution;
+		static int currentCost;
+		static List<Move> currentMoves;
+		static EMoveType moveType;
+	}
+
+	@Override
+	public void run() {
+		try {
+			doMoves(OurThreadInfo.solutions,
+					OurThreadInfo.currentSolution,
+					OurThreadInfo.currentMoves,
+					OurThreadInfo.moveType);
+		} catch (SolvingException e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 }

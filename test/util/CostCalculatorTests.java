@@ -1,7 +1,5 @@
 package util;
 
-import static org.junit.Assert.*;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -12,9 +10,12 @@ import struct.Solution;
 
 public class CostCalculatorTests {
 	
+	@SuppressWarnings("unused")
 	private static Solution s_set1;
+	@SuppressWarnings("unused")
 	private static Solution s_set2;
 	private static Solution s_set3;
+	@SuppressWarnings("unused")
 	private static Solution s_set4;
 	
 	/**

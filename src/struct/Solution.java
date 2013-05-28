@@ -310,9 +310,18 @@ public class Solution implements Serializable, Comparable<Solution> {
 		this.examSession = originalSolution.examSession;
 		this.examPeriodBase = originalSolution.examPeriodBase;
 		// fields that can be modified
-		this.examCoincidence = originalSolution.examCoincidence.clone();
-		this.examPeriodModif = originalSolution.examPeriodModif.clone();
-		this.examRoom = originalSolution.examRoom.clone();
+		this.examCoincidence = new int[originalSolution.examCoincidence.length][];
+		for (int i = 0; i < originalSolution.examCoincidence.length; i++) {
+			this.examCoincidence[i] = originalSolution.examCoincidence[i].clone();
+		}
+		this.examPeriodModif = new int[originalSolution.examPeriodModif.length][];
+		for (int i = 0; i < originalSolution.examPeriodModif.length; i++) {
+			this.examPeriodModif[i] = originalSolution.examPeriodModif[i].clone();
+		}
+		this.examRoom = new int[originalSolution.examRoom.length][];
+		for (int i = 0; i < originalSolution.examRoom.length; i++) {
+			this.examRoom[i] = originalSolution.examRoom[i].clone();
+		}
 		this.nonPlacedExams = OurCollections.manualCloneExam(originalSolution.nonPlacedExams);
 		this.result = OurCollections.manualClone(originalSolution.result);
 		this.students = (TreeMap<Integer, Student>) originalSolution.students.clone();

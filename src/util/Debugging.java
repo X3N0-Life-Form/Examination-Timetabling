@@ -1,5 +1,5 @@
 package util;
 
 public class Debugging {
-	public static boolean debug = false;
+	public static boolean debug = true;
 }
