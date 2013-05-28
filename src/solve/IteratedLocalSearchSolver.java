@@ -94,8 +94,8 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 			
 			//TODO: some randomness, skip exams or hjvo
 			//try to move each exam
-			doMoves(solutions, currentSolution, currentMoves, EMoveType.SWAP);
 			doMoves(solutions, currentSolution, currentMoves, EMoveType.SINGLE_MOVE);
+			doMoves(solutions, currentSolution, currentMoves, EMoveType.SWAP);
 			
 			/*
 			try {
@@ -123,24 +123,24 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 					}
 				}
 				
-				previousSolution = solutions.get(0); //TODO:lol bug
+				previousSolution = solutions.get(0);
 				System.out.println("----Found the least costly Solution - moving to next iteration");
 			}
 		}
 		System.out.println("--Exiting main loop");
 		
-		Solution cheapestSolution = solutions.get(0);//idem
+		Solution cheapestSolution = solutions.get(0);
 		
 		if (cheapestSolution.equals(originalSolution))
 			System.err.println("--Warning: result Solution is identical to original Solution");
 		System.out.println("--Original Solution cost=\t" + originalSolution.getCost());
-		System.out.println("--Final Solution cost=\t\t" + CostCalculator.calculateCost(cheapestSolution));
-		//System.out.println("--Improved cost by " + ((cheapestSolution.getCost() / originalSolution.getCost()) * 100) + "%");
-		System.out.println("--Other solutions:");
+		System.out.println("--Final Solution cost=\t\t" + cheapestSolution.getCost());
+		//TODO:print improvement rate
+		System.out.println("--List of solution costs:");
 		for (Solution solution : solutions) {
 			System.out.println(solution.getCost());
 		}
-		return previousSolution;
+		return cheapestSolution;
 	}
 
 	/**
