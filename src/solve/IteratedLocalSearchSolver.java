@@ -53,7 +53,7 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 	
 	/**
 	 * Number of random moves that will be performed if the ignoreThreshold is crossed (or set to 0).
-	 * Default is 100.
+	 * Default is 1000.
 	 */
 	protected int randomMoveThreshold = 1000;
 	private double temperature;
@@ -180,8 +180,6 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 			OurThreadInfo.moveType = EMoveType.SWAP;
 			//fred.start();//TODO:thread stuff
 			
-			//TODO: some randomness, skip exams or hjvo
-			//for instance: if lotsa ignoring, do random moves?
 			//try to move each exam
 			boolean thresholdCrossed = false;
 			int sSize = solutions.size();
@@ -322,7 +320,6 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 	 * Loop through the exams & do the specified move type.
 	 * @param solutions
 	 * @param currentSolution
-	 * @param currentCost
 	 * @param currentMoves
 	 * @param moveType
 	 * @return True if the ignore threshold has been crossed.
@@ -455,7 +452,6 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 	 * Saves the provided move, and potentially the resulting Solution.
 	 * @param solutions List to add the Solution into.
 	 * @param newSolution
-	 * @param lowestCost
 	 * @param currentMoves List to add the move into.
 	 * @param move
 	 * @param previousSolution

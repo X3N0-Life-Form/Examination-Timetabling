@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Contains data regarding a move (single move, swap, multiple exam moves, ...)
  * @author Adrien Droguet - Sara Tari
- * @see Moving
+ * @see util.Moving
  * @see EMoveType
  */
 public class Move {
