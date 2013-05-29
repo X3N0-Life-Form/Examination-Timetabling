@@ -60,7 +60,7 @@ public class Move {
 	 * Builder dedicated to moves involving multiple exams, but a single point of origin
 	 * and a single destination (such as a swap move). 
 	 * @param type
-	 * @param examIds
+	 * @param examIds examIds[0] = origin id; examIds[1] = target id
 	 * @param origin
 	 * @param target
 	 */

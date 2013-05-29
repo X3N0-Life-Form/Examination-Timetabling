@@ -587,6 +587,14 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 		return -1;
 	}
 	
+	/**
+	 * Looks for a random valid swap target that has not been applied yet.
+	 * @param examId
+	 * @param currentSolution
+	 * @param previousMoves
+	 * @return A valid exam target id.
+	 * @throws MovingException
+	 */
 	public int lookForRandomSwapTarget(Integer examId,
 			Solution currentSolution, List<Move> previousMoves) throws MovingException {
 		List<Integer> examIds = new ArrayList<Integer>();
