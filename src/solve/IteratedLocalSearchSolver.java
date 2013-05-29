@@ -57,7 +57,7 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 	 */
 	protected int randomMoveThreshold = 1000;
 	private double temperature;
-	protected static double defaultTemperature = 42;
+	protected static double defaultTemperature = 1;
 	private Move lastRandomMove;
 
 	public IteratedLocalSearchSolver(Solution originalSolution) {
@@ -213,7 +213,8 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 						System.out.println("------Ignoring move");
 					}
 					temperature *= 0.99;
-					System.out.println("------Current temperature = " + temperature);
+					System.out.println("------Current temperature = " + temperature
+							+ "(move " + i + "/" + randomMoveThreshold + ")");
 				}
 			}
 			
@@ -248,9 +249,9 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 		System.out.println("--Original Solution cost=\t" + originalSolution.getCost());
 		System.out.println("--Final Solution cost=\t\t" + cheapestSolution.getCost());
 		//TODO:print improvement rate
-		System.out.println("--List of solution costs: (" + solutions.size() + " solutions)");
+		System.out.println("--List of solution costs: (" + solutions.size() + " solutions)\n");
 		for (Solution solution : solutions) {
-			System.out.println(solution.getCost());
+			System.out.print(solution.getCost() + "\t");
 		}
 		return cheapestSolution;
 	}
