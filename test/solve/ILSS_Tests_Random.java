@@ -19,12 +19,14 @@ public class ILSS_Tests_Random {
 	private Solution s;
 	private IteratedLocalSearchSolver solver;
 	private List<Move> moves;
+	private HardConstraintsValidator HCV;
 
 	@Before
 	public void setUp() throws Exception {
 		s = Serialization.loadSolution(Serialization.set4SerializedName);
 		solver = new IteratedLocalSearchSolver(s);
 		moves = new ArrayList<Move>();
+		HCV = new HardConstraintsValidator();
 	}
 	
 	/**
@@ -58,5 +60,24 @@ public class ILSS_Tests_Random {
 		assertTrue(solver.isMoveValid(m, s));
 	}
 	
+	/**
+	 * Good if: a new Solution has been produced, it's different from the previous ones,
+	 * the move has been saved & the resulting Solution is valid.
+	 * @throws SolvingException
+	 */
+	@Test
+	public void testDoRandomMove() throws SolvingException {
+		List<Solution> solutions = new ArrayList<Solution>();//TODO: add some other solutions
+		Solution res = solver.doRandomMove(solutions, s, moves);
+		assertNotNull(res);
+		assertFalse(res.equals(s));
+		assertTrue(moves.size() > 0);
+		assertTrue(solver.getAppliedMoves().size() > 0);
+		Feedback f = new Feedback();
+		boolean isValid = HCV.isSolutionValid(res, f);
+		if (!isValid)
+			System.out.println(f);
+		assertTrue(isValid);
+	}
 	
 }

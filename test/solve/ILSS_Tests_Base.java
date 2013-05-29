@@ -421,6 +421,7 @@ public class ILSS_Tests_Base {
 	
 	/**
 	 * Play with stop conditions - stopTime
+	 * Ignoring for now - takes a while to loop anyway
 	 * @throws SolvingException Idem.
 	 */
 	@Test @Ignore
@@ -430,8 +431,4 @@ public class ILSS_Tests_Base {
 		//assert ends after twenty seconds
 	}
 	
-	@Test @Ignore
-	public void testSolve() {
-		
-	}
 }

@@ -60,6 +60,14 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 		this.originalSolution = originalSolution;
 	}
 
+	public Map<Move, Solution> getAppliedMoves() {
+		return appliedMoves;
+	}
+
+	public void setAppliedMoves(Map<Move, Solution> appliedMoves) {
+		this.appliedMoves = appliedMoves;
+	}
+
 	static class OurThreadInfo {
 		static List<Solution> solutions;
 		static Solution currentSolution;
@@ -369,6 +377,8 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 				System.out.println("------Solution is invalid - ignoring");
 				System.err.println("------" + feedback);
 			}
+		} else if (forceSave) {
+			System.out.println("------Force save enabled - saving");
 		} else {
 			System.out.println("------Cost superior to previous Solution - ignoring");
 		}
@@ -632,7 +642,6 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 		}
 		
 		return -1;
-		
 	}
 	
 
