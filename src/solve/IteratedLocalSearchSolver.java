@@ -44,12 +44,65 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 	 * Contains applied Moves & the Solution they've been applied to.
 	 */
 	private Map<Move, Solution> appliedMoves;
+	
+	/**
+	 * Number of time you can ignore a move before forcing a random move.
+	 * If set to 0, makes only random moves.
+	 */
+	protected int ignoreThreshold = 40;
+	
+	/**
+	 * Number of random moves that will be performed if the ignoreThreshold is crossed (or set to 0).
+	 * Default is 100.
+	 */
+	protected int randomMoveThreshold = 1000;
+	private double temperature;
+	protected static double defaultTemperature = 42;
+	private Move lastRandomMove;
 
 	public IteratedLocalSearchSolver(Solution originalSolution) {
 		super();
 		this.originalSolution = originalSolution;
 		HCV = new HardConstraintsValidator();
 		appliedMoves = new HashMap<Move, Solution>();
+		temperature = defaultTemperature;
+		lastRandomMove = null;
+	}
+
+	public int getRandomThreshold() {
+		return randomMoveThreshold;
+	}
+
+	public void setRandomThreshold(int randomThreshold) {
+		this.randomMoveThreshold = randomThreshold;
+	}
+
+	public double getTemperature() {
+		return temperature;
+	}
+
+	public void setTemperature(double temperature) {
+		this.temperature = temperature;
+	}
+
+	public static double getDefaultTemperature() {
+		return defaultTemperature;
+	}
+
+	public static void setDefaultTemperature(double defaultTemperature) {
+		IteratedLocalSearchSolver.defaultTemperature = defaultTemperature;
+	}
+
+	public int getIgnoreThreshold() {
+		return ignoreThreshold;
+	}
+
+	/**
+	 * If set to 0, makes only random moves.
+	 * @param ignoreThreshold Number of ignore before starting to make random moves.
+	 */
+	public void setIgnoreThreshold(int ignoreThreshold) {
+		this.ignoreThreshold = ignoreThreshold;
 	}
 
 	public Solution getOriginalSolution() {
@@ -128,10 +181,18 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 			//fred.start();//TODO:thread stuff
 			
 			//TODO: some randomness, skip exams or hjvo
+			//for instance: if lotsa ignoring, do random moves?
 			//try to move each exam
+			boolean thresholdCrossed = false;
 			int sSize = solutions.size();
-			doMoves(solutions, currentSolution, currentMoves, EMoveType.SINGLE_MOVE);
-			doMoves(solutions, currentSolution, currentMoves, EMoveType.SWAP);
+			if (ignoreThreshold > 0) {
+				thresholdCrossed = 
+						doMoves(solutions, currentSolution, currentMoves, EMoveType.SINGLE_MOVE);
+				if (!thresholdCrossed)
+					thresholdCrossed = doMoves(solutions, currentSolution, currentMoves, EMoveType.SWAP);
+			} else {
+				thresholdCrossed = true;
+			}
 			
 			/*
 			try {
@@ -140,11 +201,26 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 				throw new SolvingException("Thread interrupted: " + e.getMessage());
 			}*/
 			
-			System.out.println("----Finished looping through the exam list - analyzing");
+			if (thresholdCrossed) {
+				System.out.println("----Crossed the ignore threshold - doing random moves");
+				for (int i = 0; i < randomMoveThreshold; i++) {
+					Solution randomSolution = doRandomMove(solutions, currentSolution, currentMoves, false);
+					int delta = randomSolution.getCost() - currentSolution.getCost();
+					if (saveOrNot(delta)) {
+						System.out.println("------Saving move");
+						saveMoveAndSolution(solutions, randomSolution, currentMoves, lastRandomMove, previousSolution, true);
+					} else {
+						System.out.println("------Ignoring move");
+					}
+					temperature *= 0.99;
+					System.out.println("------Current temperature = " + temperature);
+				}
+			}
 			
+			System.out.println("----Finished looping through the exam list - analyzing");
 			if (sSize == solutions.size()) {
 				System.out.println("----No valid Solution was added - making a random move");
-				previousSolution = doRandomMove(solutions, currentSolution, currentMoves);
+				previousSolution = doRandomMove(solutions, currentSolution, currentMoves, true);
 				//TODO: failsafe if no other move can be done
 			} else {
 				System.out.println("----Sorting the Solutions");
@@ -172,7 +248,7 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 		System.out.println("--Original Solution cost=\t" + originalSolution.getCost());
 		System.out.println("--Final Solution cost=\t\t" + cheapestSolution.getCost());
 		//TODO:print improvement rate
-		System.out.println("--List of solution costs:");
+		System.out.println("--List of solution costs: (" + solutions.size() + " solutions)");
 		for (Solution solution : solutions) {
 			System.out.println(solution.getCost());
 		}
@@ -180,15 +256,36 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 	}
 
 	/**
+	 * Ponders whether to save this move according to the current temperature.
+	 * @param delta nuCost - originalCost
+	 * @return True if thy Move should be saved.
+	 */
+	public boolean saveOrNot(int delta) {
+		if (delta < 0) {
+			return true;
+		} else if (temperature == 0) {
+			return false;
+		} else {
+			double probability = Math.exp(-delta / temperature);
+			if (Math.random() <= probability) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
+
+	/**
 	 * Does a random move operation.
 	 * @param solutions
 	 * @param currentSolution
 	 * @param currentMoves
+	 * @param forceSave Always saves the Solution if true. Otherwise it's up to the user.
 	 * @return A new Solution, or null.
 	 * @throws SolvingException
 	 */
 	public Solution doRandomMove(List<Solution> solutions,
-			Solution currentSolution, List<Move> currentMoves) throws SolvingException {
+			Solution currentSolution, List<Move> currentMoves, boolean forceSave) throws SolvingException {
 		Move move;
 		for (int i = 0; i < currentSolution.getExamSession().getExams().size(); i++) {
 			Random rand = new Random();
@@ -211,7 +308,10 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 			}
 			
 			//force save the move
-			saveMoveAndSolution(solutions, currentCopy, currentMoves, move, currentSolution, true);
+			if (forceSave) {
+				saveMoveAndSolution(solutions, currentCopy, currentMoves, move, currentSolution, true);
+			}
+			lastRandomMove = move;
 			return currentCopy;
 		}
 		return null;
@@ -224,12 +324,14 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 	 * @param currentCost
 	 * @param currentMoves
 	 * @param moveType
+	 * @return True if the ignore threshold has been crossed.
 	 * @throws SolvingException
 	 */
-	public void doMoves(List<Solution> solutions,
+	public boolean doMoves(List<Solution> solutions,
 			Solution currentSolution, List<Move> currentMoves,
 			EMoveType moveType) throws SolvingException {
 		Move move;
+		int ignoreCount = 0;
 		for (Integer examId : currentSolution.getExamSession().getExams().navigableKeySet()) {
 			System.out.println("----Processing exam " + examId
 					+ " (loop " + (mainLoopCounter + 1) + "/" + stopCounter + " - " + moveType + ")");
@@ -258,8 +360,15 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 				continue;
 			}
 			
-			saveMoveAndSolution(solutions, currentCopy, currentMoves, move, currentSolution, false);
+			boolean saved = saveMoveAndSolution(solutions, currentCopy, currentMoves, move, currentSolution, false);
+			if (!saved) {
+				ignoreCount++;
+			}
+			if (ignoreCount >= ignoreThreshold) {
+				return true;
+			}
 		}
+		return false;
 	}
 
 	/**

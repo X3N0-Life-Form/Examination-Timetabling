@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import struct.EMoveType;
@@ -68,7 +69,7 @@ public class ILSS_Tests_Random {
 	@Test
 	public void testDoRandomMove() throws SolvingException {
 		List<Solution> solutions = new ArrayList<Solution>();//TODO: add some other solutions
-		Solution res = solver.doRandomMove(solutions, s, moves);
+		Solution res = solver.doRandomMove(solutions, s, moves, true);
 		assertNotNull(res);
 		assertFalse(res.equals(s));
 		assertTrue(moves.size() > 0);
@@ -80,4 +81,26 @@ public class ILSS_Tests_Random {
 		assertTrue(isValid);
 	}
 	
+	/**
+	 * Set ignoreThreshold to 0; enjoy making random moves.
+	 * Good to go if it doesn't crash.
+	 * @throws SolvingException
+	 */
+	@Test
+	public void testSolve_randomOnly() throws SolvingException {
+		solver.setStopConditions(1, -1);
+		solver.setIgnoreThreshold(0);
+		solver.solve();
+	}
+	
+	/**
+	 * Big test that takes a lot of time, hopefully forcing the use of random moves.
+	 * Good to go if it doesn't crash.
+	 * @throws SolvingException
+	 */
+	@Test @Ignore
+	public void testSolve_bigassTest() throws SolvingException {
+		solver.setStopConditions(20, -1);
+		solver.solve();
+	}
 }
