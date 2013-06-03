@@ -101,7 +101,7 @@ public class ILSS_Tests_Random {
 	 * @throws IOException 
 	 * @throws FileNotFoundException 
 	 */
-	@Test
+	//@Test
 	public void testSolve_bigassTest() throws SolvingException, FileNotFoundException, IOException {
 		solver.setStopConditions(20, -1);
 		solver.setIgnoreThreshold(1000);
@@ -109,11 +109,11 @@ public class ILSS_Tests_Random {
 		Serialization.saveSolution(s, Serialization.SET4_GOOD_PATH);
 	}
 	
-	//@Test
+	@Test
 	public void testSolve_bigass_set1() throws SolvingException, FileNotFoundException, IOException, ClassNotFoundException {
-		Solution s1 = Serialization.loadSolution(Serialization.set1SerializedName);
+		Solution s1 = Serialization.loadSolution(Serialization.SET1_GOOD_PATH);
 		solver = new IteratedLocalSearchSolver(s1);
-		solver.setStopConditions(20, -1);
+		solver.setStopConditions(8, -1);
 		solver.setIgnoreThreshold(1000);
 		Solution s = solver.solve();
 		Serialization.saveSolution(s, Serialization.SET1_GOOD_PATH);
@@ -123,7 +123,7 @@ public class ILSS_Tests_Random {
 	public void testSolve_bigass_set2() throws SolvingException, FileNotFoundException, IOException, ClassNotFoundException {
 		Solution s1 = Serialization.loadSolution(Serialization.set2SerializedName);
 		solver = new IteratedLocalSearchSolver(s1);
-		solver.setStopConditions(80, -1);
+		solver.setStopConditions(5, -1);
 		solver.setIgnoreThreshold(1000);
 		Solution s = solver.solve();
 		Serialization.saveSolution(s, Serialization.SET2_GOOD_PATH);
@@ -133,7 +133,7 @@ public class ILSS_Tests_Random {
 	public void testSolve_bigass_set3() throws SolvingException, FileNotFoundException, IOException, ClassNotFoundException {
 		Solution s1 = Serialization.loadSolution(Serialization.set3SerializedName);
 		solver = new IteratedLocalSearchSolver(s1);
-		solver.setStopConditions(80, -1);
+		solver.setStopConditions(2, -1);
 		solver.setIgnoreThreshold(1000);
 		Solution s = solver.solve();
 		Serialization.saveSolution(s, Serialization.SET3_GOOD_PATH);

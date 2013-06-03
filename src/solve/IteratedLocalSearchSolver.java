@@ -49,7 +49,7 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 	 * Number of time you can ignore a move before forcing a random move.
 	 * If set to 0, makes only random moves.
 	 */
-	protected int ignoreThreshold = 40;
+	protected int ignoreThreshold = 400;
 	
 	/**
 	 * Number of random moves that will be performed if the ignoreThreshold is crossed (or set to 0).
@@ -240,9 +240,10 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 			System.err.println("--Warning: result Solution is identical to original Solution");
 		System.out.println("--Original Solution cost=\t" + originalSolution.getCost());
 		System.out.println("--Final Solution cost=\t\t" + cheapestSolution.getCost());
-		double rate = cheapestSolution.getCost() / originalSolution.getCost();
-		rate *= 100;
-		System.out.println("--Improved by " + rate + "%");
+		double rate = (double) cheapestSolution.getCost() / (double) originalSolution.getCost();
+		rate *= 100.0;
+		rate = 100.0 - rate;
+		System.out.println("--Reduced cost by " + rate + "%");
 		System.out.println("--List of solution costs: (" + solutions.size() + " solutions)\n");
 		for (Solution solution : solutions) {
 			System.out.print(solution.getCost() + "\t");
@@ -261,12 +262,20 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 		for (Solution cs : solutions) {
 			Feedback f = new Feedback();
 			if (!HCV.isSolutionValid(cs, f)) {
-				System.err.println(f);
+				System.err.println(f);//TODO:return a list of valid solutions?
 				throw new SolvingException("Found an invalid Solution.");
 			}
 		}
 	}
 
+	/**
+	 * Makes random moves & save them using a simulated annealing algorithm
+	 * @param previousSolution
+	 * @param solutions
+	 * @param currentSolution
+	 * @param currentMoves
+	 * @throws SolvingException
+	 */
 	public void simulatedAnnealing(Solution previousSolution,
 			List<Solution> solutions, Solution currentSolution,
 			List<Move> currentMoves) throws SolvingException {
