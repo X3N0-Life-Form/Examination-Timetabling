@@ -57,4 +57,9 @@ public class Serialization {
 	public static final String set1SerializedName = "res/solutions/exam_comp_set1.object";
 	public static final String set2SerializedName = "res/solutions/exam_comp_set2.object";
 	public static final String set3SerializedName = "res/solutions/exam_comp_set3.object";
+	
+	public static final String SET4_GOOD_PATH = "res/solutions/set4-good.solution";
+	public static final String SET1_GOOD_PATH = "res/solutions/set1-good.solution";
+	public static final String SET2_GOOD_PATH = "res/solutions/set2-good.solution";
+	public static final String SET3_GOOD_PATH = "res/solutions/set3-good.solution";
 }

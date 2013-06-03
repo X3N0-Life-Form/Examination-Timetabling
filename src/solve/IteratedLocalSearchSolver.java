@@ -53,9 +53,9 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 	
 	/**
 	 * Number of random moves that will be performed if the ignoreThreshold is crossed (or set to 0).
-	 * Default is 1000.
+	 * Default is 500.
 	 */
-	protected int randomMoveThreshold = 1000;
+	protected int randomMoveThreshold = 500;
 	private double temperature;
 	protected static double defaultTemperature = 1;
 	private Move lastRandomMove;
@@ -179,13 +179,13 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 			OurThreadInfo.currentMoves = currentMoves;
 			OurThreadInfo.moveType = EMoveType.SWAP;
 			//fred.start();//TODO:thread stuff
+			//TODO:flush the list, keep local optimum
 			
 			//try to move each exam
 			boolean thresholdCrossed = false;
 			int sSize = solutions.size();
 			if (ignoreThreshold > 0) {
-				thresholdCrossed = 
-						doMoves(solutions, currentSolution, currentMoves, EMoveType.SINGLE_MOVE);
+				thresholdCrossed = doMoves(solutions, currentSolution, currentMoves, EMoveType.SINGLE_MOVE);
 				if (!thresholdCrossed)
 					thresholdCrossed = doMoves(solutions, currentSolution, currentMoves, EMoveType.SWAP);
 			} else {
@@ -201,37 +201,30 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 			
 			if (thresholdCrossed) {
 				System.out.println("----Crossed the ignore threshold - doing random moves");
-				for (int i = 0; i < randomMoveThreshold; i++) {
-					Solution randomSolution = doRandomMove(solutions, currentSolution, currentMoves, false);
-					int delta = randomSolution.getCost() - currentSolution.getCost();
-					if (saveOrNot(delta)) {
-						System.out.println("------Saving move");
-						saveMoveAndSolution(solutions, randomSolution, currentMoves, lastRandomMove, previousSolution, true);
-					} else {
-						System.out.println("------Ignoring move");
-					}
-					temperature *= 0.99;
-					System.out.println("------Current temperature = " + temperature
-							+ "(move " + i + "/" + randomMoveThreshold + ")");
-				}
+				simulatedAnnealing(previousSolution, solutions,
+						currentSolution, currentMoves);
 			}
-			
+			//TODO:new stop condition: stop after added a certain number of solutions has been added
 			System.out.println("----Finished looping through the exam list - analyzing");
 			if (sSize == solutions.size()) {
-				System.out.println("----No valid Solution was added - making a random move");
-				previousSolution = doRandomMove(solutions, currentSolution, currentMoves, true);
-				//TODO: failsafe if no other move can be done
+				System.out.println("----No valid Solution was added - making random moves");
+				simulatedAnnealing(previousSolution, solutions,	currentSolution, currentMoves);
+				Collections.sort(solutions);
+				
+				for (int i = 0; i < solutions.size(); i++) {
+					//don't pick the previous solution again
+					if (!solutions.get(i).equals(previousSolution)) {
+						previousSolution = solutions.get(i);
+						break;
+					}
+				}
+				
 			} else {
 				System.out.println("----Sorting the Solutions");
 				Collections.sort(solutions);
 				
-				System.out.println("----Verifying the validity of each Solution");
-				for (Solution cs : solutions) {
-					Feedback f = new Feedback();
-					if (!HCV.isSolutionValid(cs, f)) {
-						System.err.println(f);
-						throw new SolvingException("Found an invalid Solution.");
-					}
+				if (Debugging.debug == true) {
+					verifySolutions(solutions);
 				}
 				
 				previousSolution = solutions.get(0);
@@ -239,6 +232,7 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 			}
 		}
 		System.out.println("--Exiting main loop");
+		verifySolutions(solutions);
 		
 		Solution cheapestSolution = solutions.get(0);
 		
@@ -246,12 +240,49 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 			System.err.println("--Warning: result Solution is identical to original Solution");
 		System.out.println("--Original Solution cost=\t" + originalSolution.getCost());
 		System.out.println("--Final Solution cost=\t\t" + cheapestSolution.getCost());
-		//TODO:print improvement rate
+		double rate = cheapestSolution.getCost() / originalSolution.getCost();
+		rate *= 100;
+		System.out.println("--Improved by " + rate + "%");
 		System.out.println("--List of solution costs: (" + solutions.size() + " solutions)\n");
 		for (Solution solution : solutions) {
 			System.out.print(solution.getCost() + "\t");
 		}
 		return cheapestSolution;
+	}
+
+	/**
+	 * Verifies the validity of each solutions in the specified list.
+	 * @param solutions
+	 * @throws SolvingException If a solution is invalid.
+	 */
+	public void verifySolutions(List<Solution> solutions)
+			throws SolvingException {
+		System.out.println("----Verifying the validity of each Solution");
+		for (Solution cs : solutions) {
+			Feedback f = new Feedback();
+			if (!HCV.isSolutionValid(cs, f)) {
+				System.err.println(f);
+				throw new SolvingException("Found an invalid Solution.");
+			}
+		}
+	}
+
+	public void simulatedAnnealing(Solution previousSolution,
+			List<Solution> solutions, Solution currentSolution,
+			List<Move> currentMoves) throws SolvingException {
+		for (int i = 0; i < randomMoveThreshold; i++) {
+			Solution randomSolution = doRandomMove(solutions, currentSolution, currentMoves, false);
+			int delta = randomSolution.getCost() - currentSolution.getCost();
+			if (saveOrNot(delta)) {
+				System.out.println("------Saving move");
+				saveMoveAndSolution(solutions, randomSolution, currentMoves, lastRandomMove, previousSolution, true);
+			} else {
+				System.out.println("------Ignoring move");
+			}
+			temperature *= 0.99;
+			System.out.println("------Current temperature = " + temperature
+					+ "(move " + i + "/" + randomMoveThreshold + ")");
+		}
 	}
 
 	/**

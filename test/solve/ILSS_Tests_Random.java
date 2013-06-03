@@ -2,11 +2,12 @@ package solve;
 
 import static org.junit.Assert.*;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import struct.EMoveType;
@@ -86,7 +87,7 @@ public class ILSS_Tests_Random {
 	 * Good to go if it doesn't crash.
 	 * @throws SolvingException
 	 */
-	@Test
+	//@Test
 	public void testSolve_randomOnly() throws SolvingException {
 		solver.setStopConditions(1, -1);
 		solver.setIgnoreThreshold(0);
@@ -97,10 +98,44 @@ public class ILSS_Tests_Random {
 	 * Big test that takes a lot of time, hopefully forcing the use of random moves.
 	 * Good to go if it doesn't crash.
 	 * @throws SolvingException
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
 	 */
-	@Test @Ignore
-	public void testSolve_bigassTest() throws SolvingException {
+	@Test
+	public void testSolve_bigassTest() throws SolvingException, FileNotFoundException, IOException {
 		solver.setStopConditions(20, -1);
-		solver.solve();
+		solver.setIgnoreThreshold(1000);
+		Solution s = solver.solve();
+		Serialization.saveSolution(s, Serialization.SET4_GOOD_PATH);
+	}
+	
+	//@Test
+	public void testSolve_bigass_set1() throws SolvingException, FileNotFoundException, IOException, ClassNotFoundException {
+		Solution s1 = Serialization.loadSolution(Serialization.set1SerializedName);
+		solver = new IteratedLocalSearchSolver(s1);
+		solver.setStopConditions(20, -1);
+		solver.setIgnoreThreshold(1000);
+		Solution s = solver.solve();
+		Serialization.saveSolution(s, Serialization.SET1_GOOD_PATH);
+	}
+	
+	//@Test
+	public void testSolve_bigass_set2() throws SolvingException, FileNotFoundException, IOException, ClassNotFoundException {
+		Solution s1 = Serialization.loadSolution(Serialization.set2SerializedName);
+		solver = new IteratedLocalSearchSolver(s1);
+		solver.setStopConditions(80, -1);
+		solver.setIgnoreThreshold(1000);
+		Solution s = solver.solve();
+		Serialization.saveSolution(s, Serialization.SET2_GOOD_PATH);
+	}
+	
+	//@Test
+	public void testSolve_bigass_set3() throws SolvingException, FileNotFoundException, IOException, ClassNotFoundException {
+		Solution s1 = Serialization.loadSolution(Serialization.set3SerializedName);
+		solver = new IteratedLocalSearchSolver(s1);
+		solver.setStopConditions(80, -1);
+		solver.setIgnoreThreshold(1000);
+		Solution s = solver.solve();
+		Serialization.saveSolution(s, Serialization.SET3_GOOD_PATH);
 	}
 }
