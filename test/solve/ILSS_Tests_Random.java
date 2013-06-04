@@ -100,30 +100,33 @@ public class ILSS_Tests_Random {
 	 * @throws SolvingException
 	 * @throws IOException 
 	 * @throws FileNotFoundException 
+	 * @throws ClassNotFoundException 
 	 */
 	//@Test
-	public void testSolve_bigassTest() throws SolvingException, FileNotFoundException, IOException {
+	public void testSolve_bigassTest() throws SolvingException, FileNotFoundException, IOException, ClassNotFoundException {
+		Solution s1 = Serialization.loadSolution(Serialization.SET4_GOOD_PATH);
+		solver = new IteratedLocalSearchSolver(s1);
 		solver.setStopConditions(20, -1);
 		solver.setIgnoreThreshold(1000);
 		Solution s = solver.solve();
 		Serialization.saveSolution(s, Serialization.SET4_GOOD_PATH);
 	}
 	
-	@Test
+	//@Test
 	public void testSolve_bigass_set1() throws SolvingException, FileNotFoundException, IOException, ClassNotFoundException {
 		Solution s1 = Serialization.loadSolution(Serialization.SET1_GOOD_PATH);
 		solver = new IteratedLocalSearchSolver(s1);
-		solver.setStopConditions(8, -1);
+		solver.setStopConditions(20, -1);
 		solver.setIgnoreThreshold(1000);
 		Solution s = solver.solve();
 		Serialization.saveSolution(s, Serialization.SET1_GOOD_PATH);
 	}
 	
-	//@Test
+	@Test
 	public void testSolve_bigass_set2() throws SolvingException, FileNotFoundException, IOException, ClassNotFoundException {
-		Solution s1 = Serialization.loadSolution(Serialization.set2SerializedName);
+		Solution s1 = Serialization.loadSolution(Serialization.SET2_GOOD_PATH);
 		solver = new IteratedLocalSearchSolver(s1);
-		solver.setStopConditions(5, -1);
+		solver.setStopConditions(3, -1);
 		solver.setIgnoreThreshold(1000);
 		Solution s = solver.solve();
 		Serialization.saveSolution(s, Serialization.SET2_GOOD_PATH);
@@ -131,7 +134,7 @@ public class ILSS_Tests_Random {
 	
 	//@Test
 	public void testSolve_bigass_set3() throws SolvingException, FileNotFoundException, IOException, ClassNotFoundException {
-		Solution s1 = Serialization.loadSolution(Serialization.set3SerializedName);
+		Solution s1 = Serialization.loadSolution(Serialization.SET3_GOOD_PATH);
 		solver = new IteratedLocalSearchSolver(s1);
 		solver.setStopConditions(2, -1);
 		solver.setIgnoreThreshold(1000);

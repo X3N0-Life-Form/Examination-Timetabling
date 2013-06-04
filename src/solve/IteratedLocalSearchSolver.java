@@ -269,7 +269,7 @@ public class IteratedLocalSearchSolver extends SoftConstraintSolver implements R
 	}
 
 	/**
-	 * Makes random moves & save them using a simulated annealing algorithm
+	 * Makes random moves & save them using a simulated annealing algorithm.
 	 * @param previousSolution
 	 * @param solutions
 	 * @param currentSolution
